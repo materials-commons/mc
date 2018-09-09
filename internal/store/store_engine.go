@@ -1,6 +1,7 @@
 package store
 
 type UserStoreEngine interface {
-	GetUserByID(id string) (UserModel, error)
-	GetUserByAPIKey(apikey string) (UserModel, error)
+	AddUser(user UserSchema) (UserSchema, error)
+	GetUserByID(id string) (UserSchema, error)
+	GetUserByAPIKey(apikey string) (UserSchema, error)
 }

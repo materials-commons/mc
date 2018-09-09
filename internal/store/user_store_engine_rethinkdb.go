@@ -9,8 +9,8 @@ type UserStoreEngineRethinkdb struct {
 	s *r.Session
 }
 
-func (e *UserStoreEngineRethinkdb) GetUserByID(id string) (UserModel, error) {
-	var user UserModel
+func (e *UserStoreEngineRethinkdb) GetUserByID(id string) (UserSchema, error) {
+	var user UserSchema
 	res, err := r.Table("users").Get(id).Run(e.s)
 	switch {
 	case err != nil:
@@ -23,8 +23,8 @@ func (e *UserStoreEngineRethinkdb) GetUserByID(id string) (UserModel, error) {
 	}
 }
 
-func (e *UserStoreEngineRethinkdb) GetUserByAPIKey(apikey string) (UserModel, error) {
-	var user UserModel
+func (e *UserStoreEngineRethinkdb) GetUserByAPIKey(apikey string) (UserSchema, error) {
+	var user UserSchema
 	res, err := r.Table("users").GetAllByIndex("apikey", apikey).Run(e.s)
 	switch {
 	case err != nil:
