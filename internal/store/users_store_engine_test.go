@@ -1,21 +1,22 @@
-package store
+package store_test
 
 import (
 	"testing"
 	"time"
 
+	"github.com/materials-commons/mc/internal/store"
 	"github.com/materials-commons/mc/pkg/tutils/assert"
 )
 
 func TestAddUser(t *testing.T) {
-	e := NewUsersStoreEngineMemory()
+	e := store.NewUsersStoreEngineMemory()
 	tests := []struct {
-		user       UserSchema
+		user       store.UserSchema
 		shouldFail bool
 		name       string
 	}{
-		{user: UserSchema{ID: "gtarcea@umich.edu"}, shouldFail: false, name: "New user"},
-		{user: UserSchema{ID: "gtarcea@umich.edu"}, shouldFail: true, name: "Existing user"},
+		{user: store.UserSchema{ID: "gtarcea@umich.edu"}, shouldFail: false, name: "New user"},
+		{user: store.UserSchema{ID: "gtarcea@umich.edu"}, shouldFail: true, name: "Existing user"},
 	}
 
 	for _, test := range tests {
@@ -40,7 +41,7 @@ func TestGetUserByID(t *testing.T) {
 		{id: "nosuchuser@doesnot.exist", shouldFail: true, name: "Fail to find a non-existing user"},
 	}
 
-	e := NewUsersStoreEngineMemory()
+	e := store.NewUsersStoreEngineMemory()
 	addDefaultUsers(t, e)
 
 	for _, test := range tests {
@@ -67,7 +68,7 @@ func TestGetUserByAPIKey(t *testing.T) {
 		{id: "nosuchuser@doesnot.exist", apikey: "no such key", shouldFail: true, name: "Lookup apikey that doesn't exist"},
 	}
 
-	e := NewUsersStoreEngineMemory()
+	e := store.NewUsersStoreEngineMemory()
 	addDefaultUsers(t, e)
 
 	for _, test := range tests {
@@ -96,7 +97,7 @@ func TestModifyUserFullname(t *testing.T) {
 		{id: "doesnot@exist.com", newFullname: "nosuch-changed", shouldFail: true, name: "Set fullname for non-existing user"},
 	}
 
-	e := NewUsersStoreEngineMemory()
+	e := store.NewUsersStoreEngineMemory()
 	addDefaultUsers(t, e)
 
 	for _, test := range tests {
@@ -123,7 +124,7 @@ func TestModifyUserPassword(t *testing.T) {
 		{id: "doesnot@exist.com", newPassword: "nosuch-changed", shouldFail: true, name: "Set fullname for non-existing user"},
 	}
 
-	e := NewUsersStoreEngineMemory()
+	e := store.NewUsersStoreEngineMemory()
 	addDefaultUsers(t, e)
 
 	for _, test := range tests {
@@ -150,7 +151,7 @@ func TestModifyUserAPIKey(t *testing.T) {
 		{id: "doesnot@exist.com", newAPIKey: "nosuch-changed", shouldFail: true, name: "Set fullname for non-existing user"},
 	}
 
-	e := NewUsersStoreEngineMemory()
+	e := store.NewUsersStoreEngineMemory()
 	addDefaultUsers(t, e)
 
 	for _, test := range tests {
@@ -166,8 +167,8 @@ func TestModifyUserAPIKey(t *testing.T) {
 	}
 }
 
-func addDefaultUsers(t *testing.T, e UsersStoreEngine) {
-	users := []UserSchema{
+func addDefaultUsers(t *testing.T, e store.UsersStoreEngine) {
+	users := []store.UserSchema{
 		{ID: "gtarcea@umich.edu", APIKey: "gtarcea@umich.edu apikey", Fullname: "gtarcea", Password: "gtarcea-password"},
 	}
 
