@@ -5,11 +5,11 @@ import (
 	r "gopkg.in/gorethink/gorethink.v4"
 )
 
-type UserStoreEngineRethinkdb struct {
+type UsersStoreEngineRethinkdb struct {
 	s *r.Session
 }
 
-func (e *UserStoreEngineRethinkdb) GetUserByID(id string) (UserSchema, error) {
+func (e *UsersStoreEngineRethinkdb) GetUserByID(id string) (UserSchema, error) {
 	var user UserSchema
 	res, err := r.Table("users").Get(id).Run(e.s)
 	switch {
@@ -23,7 +23,7 @@ func (e *UserStoreEngineRethinkdb) GetUserByID(id string) (UserSchema, error) {
 	}
 }
 
-func (e *UserStoreEngineRethinkdb) GetUserByAPIKey(apikey string) (UserSchema, error) {
+func (e *UsersStoreEngineRethinkdb) GetUserByAPIKey(apikey string) (UserSchema, error) {
 	var user UserSchema
 	res, err := r.Table("users").GetAllByIndex("apikey", apikey).Run(e.s)
 	switch {
