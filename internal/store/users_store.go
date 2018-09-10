@@ -11,6 +11,10 @@ type UsersStore struct {
 	UsersStoreEngine
 }
 
+func NewUsersStore(e UsersStoreEngine) *UsersStore {
+	return &UsersStore{e}
+}
+
 func (s *UsersStore) AddUser(userModel AddUserModel) (user UserSchema, err error) {
 	if err := userModel.Validate(); err != nil {
 		return user, err
