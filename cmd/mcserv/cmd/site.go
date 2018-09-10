@@ -54,5 +54,5 @@ func setupAPIRoutes(e *echo.Echo) {
 	g := e.Group("/api")
 
 	uc := &api.UsersController{}
-	g.POST("/getUserAPIKey", uc.GetUserAPIKey).Name = "getUserAPIKey"
+	g.POST("/getUserAPIKey", uc.GetUserByAPIKey).Name = "getUserByAPIKey"
 }
