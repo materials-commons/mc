@@ -9,6 +9,12 @@ type UsersStoreEngineMemory struct {
 	DB map[string]UserSchema
 }
 
+func NewUsersStoreEngineMemory() *UsersStoreEngineMemory {
+	return &UsersStoreEngineMemory{
+		DB: make(map[string]UserSchema),
+	}
+}
+
 func (e *UsersStoreEngineMemory) AddUser(user UserSchema) (UserSchema, error) {
 	_, ok := e.DB[user.ID]
 	if ok {
