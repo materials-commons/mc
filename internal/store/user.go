@@ -28,9 +28,9 @@ type UserSchema struct {
 }
 
 type AddUserModel struct {
-	Email    string
-	Fullname string
-	Password string
+	Email    string `json:"email"`
+	Fullname string `json:"fullname"`
+	Password string `json:"password"`
 }
 
 func (u AddUserModel) Validate() error {
