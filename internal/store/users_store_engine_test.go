@@ -7,7 +7,7 @@ import (
 )
 
 func TestAddUser(t *testing.T) {
-	e := &UsersStoreEngineMemory{}
+	e := NewUsersStoreEngineMemory()
 	tests := []struct {
 		user       UserSchema
 		shouldFail bool
