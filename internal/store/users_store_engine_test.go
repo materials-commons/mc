@@ -8,7 +8,7 @@ import (
 	"github.com/materials-commons/mc/pkg/tutils/assert"
 )
 
-func TestStoreEngineAddUser(t *testing.T) {
+func TestUsersStoreEngine_AddUser(t *testing.T) {
 	e := store.NewUsersStoreEngineMemory()
 	tests := []struct {
 		user       store.UserSchema
@@ -31,7 +31,7 @@ func TestStoreEngineAddUser(t *testing.T) {
 	}
 }
 
-func TestStoreEngineGetUserByID(t *testing.T) {
+func TestUsersStoreEngine_GetUserByID(t *testing.T) {
 	tests := []struct {
 		id         string
 		shouldFail bool
@@ -57,7 +57,7 @@ func TestStoreEngineGetUserByID(t *testing.T) {
 	}
 }
 
-func TestStoreEngineGetUserByAPIKey(t *testing.T) {
+func TestUsersStoreEngine_GetUserByAPIKey(t *testing.T) {
 	tests := []struct {
 		id         string
 		apikey     string
@@ -86,7 +86,7 @@ func TestStoreEngineGetUserByAPIKey(t *testing.T) {
 
 }
 
-func TestStoreEngineModifyUserFullname(t *testing.T) {
+func TestUsersStoreEngine_ModifyUserFullname(t *testing.T) {
 	tests := []struct {
 		id          string
 		newFullname string
@@ -113,7 +113,7 @@ func TestStoreEngineModifyUserFullname(t *testing.T) {
 	}
 }
 
-func TestStoreEngineModifyUserPassword(t *testing.T) {
+func TestUsersStoreEngine_ModifyUserPassword(t *testing.T) {
 	tests := []struct {
 		id          string
 		newPassword string
@@ -140,7 +140,7 @@ func TestStoreEngineModifyUserPassword(t *testing.T) {
 	}
 }
 
-func TestStoreEngineModifyUserAPIKey(t *testing.T) {
+func TestUsersStoreEngine_ModifyUserAPIKey(t *testing.T) {
 	tests := []struct {
 		id         string
 		newAPIKey  string
