@@ -8,7 +8,7 @@ import (
 	"github.com/materials-commons/mc/pkg/tutils/assert"
 )
 
-func TestAddUser(t *testing.T) {
+func TestStoreEngineAddUser(t *testing.T) {
 	e := store.NewUsersStoreEngineMemory()
 	tests := []struct {
 		user       store.UserSchema
@@ -31,7 +31,7 @@ func TestAddUser(t *testing.T) {
 	}
 }
 
-func TestGetUserByID(t *testing.T) {
+func TestStoreEngineGetUserByID(t *testing.T) {
 	tests := []struct {
 		id         string
 		shouldFail bool
@@ -42,7 +42,7 @@ func TestGetUserByID(t *testing.T) {
 	}
 
 	e := store.NewUsersStoreEngineMemory()
-	addDefaultUsers(t, e)
+	addDefaultUsersToStoreEngine(t, e)
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -57,7 +57,7 @@ func TestGetUserByID(t *testing.T) {
 	}
 }
 
-func TestGetUserByAPIKey(t *testing.T) {
+func TestStoreEngineGetUserByAPIKey(t *testing.T) {
 	tests := []struct {
 		id         string
 		apikey     string
@@ -69,7 +69,7 @@ func TestGetUserByAPIKey(t *testing.T) {
 	}
 
 	e := store.NewUsersStoreEngineMemory()
-	addDefaultUsers(t, e)
+	addDefaultUsersToStoreEngine(t, e)
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -86,7 +86,7 @@ func TestGetUserByAPIKey(t *testing.T) {
 
 }
 
-func TestModifyUserFullname(t *testing.T) {
+func TestStoreEngineModifyUserFullname(t *testing.T) {
 	tests := []struct {
 		id          string
 		newFullname string
@@ -98,7 +98,7 @@ func TestModifyUserFullname(t *testing.T) {
 	}
 
 	e := store.NewUsersStoreEngineMemory()
-	addDefaultUsers(t, e)
+	addDefaultUsersToStoreEngine(t, e)
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -113,7 +113,7 @@ func TestModifyUserFullname(t *testing.T) {
 	}
 }
 
-func TestModifyUserPassword(t *testing.T) {
+func TestStoreEngineModifyUserPassword(t *testing.T) {
 	tests := []struct {
 		id          string
 		newPassword string
@@ -125,7 +125,7 @@ func TestModifyUserPassword(t *testing.T) {
 	}
 
 	e := store.NewUsersStoreEngineMemory()
-	addDefaultUsers(t, e)
+	addDefaultUsersToStoreEngine(t, e)
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -140,7 +140,7 @@ func TestModifyUserPassword(t *testing.T) {
 	}
 }
 
-func TestModifyUserAPIKey(t *testing.T) {
+func TestStoreEngineModifyUserAPIKey(t *testing.T) {
 	tests := []struct {
 		id         string
 		newAPIKey  string
@@ -152,7 +152,7 @@ func TestModifyUserAPIKey(t *testing.T) {
 	}
 
 	e := store.NewUsersStoreEngineMemory()
-	addDefaultUsers(t, e)
+	addDefaultUsersToStoreEngine(t, e)
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -167,7 +167,7 @@ func TestModifyUserAPIKey(t *testing.T) {
 	}
 }
 
-func addDefaultUsers(t *testing.T, e store.UsersStoreEngine) {
+func addDefaultUsersToStoreEngine(t *testing.T, e store.UsersStoreEngine) {
 	users := []store.UserSchema{
 		{ID: "gtarcea@umich.edu", APIKey: "gtarcea@umich.edu apikey", Fullname: "gtarcea", Password: "gtarcea-password"},
 	}
