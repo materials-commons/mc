@@ -1,0 +1,70 @@
+package store
+
+import "fmt"
+
+type UsersStoreEngineMemory struct {
+	DB map[string]UserSchema
+}
+
+func (e *UsersStoreEngineMemory) AddUser(user UserSchema) (UserSchema, error) {
+	_, ok := e.DB[user.ID]
+	if ok {
+		return UserSchema{}, fmt.Errorf("user already in exists %s", user.ID)
+	}
+
+	e.DB[user.ID] = user
+
+	return user, nil
+}
+
+func (e *UsersStoreEngineMemory) GetUserByID(id string) (UserSchema, error) {
+	user, ok := e.DB[id]
+	if !ok {
+		return UserSchema{}, ErrNotFound
+	}
+
+	return user, nil
+}
+
+func (e *UsersStoreEngineMemory) GetUserByAPIKey(apikey string) (UserSchema, error) {
+	for _, user := range e.DB {
+		if user.APIKey == apikey {
+			return user, nil
+		}
+	}
+
+	return UserSchema{}, ErrNotFound
+}
+
+func (e *UsersStoreEngineMemory) ModifyUserFullname(id, fullname string) (UserSchema, error) {
+	user, ok := e.DB[id]
+	if !ok {
+		return UserSchema{}, ErrNotFound
+	}
+
+	user.Fullname = fullname
+	e.DB[id] = user
+	return user, nil
+}
+
+func (e *UsersStoreEngineMemory) ModifyUserPassword(id, password string) (UserSchema, error) {
+	user, ok := e.DB[id]
+	if !ok {
+		return UserSchema{}, ErrNotFound
+	}
+
+	user.Password = password
+	e.DB[id] = user
+	return user, nil
+}
+
+func (e *UsersStoreEngineMemory) ModifyUserAPIKey(id, apikey string) (UserSchema, error) {
+	user, ok := e.DB[id]
+	if !ok {
+		return UserSchema{}, ErrNotFound
+	}
+
+	user.APIKey = apikey
+	e.DB[id] = user
+	return user, nil
+}
