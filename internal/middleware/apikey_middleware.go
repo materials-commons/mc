@@ -68,5 +68,5 @@ func getAPIKey(key string, c echo.Context) (string, error) {
 		return value, nil
 	}
 
-	return "", fmt.Errorf("no apikey '%s' as query param or header")
+	return "", fmt.Errorf("no apikey '%s' as query param or header", key)
 }
