@@ -1,6 +1,9 @@
 package store
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 type UsersStoreEngineMemory struct {
 	DB map[string]UserSchema
@@ -9,7 +12,7 @@ type UsersStoreEngineMemory struct {
 func (e *UsersStoreEngineMemory) AddUser(user UserSchema) (UserSchema, error) {
 	_, ok := e.DB[user.ID]
 	if ok {
-		return UserSchema{}, fmt.Errorf("user already in exists %s", user.ID)
+		return UserSchema{}, fmt.Errorf("user already in shouldFail %s", user.ID)
 	}
 
 	e.DB[user.ID] = user
@@ -36,35 +39,38 @@ func (e *UsersStoreEngineMemory) GetUserByAPIKey(apikey string) (UserSchema, err
 	return UserSchema{}, ErrNotFound
 }
 
-func (e *UsersStoreEngineMemory) ModifyUserFullname(id, fullname string) (UserSchema, error) {
+func (e *UsersStoreEngineMemory) ModifyUserFullname(id, fullname string, updatedAt time.Time) (UserSchema, error) {
 	user, ok := e.DB[id]
 	if !ok {
 		return UserSchema{}, ErrNotFound
 	}
 
 	user.Fullname = fullname
+	user.UpdatedAt = updatedAt
 	e.DB[id] = user
 	return user, nil
 }
 
-func (e *UsersStoreEngineMemory) ModifyUserPassword(id, password string) (UserSchema, error) {
+func (e *UsersStoreEngineMemory) ModifyUserPassword(id, password string, updatedAt time.Time) (UserSchema, error) {
 	user, ok := e.DB[id]
 	if !ok {
 		return UserSchema{}, ErrNotFound
 	}
 
 	user.Password = password
+	user.UpdatedAt = updatedAt
 	e.DB[id] = user
 	return user, nil
 }
 
-func (e *UsersStoreEngineMemory) ModifyUserAPIKey(id, apikey string) (UserSchema, error) {
+func (e *UsersStoreEngineMemory) ModifyUserAPIKey(id, apikey string, updatedAt time.Time) (UserSchema, error) {
 	user, ok := e.DB[id]
 	if !ok {
 		return UserSchema{}, ErrNotFound
 	}
 
 	user.APIKey = apikey
+	user.UpdatedAt = updatedAt
 	e.DB[id] = user
 	return user, nil
 }
