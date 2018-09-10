@@ -1,6 +1,8 @@
 package store
 
 import (
+	"time"
+
 	"github.com/hashicorp/go-uuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -40,7 +42,7 @@ func (s *UsersStore) GetAndVerifyUser(id, password string) (UserSchema, error) {
 }
 
 func (s *UsersStore) ModifyUserFullname(id, fullname string) (UserSchema, error) {
-	return s.UsersStoreEngine.ModifyUserFullname(id, fullname)
+	return s.UsersStoreEngine.ModifyUserFullname(id, fullname, time.Now())
 }
 
 func (s *UsersStore) ModifyUserPassword(id, password string) (UserSchema, error) {
@@ -49,7 +51,7 @@ func (s *UsersStore) ModifyUserPassword(id, password string) (UserSchema, error)
 		return UserSchema{}, err
 	}
 
-	return s.UsersStoreEngine.ModifyUserPassword(id, passwordHash)
+	return s.UsersStoreEngine.ModifyUserPassword(id, passwordHash, time.Now())
 }
 
 func (s *UsersStore) ModifyUserAPIKey(id string) (UserSchema, error) {
@@ -58,5 +60,5 @@ func (s *UsersStore) ModifyUserAPIKey(id string) (UserSchema, error) {
 		return UserSchema{}, err
 	}
 
-	return s.UsersStoreEngine.ModifyUserAPIKey(id, apikey)
+	return s.UsersStoreEngine.ModifyUserAPIKey(id, apikey, time.Now())
 }
