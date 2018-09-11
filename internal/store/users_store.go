@@ -3,6 +3,7 @@ package store
 import (
 	"time"
 
+	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/hashicorp/go-uuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -46,10 +47,17 @@ func (s *UsersStore) GetAndVerifyUser(id, password string) (UserSchema, error) {
 }
 
 func (s *UsersStore) ModifyUserFullname(id, fullname string) (UserSchema, error) {
+	if err := validation.Validate(fullname, validation.Required, validation.Length(1, 40)); err != nil {
+		return UserSchema{}, err
+	}
 	return s.UsersStoreEngine.ModifyUserFullname(id, fullname, time.Now())
 }
 
 func (s *UsersStore) ModifyUserPassword(id, password string) (UserSchema, error) {
+	if err := validation.Validate(password, validation.Required, validation.Length(1, 100)); err != nil {
+		return UserSchema{}, err
+	}
+
 	passwordHash, err := generatePasswordHash(password)
 	if err != nil {
 		return UserSchema{}, err
