@@ -80,3 +80,7 @@ func (e *UsersStoreEngineMemory) ModifyUserAPIKey(id, apikey string, updatedAt t
 	e.DB[id] = user
 	return user, nil
 }
+
+func (e *UsersStoreEngineMemory) Name() string {
+	return "UsersStoreEngineMemory"
+}
