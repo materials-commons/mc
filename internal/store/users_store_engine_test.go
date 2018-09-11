@@ -1,6 +1,7 @@
 package store_test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -20,6 +21,7 @@ func TestUsersStoreEngine_AddUser(t *testing.T) {
 
 	engines := createUsersStoreEngines()
 	for _, e := range engines {
+		fmt.Printf("\n===== Storage Engine: %s =====\n\n", e.Name())
 		for _, test := range tests {
 			t.Run(test.name, func(t *testing.T) {
 				_, err := e.AddUser(test.user)
@@ -45,8 +47,8 @@ func TestUsersStoreEngine_GetUserByID(t *testing.T) {
 
 	engines := createUsersStoreEngines()
 	for _, e := range engines {
+		fmt.Printf("\n===== Storage Engine: %s =====\n\n", e.Name())
 		addDefaultUsersToStoreEngine(t, e)
-
 		for _, test := range tests {
 			t.Run(test.name, func(t *testing.T) {
 				user, err := e.GetUserByID(test.id)
@@ -74,6 +76,7 @@ func TestUsersStoreEngine_GetUserByAPIKey(t *testing.T) {
 
 	engines := createUsersStoreEngines()
 	for _, e := range engines {
+		fmt.Printf("\n===== Storage Engine: %s =====\n\n", e.Name())
 		addDefaultUsersToStoreEngine(t, e)
 		for _, test := range tests {
 			t.Run(test.name, func(t *testing.T) {
@@ -103,6 +106,7 @@ func TestUsersStoreEngine_ModifyUserFullname(t *testing.T) {
 
 	engines := createUsersStoreEngines()
 	for _, e := range engines {
+		fmt.Printf("\n===== Storage Engine: %s =====\n\n", e.Name())
 		addDefaultUsersToStoreEngine(t, e)
 		for _, test := range tests {
 			t.Run(test.name, func(t *testing.T) {
@@ -131,6 +135,7 @@ func TestUsersStoreEngine_ModifyUserPassword(t *testing.T) {
 
 	engines := createUsersStoreEngines()
 	for _, e := range engines {
+		fmt.Printf("\n===== Storage Engine: %s =====\n\n", e.Name())
 		addDefaultUsersToStoreEngine(t, e)
 		for _, test := range tests {
 			t.Run(test.name, func(t *testing.T) {
@@ -159,6 +164,7 @@ func TestUsersStoreEngine_ModifyUserAPIKey(t *testing.T) {
 
 	engines := createUsersStoreEngines()
 	for _, e := range engines {
+		fmt.Printf("\n===== Storage Engine: %s =====\n\n", e.Name())
 		addDefaultUsersToStoreEngine(t, e)
 		for _, test := range tests {
 			t.Run(test.name, func(t *testing.T) {
