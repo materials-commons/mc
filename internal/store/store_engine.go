@@ -11,3 +11,13 @@ type UsersStoreEngine interface {
 	ModifyUserAPIKey(id, apikey string, updatedAt time.Time) (UserSchema, error)
 	Name() string
 }
+
+type ProjectsStoreEngine interface {
+	AddProject(project ProjectSchema) (ProjectSchema, error)
+	GetProject(id string) (ProjectExtendedModel, error)
+	GetAllProjectsForUser(user string) ([]ProjectSchema, error)
+	DeleteProject(id string) error
+	UpdateProjectName(id string, name string, updatedAt time.Time) error
+	UpdateProjectDescription(id string, description string, updatedAt time.Time) error
+	Name() string
+}
