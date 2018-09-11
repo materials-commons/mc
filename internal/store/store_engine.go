@@ -9,4 +9,5 @@ type UsersStoreEngine interface {
 	ModifyUserFullname(id, fullname string, updatedAt time.Time) (UserSchema, error)
 	ModifyUserPassword(id, password string, updatedAt time.Time) (UserSchema, error)
 	ModifyUserAPIKey(id, apikey string, updatedAt time.Time) (UserSchema, error)
+	Name() string
 }
