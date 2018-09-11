@@ -129,15 +129,84 @@ func TestUsersStore_GetAndVerifyUser(t *testing.T) {
 }
 
 func TestUsersStore_ModifyUserFullname(t *testing.T) {
+	tests := []struct {
+		id         string
+		fullname   string
+		shouldFail bool
+		name       string
+	}{
+		{id: "tuser@test.com", fullname: "tuser changed", shouldFail: false, name: "Test modify existing user with a valid fullname"},
+		{id: "does-not-exist@test.com", fullname: "tuser changed", shouldFail: true, name: "Test modify user that doesn't exist"},
+		{id: "tuser@test.com", fullname: "", shouldFail: true, name: "Test modify existing user with an invalid fullname"},
+	}
+	s := newSEMemoryUsersStore()
+	addDefaultUsersToStore(t, s)
 
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			user, err := s.ModifyUserFullname(test.id, test.fullname)
+			if !test.shouldFail {
+				assert.Okf(t, err, "Failed modifying user (%#v) when it was expected to succeed, error: %s", test, err)
+				assert.Truef(t, user.Fullname == test.fullname, "Expected user password (%s) to be modified to (%s)", user.Fullname, test.fullname)
+			} else {
+				assert.Errorf(t, err, "Expected test %#v to fail", test)
+			}
+		})
+	}
 }
 
 func TestUsersStore_ModifyUserPassword(t *testing.T) {
+	tests := []struct {
+		id         string
+		password   string
+		shouldFail bool
+		name       string
+	}{
+		{id: "tuser@test.com", password: "tuser changed", shouldFail: false, name: "Test modify existing user with a valid password"},
+		{id: "does-not-exist@test.com", password: "tuser changed", shouldFail: true, name: "Test modify user that doesn't exist"},
+		{id: "tuser@test.com", password: "", shouldFail: true, name: "Test modify existing user with an invalid password"},
+	}
+	s := newSEMemoryUsersStore()
+	addDefaultUsersToStore(t, s)
 
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			user, err := s.ModifyUserPassword(test.id, test.password)
+			if !test.shouldFail {
+				assert.Okf(t, err, "Failed modifying user (%#v) when it was expected to succeed, error: %s", test, err)
+				perr := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(test.password))
+				assert.Okf(t, perr, "Hashed and password don't compare %s for user %#v", perr, test)
+			} else {
+				assert.Errorf(t, err, "Expected test %#v to fail", test)
+			}
+		})
+	}
 }
 
 func TestUsersStore_ModifyUserAPIKey(t *testing.T) {
+	tests := []struct {
+		id         string
+		oldAPIKey  string
+		shouldFail bool
+		name       string
+	}{
+		{id: "tuser@test.com", oldAPIKey: "tuser@test.com apikey", shouldFail: false, name: "Test modify existing user with a valid oldAPIKey"},
+		{id: "does-not-exist@test.com", oldAPIKey: "", shouldFail: true, name: "Test modify user that doesn't exist"},
+	}
+	s := newSEMemoryUsersStore()
+	addDefaultUsersToStore(t, s)
 
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			user, err := s.ModifyUserAPIKey(test.id)
+			if !test.shouldFail {
+				assert.Okf(t, err, "Failed modifying user (%#v) when it was expected to succeed, error: %s", test, err)
+				assert.Truef(t, user.APIKey != test.oldAPIKey, "Expected user APIKey (%s) to be modified", user.APIKey)
+			} else {
+				assert.Errorf(t, err, "Expected test %#v to fail", test)
+			}
+		})
+	}
 }
 
 func addDefaultUsersToStore(t *testing.T, s *store.UsersStore) {
