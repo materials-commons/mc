@@ -3,11 +3,13 @@ package store
 import (
 	"time"
 
+	"github.com/pkg/errors"
+
 	r "gopkg.in/gorethink/gorethink.v4"
 )
 
 type ProjectsStoreEngineRethinkdb struct {
-	s *r.Session
+	session *r.Session
 }
 
 func (e *ProjectsStoreEngineRethinkdb) AddProject(project ProjectSchema) (ProjectSchema, error) {
@@ -15,7 +17,8 @@ func (e *ProjectsStoreEngineRethinkdb) AddProject(project ProjectSchema) (Projec
 }
 
 func (e *ProjectsStoreEngineRethinkdb) GetProject(id string) (ProjectExtendedModel, error) {
-	rql := r.Table("projects").Get(id).Merge(func(p r.Term) interface{} {
+	var project ProjectExtendedModel
+	res, err := r.Table("projects").Get(id).Merge(func(p r.Term) interface{} {
 		return map[string]interface{}{
 			"samples": r.Table("project2sample").GetAllByIndex("project_id", p.Field("id")).
 				EqJoin("sample_id", r.Table("samples")).Zip().CoerceTo("array"),
@@ -32,15 +35,17 @@ func (e *ProjectsStoreEngineRethinkdb) GetProject(id string) (ProjectExtendedMod
 					Pluck("experiment_id", "sample_id").CoerceTo("array"),
 			},
 		}
-	})
-	res, err := rql.Run(e.s)
-	if err != nil {
-		return ProjectExtendedModel{}, err
-	}
+	}).Run(e.session)
 
-	var project ProjectExtendedModel
-	err = res.One(&project)
-	return project, err
+	switch {
+	case err != nil:
+		return project, err
+	case res.IsNil():
+		return project, errors.Wrapf(ErrNotFound, "No such project %s", id)
+	default:
+		err = res.One(&project)
+		return project, err
+	}
 }
 
 func (e *ProjectsStoreEngineRethinkdb) GetAllProjectsForUser(user string) ([]ProjectSchema, error) {
