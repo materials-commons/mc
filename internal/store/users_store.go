@@ -66,3 +66,34 @@ func (s *UsersStore) ModifyUserAPIKey(id string) (UserSchema, error) {
 
 	return s.UsersStoreEngine.ModifyUserAPIKey(id, apikey, time.Now())
 }
+
+func prepareUser(userModel AddUserModel) (UserSchema, error) {
+	var (
+		err error
+	)
+
+	now := time.Now()
+
+	u := UserSchema{
+		CreatedAt: now,
+		UpdatedAt: now,
+		ID:        userModel.Email,
+		Fullname:  userModel.Fullname,
+		Email:     userModel.Email,
+	}
+
+	if u.Password, err = generatePasswordHash(userModel.Password); err != nil {
+		return u, err
+	}
+
+	if u.APIKey, err = uuid.GenerateUUID(); err != nil {
+		return u, err
+	}
+
+	return u, nil
+}
+
+func generatePasswordHash(password string) (passwordHash string, err error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), 10)
+	return string(hash), err
+}
