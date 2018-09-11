@@ -35,7 +35,7 @@ type AddUserModel struct {
 
 func (u AddUserModel) Validate() error {
 	err := validation.ValidateStruct(&u,
-		validation.Field(&u.Fullname, validation.Required, validation.Length(1, 20)),
+		validation.Field(&u.Fullname, validation.Required, validation.Length(1, 40)),
 		validation.Field(&u.Email, validation.Required, is.Email),
 		validation.Field(&u.Password, validation.Required, validation.Length(1, 100)))
 	if err != nil {
