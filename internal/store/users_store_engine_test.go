@@ -15,8 +15,8 @@ func TestUsersStoreEngine_AddUser(t *testing.T) {
 		shouldFail bool
 		name       string
 	}{
-		{user: store.UserSchema{ID: "gtarcea@umich.edu"}, shouldFail: false, name: "New user"},
-		{user: store.UserSchema{ID: "gtarcea@umich.edu"}, shouldFail: true, name: "Existing user"},
+		{user: store.UserSchema{ID: "tuser@test.com"}, shouldFail: false, name: "New user"},
+		{user: store.UserSchema{ID: "tuser@test.com"}, shouldFail: true, name: "Existing user"},
 	}
 
 	for _, test := range tests {
@@ -37,7 +37,7 @@ func TestUsersStoreEngine_GetUserByID(t *testing.T) {
 		shouldFail bool
 		name       string
 	}{
-		{id: "gtarcea@umich.edu", shouldFail: false, name: "Find existing user"},
+		{id: "tuser@test.com", shouldFail: false, name: "Find existing user"},
 		{id: "nosuchuser@doesnot.exist", shouldFail: true, name: "Fail to find a non-existing user"},
 	}
 
@@ -64,7 +64,7 @@ func TestUsersStoreEngine_GetUserByAPIKey(t *testing.T) {
 		shouldFail bool
 		name       string
 	}{
-		{id: "gtarcea@umich.edu", apikey: "gtarcea@umich.edu apikey", shouldFail: false, name: "Look up existing apikey"},
+		{id: "tuser@test.com", apikey: "tuser@test.com apikey", shouldFail: false, name: "Look up existing apikey"},
 		{id: "nosuchuser@doesnot.exist", apikey: "no such key", shouldFail: true, name: "Lookup apikey that doesn't exist"},
 	}
 
@@ -93,7 +93,7 @@ func TestUsersStoreEngine_ModifyUserFullname(t *testing.T) {
 		shouldFail  bool
 		name        string
 	}{
-		{id: "gtarcea@umich.edu", newFullname: "gtarcea-changed", shouldFail: false, name: "Set fullname for existing user"},
+		{id: "tuser@test.com", newFullname: "tuser-changed", shouldFail: false, name: "Set fullname for existing user"},
 		{id: "doesnot@exist.com", newFullname: "nosuch-changed", shouldFail: true, name: "Set fullname for non-existing user"},
 	}
 
@@ -120,7 +120,7 @@ func TestUsersStoreEngine_ModifyUserPassword(t *testing.T) {
 		shouldFail  bool
 		name        string
 	}{
-		{id: "gtarcea@umich.edu", newPassword: "gtarcea-changed", shouldFail: false, name: "Set fullname for existing user"},
+		{id: "tuser@test.com", newPassword: "tuser-changed", shouldFail: false, name: "Set fullname for existing user"},
 		{id: "doesnot@exist.com", newPassword: "nosuch-changed", shouldFail: true, name: "Set fullname for non-existing user"},
 	}
 
@@ -147,7 +147,7 @@ func TestUsersStoreEngine_ModifyUserAPIKey(t *testing.T) {
 		shouldFail bool
 		name       string
 	}{
-		{id: "gtarcea@umich.edu", newAPIKey: "gtarcea-changed", shouldFail: false, name: "Set fullname for existing user"},
+		{id: "tuser@test.com", newAPIKey: "tuser-changed", shouldFail: false, name: "Set fullname for existing user"},
 		{id: "doesnot@exist.com", newAPIKey: "nosuch-changed", shouldFail: true, name: "Set fullname for non-existing user"},
 	}
 
@@ -169,7 +169,7 @@ func TestUsersStoreEngine_ModifyUserAPIKey(t *testing.T) {
 
 func addDefaultUsersToStoreEngine(t *testing.T, e store.UsersStoreEngine) {
 	users := []store.UserSchema{
-		{ID: "gtarcea@umich.edu", APIKey: "gtarcea@umich.edu apikey", Fullname: "gtarcea", Password: "gtarcea-password"},
+		{ID: "tuser@test.com", APIKey: "tuser@test.com apikey", Fullname: "tuser", Password: "tuser-password"},
 	}
 
 	for _, user := range users {
