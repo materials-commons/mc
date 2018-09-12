@@ -15,7 +15,7 @@ type UsersStoreEngine interface {
 type ProjectsStoreEngine interface {
 	AddProject(project ProjectSchema) (ProjectSchema, error)
 	GetProject(id string) (ProjectExtendedModel, error)
-	GetAllProjectsForUser(user string) ([]ProjectSchema, error)
+	GetAllProjectsForUser(user string) ([]ProjectExtendedModel, error)
 	DeleteProject(id string) error
 	UpdateProjectName(id string, name string, updatedAt time.Time) error
 	UpdateProjectDescription(id string, description string, updatedAt time.Time) error
