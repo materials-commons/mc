@@ -1,8 +1,10 @@
 package store
 
 import (
+	"fmt"
 	"time"
 
+	"github.com/dancannon/gorethink/encoding"
 	"github.com/pkg/errors"
 	r "gopkg.in/gorethink/gorethink.v4"
 )
@@ -12,7 +14,15 @@ type UsersStoreEngineRethinkdb struct {
 }
 
 func (e *UsersStoreEngineRethinkdb) AddUser(user UserSchema) (UserSchema, error) {
-	return UserSchema{}, nil
+	resp, err := r.Table("users").Insert(user).RunWrite(e.session)
+	switch {
+	case err != nil:
+		return user, err
+	case resp.Errors != 0:
+		return user, fmt.Errorf("failed writing user %s", resp.FirstError)
+	default:
+		return user, nil
+	}
 }
 
 func (e *UsersStoreEngineRethinkdb) GetUserByID(id string) (UserSchema, error) {
@@ -44,15 +54,29 @@ func (e *UsersStoreEngineRethinkdb) GetUserByAPIKey(apikey string) (UserSchema, 
 }
 
 func (e *UsersStoreEngineRethinkdb) ModifyUserFullname(id, fullname string, updatedAt time.Time) (UserSchema, error) {
-	return UserSchema{}, nil
+	return e.modifyUser(id, map[string]interface{}{"fullname": fullname, "updated_at": updatedAt})
 }
 
 func (e *UsersStoreEngineRethinkdb) ModifyUserPassword(id, password string, updatedAt time.Time) (UserSchema, error) {
-	return UserSchema{}, nil
+	return e.modifyUser(id, map[string]interface{}{"password": password, "updated_at": updatedAt})
 }
 
 func (e *UsersStoreEngineRethinkdb) ModifyUserAPIKey(id, apikey string, updatedAt time.Time) (UserSchema, error) {
-	return UserSchema{}, nil
+	return e.modifyUser(id, map[string]interface{}{"apikey": apikey, "updated_at": updatedAt})
+}
+
+func (e *UsersStoreEngineRethinkdb) modifyUser(id string, what map[string]interface{}) (UserSchema, error) {
+	resp, err := r.Table("users").Get(id).Update(what, r.UpdateOpts{ReturnChanges: true}).RunWrite(e.session)
+	switch {
+	case err != nil:
+		return UserSchema{}, err
+	case resp.Errors != 0:
+		return UserSchema{}, fmt.Errorf("unable to update user %s", id)
+	default:
+		var u UserSchema
+		err := encoding.Decode(&u, resp.Changes[0].NewValue)
+		return u, err
+	}
 }
 
 func (e *UsersStoreEngineRethinkdb) Name() string {
