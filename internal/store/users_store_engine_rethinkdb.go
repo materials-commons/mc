@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dancannon/gorethink/encoding"
 	"github.com/pkg/errors"
 	r "gopkg.in/gorethink/gorethink.v4"
+	"gopkg.in/gorethink/gorethink.v4/encoding"
 )
 
 type UsersStoreEngineRethinkdb struct {
