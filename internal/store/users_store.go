@@ -83,12 +83,14 @@ func prepareUser(userModel AddUserModel) (UserSchema, error) {
 	now := time.Now()
 
 	u := UserSchema{
-		CreatedAt: now,
-		UpdatedAt: now,
-		ID:        userModel.Email,
-		Fullname:  userModel.Fullname,
-		Email:     userModel.Email,
-		OType:     "user",
+		ModelSimple: ModelSimple{
+			CreatedAt: now,
+			UpdatedAt: now,
+			ID:        userModel.Email,
+			OType:     "user",
+		},
+		Fullname: userModel.Fullname,
+		Email:    userModel.Email,
 	}
 
 	if u.Password, err = generatePasswordHash(userModel.Password); err != nil {
