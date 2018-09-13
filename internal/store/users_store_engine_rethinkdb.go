@@ -10,11 +10,15 @@ import (
 )
 
 type UsersStoreEngineRethinkdb struct {
-	session *r.Session
+	Session *r.Session
+}
+
+func NewUsersStoreEngineRethinkdb(session *r.Session) *UsersStoreEngineRethinkdb {
+	return &UsersStoreEngineRethinkdb{Session: session}
 }
 
 func (e *UsersStoreEngineRethinkdb) AddUser(user UserSchema) (UserSchema, error) {
-	resp, err := r.Table("users").Insert(user).RunWrite(e.session)
+	resp, err := r.Table("users").Insert(user).RunWrite(e.Session)
 	switch {
 	case err != nil:
 		return user, err
@@ -27,7 +31,7 @@ func (e *UsersStoreEngineRethinkdb) AddUser(user UserSchema) (UserSchema, error)
 
 func (e *UsersStoreEngineRethinkdb) GetUserByID(id string) (UserSchema, error) {
 	var user UserSchema
-	res, err := r.Table("users").Get(id).Run(e.session)
+	res, err := r.Table("users").Get(id).Run(e.Session)
 	switch {
 	case err != nil:
 		return user, err
@@ -41,7 +45,7 @@ func (e *UsersStoreEngineRethinkdb) GetUserByID(id string) (UserSchema, error) {
 
 func (e *UsersStoreEngineRethinkdb) GetUserByAPIKey(apikey string) (UserSchema, error) {
 	var user UserSchema
-	res, err := r.Table("users").GetAllByIndex("apikey", apikey).Run(e.session)
+	res, err := r.Table("users").GetAllByIndex("apikey", apikey).Run(e.Session)
 	switch {
 	case err != nil:
 		return user, err
@@ -66,7 +70,7 @@ func (e *UsersStoreEngineRethinkdb) ModifyUserAPIKey(id, apikey string, updatedA
 }
 
 func (e *UsersStoreEngineRethinkdb) modifyUser(id string, what map[string]interface{}) (UserSchema, error) {
-	resp, err := r.Table("users").Get(id).Update(what, r.UpdateOpts{ReturnChanges: true}).RunWrite(e.session)
+	resp, err := r.Table("users").Get(id).Update(what, r.UpdateOpts{ReturnChanges: true}).RunWrite(e.Session)
 	switch {
 	case err != nil:
 		return UserSchema{}, err
@@ -74,6 +78,11 @@ func (e *UsersStoreEngineRethinkdb) modifyUser(id string, what map[string]interf
 		return UserSchema{}, fmt.Errorf("unable to update user %s", id)
 	default:
 		var u UserSchema
+		if len(resp.Changes) == 0 {
+			return u, fmt.Errorf("unable to modify %s with %#v", id, what)
+		}
+		fmt.Println("len(resp.Changes) = ", len(resp.Changes))
+		fmt.Printf("resp %#v\n\n", resp.Changes)
 		err := encoding.Decode(&u, resp.Changes[0].NewValue)
 		return u, err
 	}
