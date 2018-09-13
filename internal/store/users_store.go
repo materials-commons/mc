@@ -88,6 +88,7 @@ func prepareUser(userModel AddUserModel) (UserSchema, error) {
 		ID:        userModel.Email,
 		Fullname:  userModel.Fullname,
 		Email:     userModel.Email,
+		OType:     "user",
 	}
 
 	if u.Password, err = generatePasswordHash(userModel.Password); err != nil {
