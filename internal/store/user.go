@@ -9,19 +9,19 @@ import (
 )
 
 type UserSchema struct {
-	ID              string    `db:"id" json:"id"`
-	CreatedAt       time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt       time.Time `db:"updated_at" json:"updated_at"`
-	Admin           bool      `db:"admin" json:"admin"`
-	APIKey          string    `db:"apikey" json:"apikey"`
-	BetaUser        bool      `db:"beta_user" json:"beta_user"`
-	DemoInstalled   bool      `db:"demo_installed" json:"demo_installed"`
-	Email           string    `db:"email" json:"email"`
-	Fullname        string    `db:"fullname" json:"fullname"`
-	OType           string    `db:"otype" json:"otype"`
-	Password        string    `db:"-" json:"-"`
-	IsTemplateAdmin bool      `db:"is_template_admin" json:"is_template_admin"`
-	LastLogin       time.Time `db:"last_login" json:"last_login"`
+	ID              string    `db:"id" json:"id" r:"id"`
+	CreatedAt       time.Time `db:"created_at" json:"created_at" r:"created_at"`
+	UpdatedAt       time.Time `db:"updated_at" json:"updated_at" r:"updated_at"`
+	Admin           bool      `db:"admin" json:"admin" r:"admin"`
+	APIKey          string    `db:"apikey" json:"apikey" r:"apikey"`
+	BetaUser        bool      `db:"beta_user" json:"beta_user" r:"beta_user"`
+	DemoInstalled   bool      `db:"demo_installed" json:"demo_installed" r:"demo_installed"`
+	Email           string    `db:"email" json:"email" r:"email"`
+	Fullname        string    `db:"fullname" json:"fullname" r:"fullname"`
+	OType           string    `db:"otype" json:"otype" r:"otype"`
+	Password        string    `db:"password" json:"-" r:"password"`
+	IsTemplateAdmin bool      `db:"is_template_admin" json:"is_template_admin" r:"is_template_admin"`
+	LastLogin       time.Time `db:"last_login" json:"last_login" r:"last_login"`
 }
 
 type AddUserModel struct {
