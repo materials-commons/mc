@@ -81,8 +81,6 @@ func (e *UsersStoreEngineRethinkdb) modifyUser(id string, what map[string]interf
 		if len(resp.Changes) == 0 {
 			return u, fmt.Errorf("unable to modify %s with %#v", id, what)
 		}
-		fmt.Println("len(resp.Changes) = ", len(resp.Changes))
-		fmt.Printf("resp %#v\n\n", resp.Changes)
 		err := encoding.Decode(&u, resp.Changes[0].NewValue)
 		return u, err
 	}
