@@ -7,6 +7,7 @@ import (
 
 	"github.com/materials-commons/mc/internal/store"
 	"github.com/materials-commons/mc/pkg/tutils/assert"
+	r "gopkg.in/gorethink/gorethink.v4"
 )
 
 func TestUsersStoreEngine_AddUser(t *testing.T) {
@@ -32,6 +33,7 @@ func TestUsersStoreEngine_AddUser(t *testing.T) {
 				}
 			})
 		}
+		cleanupUsersStoreEngine(e)
 	}
 }
 
@@ -60,6 +62,7 @@ func TestUsersStoreEngine_GetUserByID(t *testing.T) {
 				}
 			})
 		}
+		cleanupUsersStoreEngine(e)
 	}
 }
 
@@ -90,6 +93,7 @@ func TestUsersStoreEngine_GetUserByAPIKey(t *testing.T) {
 				}
 			})
 		}
+		cleanupUsersStoreEngine(e)
 	}
 }
 
@@ -119,6 +123,7 @@ func TestUsersStoreEngine_ModifyUserFullname(t *testing.T) {
 				}
 			})
 		}
+		cleanupUsersStoreEngine(e)
 	}
 }
 
@@ -148,6 +153,7 @@ func TestUsersStoreEngine_ModifyUserPassword(t *testing.T) {
 				}
 			})
 		}
+		cleanupUsersStoreEngine(e)
 	}
 }
 
@@ -177,6 +183,7 @@ func TestUsersStoreEngine_ModifyUserAPIKey(t *testing.T) {
 				}
 			})
 		}
+		cleanupUsersStoreEngine(e)
 	}
 }
 
@@ -194,5 +201,15 @@ func addDefaultUsersToStoreEngine(t *testing.T, e store.UsersStoreEngine) {
 func createUsersStoreEngines() []store.UsersStoreEngine {
 	var engines []store.UsersStoreEngine
 	engines = append(engines, store.NewUsersStoreEngineMemory())
+	session, _ := r.Connect(r.ConnectOpts{Database: "mctest", Address: "localhost:30815"})
+	r.SetTags("r")
+	engines = append(engines, store.NewUsersStoreEngineRethinkdb(session))
 	return engines
+}
+
+func cleanupUsersStoreEngine(e store.UsersStoreEngine) {
+	if re, ok := e.(*store.UsersStoreEngineRethinkdb); ok {
+		session := re.Session
+		r.Table("users").Delete().RunWrite(session)
+	}
 }
