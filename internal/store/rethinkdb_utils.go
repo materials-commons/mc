@@ -1,8 +1,6 @@
 package store
 
 import (
-	"fmt"
-
 	"github.com/pkg/errors"
 	r "gopkg.in/gorethink/gorethink.v4"
 )
@@ -23,7 +21,7 @@ func checkRethinkdbWriteError(resp r.WriteResponse, err error, msg string) error
 	case err != nil:
 		return errors.Wrapf(err, msg)
 	case resp.Errors != 0:
-		return fmt.Errorf("%s: %s", msg, resp.FirstError)
+		return errors.Errorf("%s: %s", msg, resp.FirstError)
 	default:
 		return nil
 	}
