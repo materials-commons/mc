@@ -9,7 +9,6 @@ type UsersStoreEngine interface {
 	ModifyUserFullname(id, fullname string, updatedAt time.Time) (UserSchema, error)
 	ModifyUserPassword(id, password string, updatedAt time.Time) (UserSchema, error)
 	ModifyUserAPIKey(id, apikey string, updatedAt time.Time) (UserSchema, error)
-	Name() string
 }
 
 type ProjectsStoreEngine interface {
@@ -19,5 +18,12 @@ type ProjectsStoreEngine interface {
 	DeleteProject(id string) error
 	UpdateProjectName(id string, name string, updatedAt time.Time) error
 	UpdateProjectDescription(id string, description string, updatedAt time.Time) error
-	Name() string
+}
+
+type AccessStoreEngine interface {
+	AddAccessEntry(entry AccessSchema) (AccessSchema, error)
+	DeleteAccess(projectID, userID string) error
+	DeleteAllAccessForProject(projectID string) error
+	GetProjectAccessEntries(projectID string) ([]AccessSchema, error)
+	GetUserAccessEntries(userID string) ([]AccessSchema, error)
 }
