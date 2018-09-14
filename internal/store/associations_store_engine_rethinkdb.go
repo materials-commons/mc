@@ -30,7 +30,7 @@ func (e *AssociationsStoreEngineRethinkdb) AssociateSampleWithExperiment(sampleI
 	return checkRethinkdbInsertError(resp, err, errMsg)
 }
 
-func (e *AssociationsStoreEngineRethinkdb) AssociateFileWithSample(sampleID, fileID string) error {
+func (e *AssociationsStoreEngineRethinkdb) AssociateSampleWithFile(sampleID, fileID string) error {
 	errMsg := fmt.Sprintf("Unable to associate sample %s with file %s", sampleID, fileID)
 	resp, err := r.Table("sample2datafile").
 		Insert(map[string]interface{}{"sample_id": sampleID, "datafile_id": fileID}, r.InsertOpts{ReturnChanges: true}).
