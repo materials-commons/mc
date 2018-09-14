@@ -4,32 +4,41 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
 	r "gopkg.in/gorethink/gorethink.v4"
+	"gopkg.in/gorethink/gorethink.v4/encoding"
 )
 
 type ProjectsStoreEngineRethinkdb struct {
 	Session *r.Session
 }
 
+func NewProjectsStoreEngineRethinkdb(session *r.Session) *ProjectsStoreEngineRethinkdb {
+	return &ProjectsStoreEngineRethinkdb{Session: session}
+}
+
 func (e *ProjectsStoreEngineRethinkdb) AddProject(project ProjectSchema) (ProjectSchema, error) {
-	return ProjectSchema{}, nil
+	errMsg := fmt.Sprintf("Unable to add project %+v", project)
+	resp, err := r.Table("projects").Insert(project, r.InsertOpts{ReturnChanges: true}).RunWrite(e.Session, r.RunOpts{})
+	if err := checkRethinkdbInsertError(resp, err, errMsg); err != nil {
+		return project, err
+	}
+
+	var proj ProjectSchema
+	err = encoding.Decode(&proj, resp.Changes[0].NewValue)
+	return proj, err
 }
 
 func (e *ProjectsStoreEngineRethinkdb) GetProject(id string) (ProjectExtendedModel, error) {
 	var project ProjectExtendedModel
-
+	errMsg := fmt.Sprintf("No such project %s", id)
 	res, err := r.Table("projects").Get(id).Merge(projectDetails).Run(e.Session)
 
-	switch {
-	case err != nil:
-		return project, err
-	case res.IsNil():
-		return project, errors.Wrapf(ErrNotFound, "No such project %s", id)
-	default:
-		err = res.One(&project)
+	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
 		return project, err
 	}
+
+	err = res.One(&project)
+	return project, err
 }
 
 func (e *ProjectsStoreEngineRethinkdb) GetAllProjectsForUser(user string) ([]ProjectExtendedModel, error) {
@@ -82,12 +91,13 @@ func projectDetails(p r.Term) interface{} {
 }
 
 func (e *ProjectsStoreEngineRethinkdb) DeleteProject(id string) error {
+	fmt.Println("Delete Project", id)
 	errMsg := fmt.Sprintf("failed deleting project %s", id)
 
 	resp, err := r.Table("projects").Get(id).
 		Update(map[string]interface{}{"owner": "delete@materialscommons.org"}).RunWrite(e.Session)
 
-	if err := checkRethinkdbWriteError(resp, err, errMsg); err != nil {
+	if err := checkRethinkdbUpdateError(resp, err, errMsg); err != nil {
 		return err
 	}
 
@@ -105,8 +115,4 @@ func (e *ProjectsStoreEngineRethinkdb) UpdateProjectDescription(id string, descr
 	resp, err := r.Table("projects").Get(id).
 		Update(map[string]interface{}{"description": description, "updated_at": updatedAt}).RunWrite(e.Session)
 	return checkRethinkdbWriteError(resp, err, fmt.Sprintf("Unable to update desciption to '%s' for project %s", description, id))
-}
-
-func (e *ProjectsStoreEngineRethinkdb) Name() string {
-	return "ProjectsStoreEngineRethinkdb"
 }
