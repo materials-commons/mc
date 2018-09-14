@@ -16,9 +16,9 @@ func NewAccessStoreEngineRethinkdb(session *r.Session) *AccessStoreEngineRethink
 }
 
 func (e *AccessStoreEngineRethinkdb) AddAccessEntry(entry AccessSchema) (AccessSchema, error) {
-	resp, err := r.Table("access").Insert(entry, r.InsertOpts{ReturnChanges: true}).RunWrite(e.Session)
 	errMsg := fmt.Sprintf("Unable to insert access entry %+v", entry)
 
+	resp, err := r.Table("access").Insert(entry, r.InsertOpts{ReturnChanges: true}).RunWrite(e.Session)
 	if err := checkRethinkdbInsertError(resp, err, errMsg); err != nil {
 		return entry, err
 	}
