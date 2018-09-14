@@ -27,3 +27,16 @@ type AccessStoreEngine interface {
 	GetProjectAccessEntries(projectID string) ([]AccessSchema, error)
 	GetUserAccessEntries(userID string) ([]AccessSchema, error)
 }
+
+type SamplesStoreEngine interface {
+	AddSample(sample SampleSchema) (SampleSchema, error)
+	DeleteSample(sampleID string) error
+	GetSample(sampleID string) (SampleSchema, error)
+	ModifySampleName(sampleID, name string, updatedAt time.Time) error
+}
+
+type AssociationsStoreEngine interface {
+	AssociateSampleWithProject(sampleID, projectID string) error
+	AssociateSampleWithExperiment(sampleID, experimentID string) error
+	AssociateFileWithSample(sampleID, fileID string) error
+}
