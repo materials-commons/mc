@@ -35,8 +35,13 @@ type SamplesStoreEngine interface {
 	ModifySampleName(sampleID, name string, updatedAt time.Time) error
 }
 
+type ProcessesStoreEngine interface {
+	AddProcess(process ProcessSchema) (ProcessSchema, error)
+	GetProcess(processID string) (ProjectExtendedModel, error)
+}
+
 type AssociationsStoreEngine interface {
 	AssociateSampleWithProject(sampleID, projectID string) error
 	AssociateSampleWithExperiment(sampleID, experimentID string) error
-	AssociateFileWithSample(sampleID, fileID string) error
+	AssociateSampleWithFile(sampleID, fileID string) error
 }

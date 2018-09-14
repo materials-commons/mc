@@ -1,41 +1,60 @@
 package store
 
-type ProcessSchema struct {
-	Model
-	DoesTransform bool   `db:"does_transform" json:"does_transform"`
-	Note          string `db:"note" json:"note"`
-	ProcessType   string `db:"process_type" json:"process_type"`
-	TemplateID    string `db:"template_id" json:"template_id"`
-	TemplateName  string `db:"template_name" json:"template_name"`
+import (
+	"fmt"
+
+	r "gopkg.in/gorethink/gorethink.v4"
+	"gopkg.in/gorethink/gorethink.v4/encoding"
+)
+
+type ProcessesStoreEngineRethinkdb struct {
+	Session *r.Session
 }
 
-type ProcessExtendedModel struct {
-	ProcessSchema
-	Setup         ProcessSetup         `json:"setup"`
-	InputSamples  []ProcessSample      `json:"input_samples"`
-	OutputSamples []ProcessSample      `json:"output_samples"`
-	Measurements  []ProcessMeasurement `json:"measurements"`
+func NewProcessesStoreEngineRethinkdb(session *r.Session) *ProcessesStoreEngineRethinkdb {
+	return &ProcessesStoreEngineRethinkdb{Session: session}
 }
 
-type ProcessSetup struct {
+func (e *ProcessesStoreEngineRethinkdb) AddProcess(process ProcessSchema) (ProcessSchema, error) {
+	errMsg := fmt.Sprintf("Unable to add process %+v", process)
+
+	resp, err := r.Table("processes").Insert(process, r.InsertOpts{ReturnChanges: true}).RunWrite(e.Session)
+	if err := checkRethinkdbInsertError(resp, err, errMsg); err != nil {
+		return process, err
+	}
+
+	var createdProcess ProcessSchema
+	err = encoding.Decode(&createdProcess, resp.Changes[0].NewValue)
+	return createdProcess, err
 }
 
-type ProcessSample struct {
+func (e *ProcessesStoreEngineRethinkdb) GetProcess(processID string) (ProcessExtendedModel, error) {
+	var process ProcessExtendedModel
+	errMsg := fmt.Sprintf("No such process %s", processID)
+	res, err := r.Table("processes").Get(processID).Merge(processDetails).Run(e.Session)
+	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
+		return process, err
+	}
+
+	err = res.One(&process)
+	return process, err
 }
 
-type ProcessMeasurement struct {
+func processDetails(p r.Term) interface{} {
+	return map[string]interface{}{
+		"setup": r.Table("process2setup").GetAllByIndex("process_id", p.Field("id")).
+			EqJoin("setup_id", r.Table("setups")).Zip().
+			Merge(func(row r.Term) interface{} {
+				return map[string]interface{}{
+					"properties": r.Table("setupproperties").GetAllByIndex("setup_id", row.Field("setup_id")).
+						CoerceTo("array"),
+				}
+			}).CoerceTo("array"),
+		"input_samples": r.Table("process2sample"),
+	}
 }
 
 /*
-       setup: r.table('process2setup').getAll(process('id'), {index: 'process_id'})
-           .eqJoin('setup_id', r.table('setups')).zip()
-           .merge(function (setup) {
-               return {
-                   properties: r.table('setupproperties')
-                       .getAll(setup('setup_id'), {index: 'setup_id'})
-                       .coerceTo('array')
-               }
-           }).coerceTo('array'),
 
        input_samples: r.table('process2sample').getAll(process('id'), {index: 'process_id'})
            .filter({'direction': 'in'})
