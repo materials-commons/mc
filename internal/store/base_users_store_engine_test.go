@@ -9,7 +9,7 @@ import (
 	r "gopkg.in/gorethink/gorethink.v4"
 )
 
-func testUsersStoreEngine_AddUser(t *testing.T, e store.UsersStoreEngine) {
+func testUsersStoreEngineAddUser(t *testing.T, e store.UsersStoreEngine) {
 	tests := []struct {
 		user       store.UserSchema
 		shouldFail bool
@@ -32,7 +32,7 @@ func testUsersStoreEngine_AddUser(t *testing.T, e store.UsersStoreEngine) {
 	cleanupUsersStoreEngine(e)
 }
 
-func testUsersStoreEngine_GetUserByID(t *testing.T, e store.UsersStoreEngine) {
+func testUsersStoreEngineGetUserByID(t *testing.T, e store.UsersStoreEngine) {
 	tests := []struct {
 		id         string
 		shouldFail bool
@@ -57,7 +57,7 @@ func testUsersStoreEngine_GetUserByID(t *testing.T, e store.UsersStoreEngine) {
 	cleanupUsersStoreEngine(e)
 }
 
-func testUsersStoreEngine_GetUserByAPIKey(t *testing.T, e store.UsersStoreEngine) {
+func testUsersStoreEngineGetUserByAPIKey(t *testing.T, e store.UsersStoreEngine) {
 	tests := []struct {
 		id         string
 		apikey     string
@@ -84,7 +84,7 @@ func testUsersStoreEngine_GetUserByAPIKey(t *testing.T, e store.UsersStoreEngine
 	cleanupUsersStoreEngine(e)
 }
 
-func testUsersStoreEngine_ModifyUserFullname(t *testing.T, e store.UsersStoreEngine) {
+func testUsersStoreEngineModifyUserFullname(t *testing.T, e store.UsersStoreEngine) {
 	tests := []struct {
 		id          string
 		newFullname string
@@ -110,7 +110,7 @@ func testUsersStoreEngine_ModifyUserFullname(t *testing.T, e store.UsersStoreEng
 	cleanupUsersStoreEngine(e)
 }
 
-func testUsersStoreEngine_ModifyUserPassword(t *testing.T, e store.UsersStoreEngine) {
+func testUsersStoreEngineModifyUserPassword(t *testing.T, e store.UsersStoreEngine) {
 	tests := []struct {
 		id          string
 		newPassword string
@@ -136,7 +136,7 @@ func testUsersStoreEngine_ModifyUserPassword(t *testing.T, e store.UsersStoreEng
 	cleanupUsersStoreEngine(e)
 }
 
-func testUsersStoreEngine_ModifyUserAPIKey(t *testing.T, e store.UsersStoreEngine) {
+func testUsersStoreEngineModifyUserAPIKey(t *testing.T, e store.UsersStoreEngine) {
 	tests := []struct {
 		id         string
 		newAPIKey  string
