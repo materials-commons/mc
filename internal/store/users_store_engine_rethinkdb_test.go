@@ -9,37 +9,37 @@ import (
 
 func TestUsersStoreEngineRethinkdb_AddUser(t *testing.T) {
 	e := createRethinkdbUsersStoreEngine()
-	testUsersStoreEngine_AddUser(t, e)
+	testUsersStoreEngineAddUser(t, e)
 	e.Session.Close()
 }
 
 func TestUsersStoreEngineRethinkdb_GetUserByID(t *testing.T) {
 	e := createRethinkdbUsersStoreEngine()
-	testUsersStoreEngine_GetUserByID(t, e)
+	testUsersStoreEngineGetUserByID(t, e)
 	e.Session.Close()
 }
 
 func TestUsersStoreEngineRethinkdb_GetUserByAPIKey(t *testing.T) {
 	e := createRethinkdbUsersStoreEngine()
-	testUsersStoreEngine_GetUserByAPIKey(t, e)
+	testUsersStoreEngineGetUserByAPIKey(t, e)
 	e.Session.Close()
 }
 
 func TestUsersStoreEngineRethinkdb_ModifyUserFullname(t *testing.T) {
 	e := createRethinkdbUsersStoreEngine()
-	testUsersStoreEngine_ModifyUserFullname(t, e)
+	testUsersStoreEngineModifyUserFullname(t, e)
 	e.Session.Close()
 }
 
 func TestUsersStoreEngineRethinkdb_ModifyUserPassword(t *testing.T) {
 	e := createRethinkdbUsersStoreEngine()
-	testUsersStoreEngine_ModifyUserPassword(t, e)
+	testUsersStoreEngineModifyUserPassword(t, e)
 	e.Session.Close()
 }
 
 func TestUsersStoreEngineRethinkdb_ModifyUserAPIKey(t *testing.T) {
 	e := createRethinkdbUsersStoreEngine()
-	testUsersStoreEngine_ModifyUserAPIKey(t, e)
+	testUsersStoreEngineModifyUserAPIKey(t, e)
 	e.Session.Close()
 }
 
