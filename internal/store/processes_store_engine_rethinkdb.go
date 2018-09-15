@@ -54,6 +54,27 @@ func processDetails(p r.Term) interface{} {
 	}
 }
 
+func processSamples(p r.Term, direction string) r.Term {
+	return r.Table("process2sample").GetAllByIndex("process_id", p.Field("id")).
+		Filter(r.Row.Field("direction").Eq(direction)).
+		EqJoin("sample_id", r.Table("samples")).Zip().
+		Merge(func(row r.Term) interface{} {
+			return map[string]interface{}{
+				"properties": r.Table("propertyset2property").
+					GetAllByIndex("property_set_id", row.Field("property_set_id")).
+					EqJoin("property_id", r.Table("properties")).Zip().
+					Merge(func(row r.Term) interface{} {
+						return map[string]interface{}{
+							"best_measure": r.Table("best_measure_history").
+								GetAllByIndex("id", row.Field("best_measure_id")).
+								EqJoin("measurement_id", r.Table("measurements")).Zip().
+								CoerceTo("array"),
+						}
+					}).CoerceTo("array"),
+			}
+		}).CoerceTo("array")
+}
+
 /*
 
        input_samples: r.table('process2sample').getAll(process('id'), {index: 'process_id'})
