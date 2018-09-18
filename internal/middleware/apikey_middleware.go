@@ -43,22 +43,6 @@ func APIKeyAuth(config APIKeyConfig) echo.MiddlewareFunc {
 	}
 }
 
-func keyFromQuery(key string, c echo.Context) (string, error) {
-	value := c.QueryParam(key)
-	if value == "" {
-		return "", fmt.Errorf("no apikey '%s' as query param", key)
-	}
-	return value, nil
-}
-
-func keyFromHeader(key string, c echo.Context) (string, error) {
-	value := c.Request().Header.Get(key)
-	if value == "" {
-		return "", fmt.Errorf("no apikey '%s' as header", key)
-	}
-	return value, nil
-}
-
 func getAPIKey(key string, c echo.Context) (string, error) {
 	if value, err := keyFromHeader(key, c); err == nil {
 		return value, nil
@@ -69,4 +53,20 @@ func getAPIKey(key string, c echo.Context) (string, error) {
 	}
 
 	return "", fmt.Errorf("no apikey '%s' as query param or header", key)
+}
+
+func keyFromHeader(key string, c echo.Context) (string, error) {
+	value := c.Request().Header.Get(key)
+	if value == "" {
+		return "", fmt.Errorf("no apikey '%s' as header", key)
+	}
+	return value, nil
+}
+
+func keyFromQuery(key string, c echo.Context) (string, error) {
+	value := c.QueryParam(key)
+	if value == "" {
+		return "", fmt.Errorf("no apikey '%s' as query param", key)
+	}
+	return value, nil
 }
