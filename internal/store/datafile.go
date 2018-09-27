@@ -1,5 +1,11 @@
 package store
 
+import (
+	"github.com/go-ozzo/ozzo-validation"
+	"github.com/go-ozzo/ozzo-validation/is"
+	"github.com/pkg/errors"
+)
+
 type DatafileSchema struct {
 	Model
 	Checksum    string            `db:"checksum" json:"checksum" r:"checksum"`
@@ -15,4 +21,28 @@ type DatafileSchema struct {
 type DatafileMediaType struct {
 	Description string `db:"description" json:"description" r:"description"`
 	Mime        string `db:"mime" json:"mime" r:"mime"`
+}
+
+type AddDatafileModel struct {
+	Name        string `json:"name"`
+	Owner       string `json:"owner"`
+	Checksum    string
+	Description string `json:"description"`
+	UsesID      string
+	Parent      string
+	Size        int
+}
+
+func (d AddDatafileModel) Validate() error {
+	err := validation.ValidateStruct(&d,
+		validation.Field(&d.Name, validation.Required, validation.Length(1, 50)),
+		validation.Field(&d.Owner, validation.Required, is.Email),
+		validation.Field(&d.Description, validation.Required, validation.Length(0, 300)),
+		validation.Field(&d.Size, validation.Required, validation.Min(1)))
+
+	if err != nil {
+		return errors.WithMessage(ErrValidation, err.Error())
+	}
+
+	return nil
 }
