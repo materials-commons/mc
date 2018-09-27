@@ -25,6 +25,7 @@ dep:
 	dep ensure
 
 test:
+	-(cd ./internal/store/migration; go test)
 	-go test -v ./...
 
 docs:

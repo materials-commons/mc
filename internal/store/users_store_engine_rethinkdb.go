@@ -18,7 +18,7 @@ func NewUsersStoreEngineRethinkdb(session *r.Session) *UsersStoreEngineRethinkdb
 
 func (e *UsersStoreEngineRethinkdb) AddUser(user UserSchema) (UserSchema, error) {
 	errMsg := fmt.Sprintf("Unable to add user %+v", user)
-	resp, err := r.Table("users").Insert(user).RunWrite(e.Session)
+	resp, err := r.Table("users").Insert(user, r.InsertOpts{ReturnChanges: true}).RunWrite(e.Session)
 	return user, checkRethinkdbInsertError(resp, err, errMsg)
 }
 

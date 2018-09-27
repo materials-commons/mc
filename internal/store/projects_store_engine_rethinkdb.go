@@ -18,7 +18,7 @@ func NewProjectsStoreEngineRethinkdb(session *r.Session) *ProjectsStoreEngineRet
 
 func (e *ProjectsStoreEngineRethinkdb) AddProject(project ProjectSchema) (ProjectSchema, error) {
 	errMsg := fmt.Sprintf("Unable to add project %+v", project)
-	resp, err := r.Table("projects").Insert(project, r.InsertOpts{ReturnChanges: true}).RunWrite(e.Session, r.RunOpts{})
+	resp, err := r.Table("projects").Insert(project, r.InsertOpts{ReturnChanges: true}).RunWrite(e.Session)
 	if err := checkRethinkdbInsertError(resp, err, errMsg); err != nil {
 		return project, err
 	}

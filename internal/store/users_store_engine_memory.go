@@ -52,7 +52,7 @@ func (e *UsersStoreEngineMemory) ModifyUserFullname(id, fullname string, updated
 	}
 
 	user.Fullname = fullname
-	user.UpdatedAt = updatedAt
+	user.MTime = updatedAt
 	e.DB[id] = user
 	return user, nil
 }
@@ -64,7 +64,7 @@ func (e *UsersStoreEngineMemory) ModifyUserPassword(id, password string, updated
 	}
 
 	user.Password = password
-	user.UpdatedAt = updatedAt
+	user.MTime = updatedAt
 	e.DB[id] = user
 	return user, nil
 }
@@ -76,7 +76,7 @@ func (e *UsersStoreEngineMemory) ModifyUserAPIKey(id, apikey string, updatedAt t
 	}
 
 	user.APIKey = apikey
-	user.UpdatedAt = updatedAt
+	user.MTime = updatedAt
 	e.DB[id] = user
 	return user, nil
 }

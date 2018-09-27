@@ -28,6 +28,13 @@ type AccessStoreEngine interface {
 	GetUserAccessEntries(userID string) ([]AccessSchema, error)
 }
 
+type DatafilesStoreEngine interface {
+	AddFile(schema DatafileSchema) (DatafileSchema, error)
+	GetFile(id string) (DatafileSchema, error)
+	GetFileWithChecksum(checksum string) (DatafileSchema, error)
+	GetFileInDir(name string, dirID string) (DatafileSchema, error)
+}
+
 type SamplesStoreEngine interface {
 	AddSample(sample SampleSchema) (SampleSchema, error)
 	DeleteSample(sampleID string) error

@@ -84,8 +84,8 @@ func prepareUser(userModel AddUserModel) (UserSchema, error) {
 
 	u := UserSchema{
 		ModelSimple: ModelSimple{
-			CreatedAt: now,
-			UpdatedAt: now,
+			Birthtime: now,
+			MTime:     now,
 			ID:        userModel.Email,
 			OType:     "user",
 		},
