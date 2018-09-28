@@ -22,8 +22,13 @@ type ProjectRelationships struct {
 
 type ProjectUserModel struct {
 	ModelSimple
-	BetaUser  bool   `db:"beta_user" json:"beta_user"`
-	Fullname  string `db:"fullname" json:"fullname"`
-	ProjectID string `db:"project_id" json:"project_id"`
-	UserID    string `db:"user_id" json:"user_id"`
+	BetaUser  bool   `db:"beta_user" json:"beta_user" r:"beta_user"`
+	Fullname  string `db:"fullname" json:"fullname" r:"fullname"`
+	ProjectID string `db:"project_id" json:"project_id" r:"project_id"`
+	UserID    string `db:"user_id" json:"user_id" r:"user_id"`
+}
+
+type ProjectSimpleModel struct {
+	ProjectSchema
+	RootDir []DatadirSchema `json:"root_dir" r:"root_dir"`
 }

@@ -28,6 +28,26 @@ func (e *ProjectsStoreEngineRethinkdb) AddProject(project ProjectSchema) (Projec
 	return proj, err
 }
 
+func (e *ProjectsStoreEngineRethinkdb) GetProjectSimple(id string) (ProjectSimpleModel, error) {
+	var project ProjectSimpleModel
+	errMsg := fmt.Sprintf("No such project %s", id)
+	res, err := r.Table("projects").Get(id).Merge(projectTopLevelDir).Run(e.Session)
+
+	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
+		return project, err
+	}
+
+	err = res.One(&project)
+	return project, err
+}
+
+func projectTopLevelDir(p r.Term) interface{} {
+	return map[string]interface{}{
+		"root_dir": r.Table("datadirs").
+			GetAllByIndex("datadir_project_name", []interface{}{p.Field("id"), p.Field("name")}),
+	}
+}
+
 func (e *ProjectsStoreEngineRethinkdb) GetProject(id string) (ProjectExtendedModel, error) {
 	var project ProjectExtendedModel
 	errMsg := fmt.Sprintf("No such project %s", id)
