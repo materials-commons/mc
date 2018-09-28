@@ -29,10 +29,16 @@ type AccessStoreEngine interface {
 }
 
 type DatafilesStoreEngine interface {
-	AddFile(schema DatafileSchema) (DatafileSchema, error)
+	AddFile(file DatafileSchema) (DatafileSchema, error)
 	GetFile(id string) (DatafileSchema, error)
 	GetFileWithChecksum(checksum string) (DatafileSchema, error)
 	GetFileInDir(name string, dirID string) (DatafileSchema, error)
+}
+
+type DatadirsStoreEngine interface {
+	AddDir(dir DatadirSchema) (DatadirSchema, error)
+	GetDatadirByPathInProject(path, projectID string) (DatadirSchema, error)
+	GetDatadir(id string) (DatadirSchema, error)
 }
 
 type SamplesStoreEngine interface {
