@@ -26,6 +26,11 @@ func RethinkDB(database, address string) error {
 		r.Table("projects").IndexCreate("owner"),
 		r.Table("projects").IndexCreateFunc("name_owner", []interface{}{r.Row.Field("name"), r.Row.Field("owner")}),
 
+		r.TableCreate("project2datadir"),
+		r.Table("project2datadir").IndexCreate("datadir_id"),
+		r.Table("project2datadir").IndexCreate("project_id"),
+		r.Table("project2datadir").IndexCreateFunc("project_datadir", []interface{}{r.Row.Field("project_id"), r.Row.Field("datadir_id")}),
+
 		// access table
 		r.TableCreate("access"),
 		r.Table("access").IndexCreate("user_id"),
