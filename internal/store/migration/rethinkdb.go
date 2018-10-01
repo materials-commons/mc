@@ -31,6 +31,11 @@ func RethinkDB(database, address string) error {
 		r.Table("project2datadir").IndexCreate("project_id"),
 		r.Table("project2datadir").IndexCreateFunc("project_datadir", []interface{}{r.Row.Field("project_id"), r.Row.Field("datadir_id")}),
 
+		r.TableCreate("project2datafile"),
+		r.Table("project2datafile").IndexCreate("project_id"),
+		r.Table("project2datafile").IndexCreate("datafile_id"),
+		r.Table("project2datafile").IndexCreateFunc("project_datafile", []interface{}{r.Row.Field("project_id"), r.Row.Field("datafile_id")}),
+
 		// access table
 		r.TableCreate("access"),
 		r.Table("access").IndexCreate("user_id"),
@@ -57,6 +62,11 @@ func RethinkDB(database, address string) error {
 		r.Table("datadirs").IndexCreate("parent"),
 		r.Table("datadirs").IndexCreateFunc("datadir_project_name", []interface{}{r.Row.Field("project"), r.Row.Field("name")}),
 		r.Table("datadirs").IndexCreateFunc("datadir_project_shortcut", []interface{}{r.Row.Field("project"), r.Row.Field("shortcut")}),
+
+		r.TableCreate("datadir2datafile"),
+		r.Table("datadir2datafile").IndexCreate("datadir_id"),
+		r.Table("datadir2datafile").IndexCreate("datafile_id"),
+		r.Table("datadir2datafile").IndexCreateFunc("datadir_datafile", []interface{}{r.Row.Field("datadir_id"), r.Row.Field("datafile_id")}),
 
 		// templates table
 		r.TableCreate("templates"),
