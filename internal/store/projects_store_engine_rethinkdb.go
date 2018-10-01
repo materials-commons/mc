@@ -24,7 +24,18 @@ func (e *ProjectsStoreEngineRethinkdb) AddProject(project ProjectSchema) (Projec
 	}
 
 	var proj ProjectSchema
-	err = encoding.Decode(&proj, resp.Changes[0].NewValue)
+	if err := encoding.Decode(&proj, resp.Changes[0].NewValue); err != nil {
+		return proj, err
+	}
+
+	ddirModel := AddDatadirModel{
+		Name:      project.Name,
+		Owner:     project.Owner,
+		ProjectID: proj.ID,
+	}
+
+	_, err = addDatadir(toDatadirSchema(ddirModel), e.Session)
+
 	return proj, err
 }
 
