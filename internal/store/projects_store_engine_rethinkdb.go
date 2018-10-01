@@ -122,7 +122,6 @@ func projectDetails(p r.Term) interface{} {
 }
 
 func (e *ProjectsStoreEngineRethinkdb) DeleteProject(id string) error {
-	fmt.Println("Delete Project", id)
 	errMsg := fmt.Sprintf("failed deleting project %s", id)
 
 	resp, err := r.Table("projects").Get(id).

@@ -31,6 +31,8 @@ type AddDatafileModel struct {
 	UsesID      string
 	Parent      string
 	Size        int
+	ProjectID   string
+	DatadirID   string
 }
 
 func (d AddDatafileModel) Validate() error {

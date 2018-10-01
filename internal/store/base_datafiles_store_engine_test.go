@@ -45,7 +45,7 @@ func testDatafilesStoreEngineAddFile(t *testing.T, e store.DatafilesStoreEngine)
 	addDefaultDatafilesToStoreEngine(t, e)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			f, err := e.AddFile(test.file)
+			f, err := e.AddFile(test.file, "", "")
 			if !test.shouldFail {
 				assert.Okf(t, err, "Could not add file id %+v, error: %s", test.file, err)
 			} else {
@@ -88,7 +88,7 @@ func addDefaultDatafilesToStoreEngine(t *testing.T, e store.DatafilesStoreEngine
 	}
 
 	for _, datafile := range datafiles {
-		_, err := e.AddFile(datafile)
+		_, err := e.AddFile(datafile, "", "")
 		assert.Okf(t, err, "Failed to add file %s", datafile.ID)
 	}
 }
@@ -97,5 +97,7 @@ func cleanupDatafilesStoreEngine(e store.DatafilesStoreEngine) {
 	if re, ok := e.(*store.DatafilesStoreEngineRethinkdb); ok {
 		session := re.Session
 		r.Table("datafiles").Delete().RunWrite(session)
+		r.Table("project2datafile").Delete().RunWrite(session)
+		r.Table("datadir2datafile").Delete().RunWrite(session)
 	}
 }

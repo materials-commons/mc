@@ -23,7 +23,6 @@ func (d AddDatadirModel) Validate() error {
 	err := validation.ValidateStruct(&d,
 		validation.Field(&d.Name, validation.Required, validation.Length(1, 250)),
 		validation.Field(&d.Owner, validation.Required),
-		validation.Field(&d.Parent, validation.Required),
 		validation.Field(&d.ProjectID, validation.Required),
 	)
 

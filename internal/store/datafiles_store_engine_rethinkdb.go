@@ -15,7 +15,7 @@ func NewDatafilesStoreEngineRethinkdb(session *r.Session) *DatafilesStoreEngineR
 	return &DatafilesStoreEngineRethinkdb{Session: session}
 }
 
-func (e *DatafilesStoreEngineRethinkdb) AddFile(file DatafileSchema) (DatafileSchema, error) {
+func (e *DatafilesStoreEngineRethinkdb) AddFile(file DatafileSchema, projectID, datadirID string) (DatafileSchema, error) {
 	errMsg := fmt.Sprintf("Unable to add datafile: %+v", file)
 	resp, err := r.Table("datafiles").Insert(file, r.InsertOpts{ReturnChanges: true}).RunWrite(e.Session)
 	if err := checkRethinkdbInsertError(resp, err, errMsg); err != nil {

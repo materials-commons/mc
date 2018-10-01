@@ -1,30 +1,44 @@
 package api
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/pkg/errors"
 
 	"github.com/materials-commons/mc/internal/store"
 )
 
 type MCFileLoader struct {
-	root             string
-	datafilesStore   *store.DatafilesStore
-	project          store.ProjectSimpleModel
-	currentDatadirID string
+	root               string
+	dfStore            *store.DatafilesStore
+	ddStore            *store.DatadirsStore
+	project            store.ProjectSimpleModel
+	currentRootDatadir store.DatadirSchema
+	owner              string
 }
 
-func NewMCFileLoader(root string, project store.ProjectSimpleModel, dfStore *store.DatafilesStore) *MCFileLoader {
+func NewMCFileLoader(root, owner string, project store.ProjectSimpleModel, dfStore *store.DatafilesStore, ddStore *store.DatadirsStore) *MCFileLoader {
 	return &MCFileLoader{
-		root:           root,
-		datafilesStore: dfStore,
-		project:        project,
+		root:    root,
+		owner:   owner,
+		dfStore: dfStore,
+		ddStore: ddStore,
+		project: project,
 	}
 }
 
 func (l *MCFileLoader) LoadFileOrDir(path string, finfo os.FileInfo) error {
+	var err error
+	dirName := filepath.Dir(filepath.Join(l.project.Name, strings.TrimPrefix(path, l.root+"/")))
+	if l.currentRootDatadir.Name != dirName {
+		l.currentRootDatadir, err = l.ddStore.GetDatadirByPathInProject(dirName, l.project.ID)
+		if err != nil {
+			errors.Wrapf(err, "Unable to get dir for path (%s) and project ID (%s) as new current dir", dirName, l.project.ID)
+		}
+	}
+
 	switch {
 
 	case !finfo.Mode().IsRegular() && !finfo.IsDir():
@@ -41,8 +55,34 @@ func (l *MCFileLoader) LoadFileOrDir(path string, finfo os.FileInfo) error {
 }
 
 func (l *MCFileLoader) loadDirectory(path string, finfo os.FileInfo) error {
-	fmt.Printf("loadDirectory '%s' '%s'\n", l.root, filepath.Join(l.project.Name, strings.TrimPrefix(path, l.root+"/")))
+	dirPath := filepath.Join(l.project.Name, strings.TrimPrefix(path, l.root+"/"))
+	if _, err := l.ddStore.GetDatadirByPathInProject(dirPath, l.project.ID); err == nil {
+		return nil
+	}
+
+	//parentDirPath := filepath.Dir(dirPath)
+	//parentDir, err := l.ddStore.GetDatadirByPathInProject(parentDirPath, l.project.ID)
+	//if err != nil {
+	//	return errors.Wrapf(err, "Can't find parent path (%s) for (%s)", parentDirPath, dirPath)
+	//}
+
+	dir := store.AddDatadirModel{
+		Name:      dirPath,
+		Owner:     l.owner,
+		Parent:    l.currentRootDatadir.ID,
+		ProjectID: l.project.ID,
+	}
+
+	if _, err := l.ddStore.AddDatadir(dir); err != nil {
+		return err
+	}
+
 	return nil
+}
+
+func (l *MCFileLoader) getParent(path string, projectID string) (store.DatadirSchema, error) {
+	parentPath := filepath.Dir(path)
+	return l.ddStore.GetDatadirByPathInProject(parentPath, projectID)
 }
 
 func (l *MCFileLoader) loadFile(path string, finfo os.FileInfo) error {

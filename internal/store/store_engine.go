@@ -30,7 +30,7 @@ type AccessStoreEngine interface {
 }
 
 type DatafilesStoreEngine interface {
-	AddFile(file DatafileSchema) (DatafileSchema, error)
+	AddFile(file DatafileSchema, projectID, datadirID string) (DatafileSchema, error)
 	GetFile(id string) (DatafileSchema, error)
 	GetFileWithChecksum(checksum string) (DatafileSchema, error)
 	GetFileInDir(name string, dirID string) (DatafileSchema, error)
