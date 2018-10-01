@@ -2,6 +2,7 @@ package store
 
 import (
 	"fmt"
+	"time"
 
 	"gopkg.in/gorethink/gorethink.v4/encoding"
 
@@ -17,15 +18,48 @@ func NewDatadirsStoreEngineRethinkdb(session *r.Session) *DatadirsStoreEngineRet
 }
 
 func (e *DatadirsStoreEngineRethinkdb) AddDir(dir DatadirSchema) (DatadirSchema, error) {
+	return addDatadir(dir, e.Session)
+}
+
+func addDatadir(dir DatadirSchema, session *r.Session) (DatadirSchema, error) {
 	errMsg := fmt.Sprintf("Unable to add datadir: %+v", dir)
-	resp, err := r.Table("datadirs").Insert(dir, r.InsertOpts{ReturnChanges: true}).RunWrite(e.Session)
+	resp, err := r.Table("datadirs").Insert(dir, r.InsertOpts{ReturnChanges: true}).RunWrite(session)
 	if err := checkRethinkdbInsertError(resp, err, errMsg); err != nil {
 		return dir, err
 	}
 
 	var d DatadirSchema
-	err = encoding.Decode(&d, resp.Changes[0].NewValue)
-	return d, err
+	if err := encoding.Decode(&d, resp.Changes[0].NewValue); err != nil {
+		return d, err
+	}
+
+	proj2datadir := map[string]interface{}{"project_id": dir.Project, "datadir_id": d.ID}
+
+	resp, err = r.Table("project2datadir").Insert(proj2datadir, r.InsertOpts{ReturnChanges: true}).RunWrite(session)
+
+	if err := checkRethinkdbInsertError(resp, err, errMsg); err != nil {
+		return d, err
+	}
+
+	return d, nil
+}
+
+func toDatadirSchema(ddModel AddDatadirModel) DatadirSchema {
+	now := time.Now()
+
+	dd := DatadirSchema{
+		Model: Model{
+			Name:      ddModel.Name,
+			Owner:     ddModel.Owner,
+			Birthtime: now,
+			MTime:     now,
+			OType:     "datadir",
+		},
+		Parent:  ddModel.Parent,
+		Project: ddModel.ProjectID,
+	}
+
+	return dd
 }
 
 func (e *DatadirsStoreEngineRethinkdb) GetDatadirByPathInProject(path, projectID string) (DatadirSchema, error) {
