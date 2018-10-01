@@ -134,5 +134,7 @@ func cleanupProjectsStoreEngine(e store.ProjectsStoreEngine) {
 	if re, ok := e.(*store.ProjectsStoreEngineRethinkdb); ok {
 		session := re.Session
 		r.Table("projects").Delete().RunWrite(session)
+		r.Table("datadirs").Delete().RunWrite(session)
+		r.Table("project2datadir").Delete().RunWrite(session)
 	}
 }
