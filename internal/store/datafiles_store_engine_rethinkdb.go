@@ -23,8 +23,19 @@ func (e *DatafilesStoreEngineRethinkdb) AddFile(file DatafileSchema, projectID, 
 	}
 
 	var f DatafileSchema
-	err = encoding.Decode(&f, resp.Changes[0].NewValue)
-	return f, err
+	if err := encoding.Decode(&f, resp.Changes[0].NewValue); err != nil {
+		return f, err
+	}
+
+	proj2datafile := map[string]interface{}{"project_id": projectID, "datafile_id": f.ID}
+	resp, err = r.Table("project2datafile").Insert(proj2datafile, r.InsertOpts{ReturnChanges: true}).RunWrite(e.Session)
+	if err := checkRethinkdbInsertError(resp, err, errMsg); err != nil {
+		return f, err
+	}
+
+	datadir2datafile := map[string]interface{}{"datadir_id": datadirID, "datafile_id": f.ID}
+	resp, err = r.Table("datadir2datafile").Insert(datadir2datafile, r.InsertOpts{ReturnChanges: true}).RunWrite(e.Session)
+	return f, checkRethinkdbInsertError(resp, err, errMsg)
 }
 
 func (e *DatafilesStoreEngineRethinkdb) GetFile(id string) (DatafileSchema, error) {
