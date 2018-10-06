@@ -60,12 +60,6 @@ func (l *MCFileLoader) loadDirectory(path string, finfo os.FileInfo) error {
 		return nil
 	}
 
-	//parentDirPath := filepath.Dir(dirPath)
-	//parentDir, err := l.ddStore.GetDatadirByPathInProject(parentDirPath, l.project.ID)
-	//if err != nil {
-	//	return errors.Wrapf(err, "Can't find parent path (%s) for (%s)", parentDirPath, dirPath)
-	//}
-
 	dir := store.AddDatadirModel{
 		Name:      dirPath,
 		Owner:     l.owner,
@@ -74,15 +68,10 @@ func (l *MCFileLoader) loadDirectory(path string, finfo os.FileInfo) error {
 	}
 
 	if _, err := l.ddStore.AddDatadir(dir); err != nil {
-		return err
+		return errors.Wrapf(err, "Unable to create Datadir for path (%s) in project (%s)", dirPath, l.project.ID)
 	}
 
 	return nil
-}
-
-func (l *MCFileLoader) getParent(path string, projectID string) (store.DatadirSchema, error) {
-	parentPath := filepath.Dir(path)
-	return l.ddStore.GetDatadirByPathInProject(parentPath, projectID)
 }
 
 func (l *MCFileLoader) loadFile(path string, finfo os.FileInfo) error {

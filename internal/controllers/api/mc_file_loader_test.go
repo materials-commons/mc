@@ -11,7 +11,7 @@ import (
 )
 
 func TestMCFileLoaderLoadOnlyADirectory(t *testing.T) {
-	// Create a finfo so we can pass it to LoadFileOrDir, doesn't matter what it points at
+	// Create a finfo so we can pass it to LoadFileOrDir, doesn't matter what it points at as long as its a directory
 	finfo, err := os.Stat(".")
 	assert.Okf(t, err, "Unable to stat current dir %s", err)
 
