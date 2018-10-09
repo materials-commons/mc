@@ -34,6 +34,7 @@ type DatafilesStoreEngine interface {
 	GetFile(id string) (DatafileSchema, error)
 	GetFileWithChecksum(checksum string) (DatafileSchema, error)
 	GetFileInDir(name string, dirID string) (DatafileSchema, error)
+	UpdateFileCurrentFlag(fileID string, current bool) error
 }
 
 type DatadirsStoreEngine interface {

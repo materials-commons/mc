@@ -1,3 +1,7 @@
+/**
+ ** FileLoader will load all the files and directories at a root. It assumes that the root already exists so it skips
+ ** sending the starting directory to the Skipper and Loader functions.
+ */
 package api
 
 import (
@@ -9,18 +13,21 @@ type Skipper func(path string, finfo os.FileInfo) bool
 type Loader func(path string, info os.FileInfo) error
 
 type FileLoader struct {
-	Skipper Skipper
-	Loader  Loader
+	Skipper Skipper // Method to call to see if this entry should be skipped
+	Loader  Loader  // Method to call to load the entry if it is not skipped
 }
 
+// DefaultSkipper doesn't skip any entries.
 func DefaultSkipper(path string, finfo os.FileInfo) bool {
 	return false
 }
 
+// ExcludeListSkipper contains a list of entries to skip
 type ExcludeListSkipper struct {
 	ExcludeList map[string]string
 }
 
+// NewExcludeListSkipper creates a new ExludeListSkipper from the list of entries to exclude.
 func NewExcludeListSkipper(excludeList []string) *ExcludeListSkipper {
 	e := &ExcludeListSkipper{ExcludeList: make(map[string]string)}
 	for _, entry := range excludeList {
@@ -71,7 +78,9 @@ func (l *FileLoader) LoadFiles(path string) error {
 			return nil
 
 		case path == fpath:
-			// Always skip processing the root
+			// Always skip processing the root. We assume this entry already exists or that loading is
+			// starting from this entry. For example if you load /tmp/dir, then all entries under /tmp/dir
+			// will be processed, but the /tmp/dir starting dir will be skipped.
 			return nil
 
 		default:

@@ -3,11 +3,11 @@ package store
 import "time"
 
 type DatafilesStore struct {
-	DatafilesStoreEngine
+	dfStoreEngine DatafilesStoreEngine
 }
 
 func NewDatafilesStore(e DatafilesStoreEngine) *DatafilesStore {
-	return &DatafilesStore{DatafilesStoreEngine: e}
+	return &DatafilesStore{dfStoreEngine: e}
 }
 
 func (s *DatafilesStore) AddDatafile(dfModel AddDatafileModel) (DatafileSchema, error) {
@@ -29,19 +29,24 @@ func (s *DatafilesStore) AddDatafile(dfModel AddDatafileModel) (DatafileSchema, 
 		Checksum:    dfModel.Checksum,
 		UsesID:      dfModel.UsesID,
 		Parent:      dfModel.Parent,
+		Current:     true,
 	}
 
-	return s.AddFile(df, dfModel.ProjectID, dfModel.DatadirID)
+	return s.dfStoreEngine.AddFile(df, dfModel.ProjectID, dfModel.DatadirID)
 }
 
 func (s *DatafilesStore) GetDatafileByID(id string) (DatafileSchema, error) {
-	return s.GetFile(id)
+	return s.dfStoreEngine.GetFile(id)
 }
 
 func (s *DatafilesStore) GetDatafileWithChecksum(checksum string) (DatafileSchema, error) {
-	return s.GetDatafileWithChecksum(checksum)
+	return s.dfStoreEngine.GetFileWithChecksum(checksum)
 }
 
 func (s *DatafilesStore) GetDatafileInDir(name, datadirID string) (DatafileSchema, error) {
-	return s.GetDatafileInDir(name, datadirID)
+	return s.dfStoreEngine.GetFileInDir(name, datadirID)
+}
+
+func (s *DatafilesStore) UpdateDatafileCurrentFlag(id string, current bool) error {
+	return s.dfStoreEngine.UpdateFileCurrentFlag(id, current)
 }

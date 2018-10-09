@@ -76,3 +76,12 @@ func (e *DatafilesStoreEngineRethinkdb) GetFileInDir(name string, dirID string) 
 	err = res.One(&file)
 	return file, err
 }
+
+func (e *DatafilesStoreEngineRethinkdb) UpdateFileCurrentFlag(id string, current bool) error {
+	errMsg := fmt.Sprintf("failed updated file %s current flag", id)
+
+	resp, err := r.Table("datafiles").Get(id).
+		Update(map[string]interface{}{"current": current}).RunWrite(e.Session)
+
+	return checkRethinkdbUpdateError(resp, err, errMsg)
+}
