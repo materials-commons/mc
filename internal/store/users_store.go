@@ -9,7 +9,7 @@ import (
 )
 
 type UsersStore struct {
-	UsersStoreEngine
+	UsersStoreEngine UsersStoreEngine
 }
 
 func NewUsersStore(e UsersStoreEngine) *UsersStore {

@@ -3,11 +3,11 @@ package store
 import "time"
 
 type DatadirsStore struct {
-	DatadirsStoreEngine
+	ddStoreEngine DatadirsStoreEngine
 }
 
 func NewDatadirsStore(e DatadirsStoreEngine) *DatadirsStore {
-	return &DatadirsStore{DatadirsStoreEngine: e}
+	return &DatadirsStore{ddStoreEngine: e}
 }
 
 func (s *DatadirsStore) AddDatadir(ddModel AddDatadirModel) (DatadirSchema, error) {
@@ -29,13 +29,13 @@ func (s *DatadirsStore) AddDatadir(ddModel AddDatadirModel) (DatadirSchema, erro
 		Project: ddModel.ProjectID,
 	}
 
-	return s.DatadirsStoreEngine.AddDir(dd)
+	return s.ddStoreEngine.AddDir(dd)
 }
 
 func (s *DatadirsStore) GetDatadirByPathInProject(path, projectID string) (DatadirSchema, error) {
-	return s.DatadirsStoreEngine.GetDatadirByPathInProject(path, projectID)
+	return s.ddStoreEngine.GetDatadirByPathInProject(path, projectID)
 }
 
 func (s *DatadirsStore) GetDatadirByID(id string) (DatadirSchema, error) {
-	return s.DatadirsStoreEngine.GetDatadir(id)
+	return s.ddStoreEngine.GetDatadir(id)
 }
