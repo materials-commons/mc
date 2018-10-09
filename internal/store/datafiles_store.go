@@ -31,7 +31,7 @@ func (s *DatafilesStore) AddDatafile(dfModel AddDatafileModel) (DatafileSchema, 
 		Parent:      dfModel.Parent,
 	}
 
-	return s.AddFile(df)
+	return s.AddFile(df, dfModel.ProjectID, dfModel.DatadirID)
 }
 
 func (s *DatafilesStore) GetDatafileByID(id string) (DatafileSchema, error) {
