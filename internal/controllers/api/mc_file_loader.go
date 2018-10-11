@@ -12,6 +12,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/materials-commons/mc/internal/file"
+
 	"github.com/pkg/errors"
 
 	"github.com/materials-commons/mc/internal/store"
@@ -104,13 +106,19 @@ func (l *MCFileLoader) loadFile(path string, finfo os.FileInfo) error {
 		return err
 	}
 
+	mediatype := file.GetMediaTypeByExtension(path)
+
 	addFile := store.AddDatafileModel{
-		Name:      "",
+		Name:      filepath.Base(path),
 		Owner:     l.owner,
 		Checksum:  checksum,
 		Size:      finfo.Size(),
 		ProjectID: l.project.ID,
 		DatadirID: l.currentRootDatadir.ID,
+		MediaType: store.DatafileMediaType{
+			Mime:        mediatype.Mime,
+			Description: mediatype.Description,
+		},
 	}
 
 	// See if a file with matching checksum already exists, and if so
