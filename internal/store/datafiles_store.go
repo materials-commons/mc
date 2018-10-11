@@ -1,6 +1,8 @@
 package store
 
-import "time"
+import (
+	"time"
+)
 
 type DatafilesStore struct {
 	dfStoreEngine DatafilesStoreEngine
@@ -30,6 +32,7 @@ func (s *DatafilesStore) AddDatafile(dfModel AddDatafileModel) (DatafileSchema, 
 		UsesID:      dfModel.UsesID,
 		Parent:      dfModel.Parent,
 		Current:     true,
+		MediaType:   dfModel.MediaType,
 	}
 
 	return s.dfStoreEngine.AddFile(df, dfModel.ProjectID, dfModel.DatadirID)
