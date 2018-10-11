@@ -12,6 +12,14 @@ import (
 	"github.com/materials-commons/mc/pkg/tutils/assert"
 )
 
+type loader struct {
+	loaderFunc func(path string, info os.FileInfo) error
+}
+
+func (l *loader) LoadFileOrDir(path string, info os.FileInfo) error {
+	return l.loaderFunc(path, info)
+}
+
 func TestLoadFiles(t *testing.T) {
 	var tmpFile string
 	tmpDir, err := prepareTestDirTree("test/dir")
@@ -23,10 +31,12 @@ func TestLoadFiles(t *testing.T) {
 
 	results := []string{""}
 
-	loader := func(path string, finfo os.FileInfo) error {
+	loaderFunc := func(path string, finfo os.FileInfo) error {
 		results = append(results, path)
 		return nil
 	}
+
+	loader := &loader{loaderFunc: loaderFunc}
 
 	createSkipperForPath := func(whatToSkip string) file.Skipper {
 		return func(path string, finfo os.FileInfo) bool {

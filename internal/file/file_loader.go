@@ -1,5 +1,5 @@
 /**
- ** FileLoader will load all the files and directories at a root. It assumes that the root already exists so it skips
+ ** Loader will load all the files and directories at a root. It assumes that the root already exists so it skips
  ** sending the starting directory to the Skipper and Loader functions.
  */
 package file
@@ -9,12 +9,15 @@ import (
 	"path/filepath"
 )
 
-type Skipper func(path string, finfo os.FileInfo) bool
-type Loader func(path string, info os.FileInfo) error
+type DirectoryLoader interface {
+	LoadFileOrDir(path string, info os.FileInfo) error
+}
 
-type FileLoader struct {
-	Skipper Skipper // Method to call to see if this entry should be skipped
-	Loader  Loader  // Method to call to load the entry if it is not skipped
+type Skipper func(path string, finfo os.FileInfo) bool
+
+type Loader struct {
+	Skipper         Skipper         // Method to call to see if this entry should be skipped
+	DirectoryLoader DirectoryLoader // Interface to call to load the entry if it is not skipped
 }
 
 // DefaultSkipper doesn't skip any entries.
@@ -42,21 +45,17 @@ func (s *ExcludeListSkipper) Skipper(path string, finfo os.FileInfo) bool {
 	return ok
 }
 
-func NewFileLoader(skipper Skipper, loader Loader) *FileLoader {
+func NewFileLoader(skipper Skipper, loader DirectoryLoader) *Loader {
 	s := DefaultSkipper
 
 	if skipper != nil {
 		s = skipper
 	}
 
-	if loader == nil {
-		panic("A loader for NewFileLoader must be specified")
-	}
-
-	return &FileLoader{Skipper: s, Loader: loader}
+	return &Loader{Skipper: s, DirectoryLoader: loader}
 }
 
-func (l *FileLoader) LoadFiles(path string) error {
+func (l *Loader) LoadFiles(path string) error {
 	err := filepath.Walk(path, func(fpath string, finfo os.FileInfo, err error) error {
 		switch {
 		case err != nil && os.IsPermission(err):
@@ -84,7 +83,7 @@ func (l *FileLoader) LoadFiles(path string) error {
 			return nil
 
 		default:
-			l.Loader(fpath, finfo)
+			l.DirectoryLoader.LoadFileOrDir(fpath, finfo)
 			return nil
 		}
 	})
