@@ -24,6 +24,9 @@ devtest:
 dep:
 	dep ensure
 
+testdb:
+	-(cd ./internal/store/migration; go test)
+
 test:
 	-(cd ./internal/store/migration; go test)
 	-go test -v ./...
