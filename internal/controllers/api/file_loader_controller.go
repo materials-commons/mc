@@ -1,15 +1,18 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
-	"os"
-	"path/filepath"
+
+	"github.com/materials-commons/mc/internal/store"
 
 	"github.com/labstack/echo"
+	"github.com/materials-commons/mc/internal/file"
 )
 
-type FileLoaderController struct {
+type FileLoaderController struct{}
+
+func NewFileLoaderController() *FileLoaderController {
+	return &FileLoaderController{}
 }
 
 type LoadFilesReq struct {
@@ -17,6 +20,12 @@ type LoadFilesReq struct {
 	User      string   `json:"user"`
 	Path      string   `json:"path"`
 	Exclude   []string `json:"exclude"`
+}
+
+type fileLoaderStores struct {
+	projectsStore  *store.ProjectsStore
+	datafilesStore *store.DatafilesStore
+	datadirsStore  *store.DatadirsStore
 }
 
 func (f *FileLoaderController) LoadFilesFromDirectory(c echo.Context) error {
@@ -31,27 +40,31 @@ func (f *FileLoaderController) LoadFilesFromDirectory(c echo.Context) error {
 		return err
 	}
 
-	go f.loadFiles(req)
+	db := c.Get("DB").(store.DB)
+	stores := &fileLoaderStores{
+		projectsStore:  db.ProjectsStore(),
+		datafilesStore: db.DatafilesStore(),
+		datadirsStore:  db.DatadirsStore(),
+	}
+
+	proj, err := stores.projectsStore.GetProjectSimple(req.ProjectID)
+	if err != nil {
+		return err
+	}
+
+	go f.loadFiles(req, proj, stores)
 
 	return c.JSON(http.StatusOK, map[string]interface{}{"load_id": loadID})
 }
 
-func (f *FileLoaderController) loadFiles(req LoadFilesReq) {
-	err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			fmt.Printf("prevent panic by handling failure accessing a path %q: %v\n", path, err)
-			return err
-		}
-		if info.IsDir() && info.Name() == "" {
-			fmt.Printf("skipping a dir without errors: %+v \n", info.Name())
-			return filepath.SkipDir
-		}
-		fmt.Printf("visited file or dir: %q\n", path)
-		return nil
-	})
-	fmt.Println("err", err)
+func (f *FileLoaderController) loadFiles(req LoadFilesReq, proj store.ProjectSimpleModel, stores *fileLoaderStores) {
+	loader := file.NewMCFileLoader(req.Path, req.User, proj, stores.datafilesStore, stores.datadirsStore)
+	skipper := file.NewExcludeListSkipper(req.Exclude)
+	fl := file.NewFileLoader(skipper.Skipper, loader)
+	fl.LoadFiles(req.Path)
 }
 
 func (f *FileLoaderController) createLoadReq(req LoadFilesReq) (id string, err error) {
+	id = "abc123"
 	return id, err
 }
