@@ -2,7 +2,7 @@
  ** FileLoader will load all the files and directories at a root. It assumes that the root already exists so it skips
  ** sending the starting directory to the Skipper and Loader functions.
  */
-package api
+package file
 
 import (
 	"os"

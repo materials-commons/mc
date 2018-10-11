@@ -2,7 +2,7 @@
  ** MCFileLoader loads files and directories into a Materials Commons project. It does various checks to see
  ** if the file or directory already exists.
  */
-package api
+package file
 
 import (
 	"crypto/md5"
@@ -11,8 +11,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/materials-commons/mc/internal/file"
 
 	"github.com/pkg/errors"
 
@@ -106,7 +104,7 @@ func (l *MCFileLoader) loadFile(path string, finfo os.FileInfo) error {
 		return err
 	}
 
-	mediatype := file.GetMediaTypeByExtension(path)
+	mediatype := GetMediaTypeByExtension(path)
 
 	addFile := store.AddDatafileModel{
 		Name:      filepath.Base(path),

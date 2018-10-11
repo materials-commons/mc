@@ -1,4 +1,4 @@
-package api_test
+package file_test
 
 import (
 	"fmt"
@@ -7,7 +7,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/materials-commons/mc/internal/controllers/api"
+	"github.com/materials-commons/mc/internal/file"
+
 	"github.com/materials-commons/mc/pkg/tutils/assert"
 )
 
@@ -27,7 +28,7 @@ func TestLoadFiles(t *testing.T) {
 		return nil
 	}
 
-	createSkipperForPath := func(whatToSkip string) api.Skipper {
+	createSkipperForPath := func(whatToSkip string) file.Skipper {
 		return func(path string, finfo os.FileInfo) bool {
 			return path == whatToSkip
 		}
@@ -37,10 +38,10 @@ func TestLoadFiles(t *testing.T) {
 		return true
 	}
 
-	excludeListSkipper := api.NewExcludeListSkipper([]string{filepath.Join(tmpDir, "test/dir"), tmpFile})
+	excludeListSkipper := file.NewExcludeListSkipper([]string{filepath.Join(tmpDir, "test/dir"), tmpFile})
 
 	tests := []struct {
-		skipper  api.Skipper
+		skipper  file.Skipper
 		expected []string
 		name     string
 	}{
@@ -73,7 +74,7 @@ func TestLoadFiles(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			fileLoader := api.NewFileLoader(test.skipper, loader)
+			fileLoader := file.NewFileLoader(test.skipper, loader)
 			results = nil
 			err = fileLoader.LoadFiles(tmpDir)
 			assert.Okf(t, err, "LoadFiles returned err %s", err)

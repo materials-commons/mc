@@ -1,4 +1,4 @@
-package api_test
+package file_test
 
 import (
 	"io/ioutil"
@@ -6,7 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/materials-commons/mc/internal/controllers/api"
+	"github.com/materials-commons/mc/internal/file"
+
 	"github.com/materials-commons/mc/internal/store"
 	"github.com/materials-commons/mc/pkg/tutils/assert"
 )
@@ -37,7 +38,7 @@ func TestMCFileLoaderLoadOnlyADirectory(t *testing.T) {
 	projDataDir, err = ddStore.AddDatadir(dirToAdd)
 	assert.Okf(t, err, "Unable to add project dir %s", err)
 
-	mcFileLoader := api.NewMCFileLoader("/tmp", "mctest", project, store.NewDatafilesStore(nil), ddStore)
+	mcFileLoader := file.NewMCFileLoader("/tmp", "mctest", project, store.NewDatafilesStore(nil), ddStore)
 
 	// Load /tmp/dir for the first time
 	t.Run("Initial load of directory /tmp/dir", func(t *testing.T) {
@@ -103,7 +104,7 @@ func TestMCFileLoaderLoadOnlyAFile(t *testing.T) {
 	projDataDir, err = ddStore.AddDatadir(dirToAdd)
 	assert.Okf(t, err, "Unable to add project dir %s", err)
 
-	mcFileLoader := api.NewMCFileLoader("/tmp", "mctest@test.com", project, dfStore, ddStore)
+	mcFileLoader := file.NewMCFileLoader("/tmp", "mctest@test.com", project, dfStore, ddStore)
 
 	t.Run("Check simple file load works", func(t *testing.T) {
 		var df store.DatafileSchema
