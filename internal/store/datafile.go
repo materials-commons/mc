@@ -33,13 +33,14 @@ type AddDatafileModel struct {
 	Size        int64
 	ProjectID   string
 	DatadirID   string
+	MediaType   DatafileMediaType
 }
 
 func (d AddDatafileModel) Validate() error {
 	err := validation.ValidateStruct(&d,
 		validation.Field(&d.Name, validation.Required, validation.Length(1, 50)),
 		validation.Field(&d.Owner, validation.Required, is.Email),
-		validation.Field(&d.Description, validation.Required, validation.Length(0, 300)),
+		validation.Field(&d.Description, validation.Length(0, 300)),
 		validation.Field(&d.Size, validation.Required, validation.Min(1)))
 
 	if err != nil {
