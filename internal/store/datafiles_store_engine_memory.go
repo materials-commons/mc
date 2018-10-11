@@ -53,7 +53,7 @@ func (e *DatafilesStoreEngineMemory) GetFileWithChecksum(checksum string) (Dataf
 
 func (e *DatafilesStoreEngineMemory) GetFileInDir(name string, dirID string) (DatafileSchema, error) {
 	for _, dfEntry := range e.DB {
-		if dfEntry.datadirID == dirID && dfEntry.dataFile.Name == name {
+		if dfEntry.datadirID == dirID && dfEntry.dataFile.Name == name && dfEntry.dataFile.Current {
 			return dfEntry.dataFile, nil
 		}
 	}
