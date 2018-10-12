@@ -15,10 +15,15 @@
 package cmd
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/materials-commons/mc/internal/controllers/api"
+	"github.com/materials-commons/mc/internal/store"
 	"github.com/spf13/cobra"
+	r "gopkg.in/gorethink/gorethink.v4"
 )
 
 // siteCmd represents the site command
@@ -55,4 +60,22 @@ func setupAPIRoutes(e *echo.Echo) {
 
 	uc := &api.UsersController{}
 	g.POST("/getUserAPIKey", uc.GetUserByAPIKey).Name = "getUserByAPIKey"
+
+	db := os.Getenv("MCDB")
+	if db == "" {
+		db = "materialscommons"
+	}
+
+	address := os.Getenv("MCDB_CONNECTION")
+	if address == "" {
+		address = "localhost:28015"
+	}
+
+	session, err := r.Connect(r.ConnectOpts{Database: db, Address: address})
+	if err != nil {
+		panic(fmt.Sprintf("unable to connect to rethinkdb server, database: %s, address: %s, error: %s", db, address, err))
+	}
+
+	fileLoaderController := api.NewFileLoaderController(store.NewDBRethinkdb(session))
+	g.POST("/loadFilesFromDirectory", fileLoaderController.LoadFilesFromDirectory).Name = "loadFilesFromDirectory"
 }
