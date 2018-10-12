@@ -10,6 +10,23 @@ type MediaType struct {
 	Description string
 }
 
+func init() {
+	mime.AddExtensionType(".m", "application/matlab")
+}
+
+func GetMediaTypeByExtension(path string) MediaType {
+	var (
+		mt MediaType
+		ok bool
+	)
+	mt.Mime = mime.TypeByExtension(filepath.Ext(path))
+	mt.Description, ok = mediaTypeDescriptions[mt.Mime]
+	if !ok {
+		mt.Description = "Unknown"
+	}
+	return mt
+}
+
 // maps media types to descriptions most people would recognize.
 var mediaTypeDescriptions = map[string]string{
 	"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":         "Spreadsheet",
@@ -52,21 +69,4 @@ var mediaTypeDescriptions = map[string]string{
 	"application/zip":                          "ZIP",
 	"application/msword":                       "MS-Word",
 	"unknown":                                  "Unknown",
-}
-
-func init() {
-	mime.AddExtensionType(".m", "application/matlab")
-}
-
-func GetMediaTypeByExtension(path string) MediaType {
-	var (
-		mt MediaType
-		ok bool
-	)
-	mt.Mime = mime.TypeByExtension(filepath.Ext(path))
-	mt.Description, ok = mediaTypeDescriptions[mt.Mime]
-	if !ok {
-		mt.Description = "Unknown"
-	}
-	return mt
 }
