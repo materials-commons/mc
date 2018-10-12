@@ -1,10 +1,8 @@
 package file
 
 import (
+	"mime"
 	"path/filepath"
-	"strings"
-
-	"gopkg.in/h2non/filetype.v1"
 )
 
 type MediaType struct {
@@ -57,27 +55,18 @@ var mediaTypeDescriptions = map[string]string{
 }
 
 func init() {
-	filetype.AddType("txt", "text/plain")
-	filetype.AddType("m", "application/matlab")
+	mime.AddExtensionType(".m", "application/matlab")
 }
 
 func GetMediaTypeByExtension(path string) MediaType {
-	var mt MediaType
-	ext := strings.ToLower(filepath.Ext(path)[1:])
-	mime := filetype.GetType(ext)
-	switch mime.Extension {
-	case "unknown":
-		mt.Description = mediaTypeDescriptions["unknown"]
-		mt.Mime = "unknown"
-	default:
-		mt.Mime = mime.MIME.Value
-		desc, ok := mediaTypeDescriptions[mt.Mime]
-		if !ok {
-			mt.Description = "Unknown"
-		} else {
-			mt.Description = desc
-		}
+	var (
+		mt MediaType
+		ok bool
+	)
+	mt.Mime = mime.TypeByExtension(filepath.Ext(path))
+	mt.Description, ok = mediaTypeDescriptions[mt.Mime]
+	if !ok {
+		mt.Description = "Unknown"
 	}
-
 	return mt
 }
