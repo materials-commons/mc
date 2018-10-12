@@ -9,10 +9,23 @@ import (
 	"github.com/materials-commons/mc/internal/file"
 )
 
-type FileLoaderController struct{}
+type fileLoaderStores struct {
+	projectsStore  *store.ProjectsStore
+	datafilesStore *store.DatafilesStore
+	datadirsStore  *store.DatadirsStore
+}
 
-func NewFileLoaderController() *FileLoaderController {
-	return &FileLoaderController{}
+type FileLoaderController struct {
+	stores *fileLoaderStores
+}
+
+func NewFileLoaderController(db store.DB) *FileLoaderController {
+	stores := &fileLoaderStores{
+		projectsStore:  db.ProjectsStore(),
+		datafilesStore: db.DatafilesStore(),
+		datadirsStore:  db.DatadirsStore(),
+	}
+	return &FileLoaderController{stores: stores}
 }
 
 type LoadFilesReq struct {
@@ -20,12 +33,6 @@ type LoadFilesReq struct {
 	User      string   `json:"user"`
 	Path      string   `json:"path"`
 	Exclude   []string `json:"exclude"`
-}
-
-type fileLoaderStores struct {
-	projectsStore  *store.ProjectsStore
-	datafilesStore *store.DatafilesStore
-	datadirsStore  *store.DatadirsStore
 }
 
 func (f *FileLoaderController) LoadFilesFromDirectory(c echo.Context) error {
@@ -40,25 +47,18 @@ func (f *FileLoaderController) LoadFilesFromDirectory(c echo.Context) error {
 		return err
 	}
 
-	db := c.Get("DB").(store.DB)
-	stores := &fileLoaderStores{
-		projectsStore:  db.ProjectsStore(),
-		datafilesStore: db.DatafilesStore(),
-		datadirsStore:  db.DatadirsStore(),
-	}
-
-	proj, err := stores.projectsStore.GetProjectSimple(req.ProjectID)
+	proj, err := f.stores.projectsStore.GetProjectSimple(req.ProjectID)
 	if err != nil {
 		return err
 	}
 
-	go f.loadFiles(req, proj, stores)
+	go f.loadFiles(req, proj)
 
 	return c.JSON(http.StatusOK, map[string]interface{}{"load_id": loadID})
 }
 
-func (f *FileLoaderController) loadFiles(req LoadFilesReq, proj store.ProjectSimpleModel, stores *fileLoaderStores) {
-	loader := file.NewMCFileLoader(req.Path, req.User, proj, stores.datafilesStore, stores.datadirsStore)
+func (f *FileLoaderController) loadFiles(req LoadFilesReq, proj store.ProjectSimpleModel) {
+	loader := file.NewMCFileLoader(req.Path, req.User, proj, f.stores.datafilesStore, f.stores.datadirsStore)
 	skipper := file.NewExcludeListSkipper(req.Exclude)
 	fl := file.NewFileLoader(skipper.Skipper, loader)
 	fl.LoadFiles(req.Path)
