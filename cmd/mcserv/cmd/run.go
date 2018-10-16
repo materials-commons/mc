@@ -88,8 +88,8 @@ func setupEcho() *echo.Echo {
 func setupAPIRoutes(e *echo.Echo, db store.DB) {
 	g := e.Group("/api")
 
-	uc := &api.UsersController{}
-	g.POST("/getUserAPIKey", uc.GetUserByAPIKey).Name = "getUserByAPIKey"
+	//uc := &api.UsersController{}
+	//g.POST("/getUserAPIKey", uc.GetUserByAPIKey).Name = "getUserByAPIKey"
 
 	fileLoaderController := api.NewFileLoaderController(db)
 	g.POST("/loadFilesFromDirectory", fileLoaderController.LoadFilesFromDirectory).Name = "loadFilesFromDirectory"
