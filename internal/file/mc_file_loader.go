@@ -50,7 +50,7 @@ func (l *MCFileLoader) LoadFileOrDir(path string, finfo os.FileInfo) error {
 		// The root directory changed, so get the directory from Materials Commons and set it as our "root" we are processing
 		l.currentRootDatadir, err = l.ddStore.GetDatadirByPathInProject(dirName, l.project.ID)
 		if err != nil {
-			errors.Wrapf(err, "Unable to get dir for path (%s) and project ID (%s) as new current dir", dirName, l.project.ID)
+			return errors.Wrapf(err, "Unable to get dir for path (%s) and project ID (%s) as new current dir", dirName, l.project.ID)
 		}
 	}
 

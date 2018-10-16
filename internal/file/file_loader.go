@@ -83,8 +83,7 @@ func (l *Loader) LoadFiles(path string) error {
 			return nil
 
 		default:
-			l.DirectoryLoader.LoadFileOrDir(fpath, finfo)
-			return nil
+			return l.DirectoryLoader.LoadFileOrDir(fpath, finfo)
 		}
 	})
 

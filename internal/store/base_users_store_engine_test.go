@@ -170,15 +170,13 @@ func addDefaultUsersToStoreEngine(t *testing.T, e store.UsersStoreEngine) {
 
 	for _, user := range users {
 		_, err := e.AddUser(user)
-		//assert.Okf(t, err, "Failed to add user %s", user.ID)
-		if err != nil {
-		}
+		assert.Okf(t, err, "Failed to add user %s", user.ID)
 	}
 }
 
 func cleanupUsersStoreEngine(e store.UsersStoreEngine) {
 	if re, ok := e.(*store.UsersStoreEngineRethinkdb); ok {
 		session := re.Session
-		r.Table("users").Delete().RunWrite(session)
+		_, _ = r.Table("users").Delete().RunWrite(session)
 	}
 }

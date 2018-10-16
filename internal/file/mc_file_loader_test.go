@@ -164,6 +164,6 @@ func TestMCFileLoaderLoadOnlyAFile(t *testing.T) {
 		assert.Truef(t, df.Size == finfo.Size(), "Datafile size in db not equal to actual file df = %d, actual = %d", df.Size, finfo.Size())
 		assert.Truef(t, df.Parent == "", "Datafile parent is set and should not be")
 		assert.Truef(t, df.Checksum != "", "Datafile checksum is blank")
-		assert.Truef(t, df.Current == false, "Datafile Current flag is true")
+		assert.Truef(t, !df.Current, "Datafile Current flag is true")
 	})
 }

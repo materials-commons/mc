@@ -3,6 +3,8 @@ package migration
 import (
 	"fmt"
 
+	"github.com/pkg/errors"
+
 	r "gopkg.in/gorethink/gorethink.v4"
 )
 
@@ -12,7 +14,7 @@ func RethinkDB(database, address string) error {
 		return fmt.Errorf("unable to connect to rethinkdb server, database: %s, address: %s, error: %s", database, address, err)
 	}
 
-	r.DBCreate(database).Exec(session)
+	_ = r.DBCreate(database).Exec(session)
 
 	tables := []r.Term{
 		// users table
@@ -76,11 +78,14 @@ func RethinkDB(database, address string) error {
 		r.TableCreate("file_loads"),
 	}
 
+	var errOnExec error
 	for _, table := range tables {
 		if err := table.Exec(session); err != nil {
-			//fmt.Printf("Failed creating table: %s", err)
+			if errOnExec != nil {
+				errOnExec = errors.Errorf("Error processing a table: %s", err)
+			}
 		}
 	}
 
-	return nil
+	return errOnExec
 }

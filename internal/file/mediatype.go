@@ -11,7 +11,7 @@ type MediaType struct {
 }
 
 func init() {
-	mime.AddExtensionType(".m", "application/matlab")
+	_ = mime.AddExtensionType(".m", "application/matlab")
 }
 
 func GetMediaTypeByExtension(path string) MediaType {

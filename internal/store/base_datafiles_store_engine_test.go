@@ -96,8 +96,8 @@ func addDefaultDatafilesToStoreEngine(t *testing.T, e store.DatafilesStoreEngine
 func cleanupDatafilesStoreEngine(e store.DatafilesStoreEngine) {
 	if re, ok := e.(*store.DatafilesStoreEngineRethinkdb); ok {
 		session := re.Session
-		r.Table("datafiles").Delete().RunWrite(session)
-		r.Table("project2datafile").Delete().RunWrite(session)
-		r.Table("datadir2datafile").Delete().RunWrite(session)
+		_, _ = r.Table("datafiles").Delete().RunWrite(session)
+		_, _ = r.Table("project2datafile").Delete().RunWrite(session)
+		_, _ = r.Table("datadir2datafile").Delete().RunWrite(session)
 	}
 }

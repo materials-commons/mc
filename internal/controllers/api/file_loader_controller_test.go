@@ -30,7 +30,7 @@ func TestFileLoaderController_LoadFilesFromDirectory(t *testing.T) {
 	c, rec := setupEcho(j)
 
 	var resp struct {
-		LoadID string `json:"load_id"`
+		FileLoadID string `json:"file_load_id"`
 	}
 
 	err = uploadController.LoadFilesFromDirectory(c)
@@ -40,7 +40,7 @@ func TestFileLoaderController_LoadFilesFromDirectory(t *testing.T) {
 	err = json.Unmarshal(rec.Body.Bytes(), &resp)
 	assert.Okf(t, err, "Unable to marshal response: %s", err)
 
-	assert.Truef(t, resp.LoadID == "abc123", "Expected LoadID = abc123, got %s", resp.LoadID)
+	assert.Truef(t, resp.FileLoadID != "", "Expected LoadID, got blank")
 }
 
 func setupEcho(jsonBytes []byte) (echo.Context, *httptest.ResponseRecorder) {
