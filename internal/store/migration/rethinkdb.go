@@ -71,6 +71,9 @@ func RethinkDB(database, address string) error {
 		// templates table
 		r.TableCreate("templates"),
 		r.Table("templates").IndexCreate("owner"),
+
+		// file loads table
+		r.TableCreate("file_loads"),
 	}
 
 	for _, table := range tables {

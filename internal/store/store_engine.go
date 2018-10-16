@@ -61,9 +61,9 @@ type AssociationsStoreEngine interface {
 	AssociateSampleWithFile(sampleID, fileID string) error
 }
 
-type UploadStoreEngine interface {
-	AddUpload(upload UploadSchema) (UploadSchema, error)
-	DeleteUpload(uploadID string) error
-	GetUpload(uploadID string) (UploadSchema, error)
-	GetAllUploads() ([]UploadSchema, error)
+type FileLoadsStoreEngine interface {
+	AddFileLoad(fileLoad FileLoadSchema) (FileLoadSchema, error)
+	DeleteFileLoad(id string) error
+	GetFileLoad(id string) (FileLoadSchema, error)
+	GetAllFileLoads() ([]FileLoadSchema, error)
 }

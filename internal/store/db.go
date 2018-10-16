@@ -9,6 +9,7 @@ type DB interface {
 	UsersStore() *UsersStore
 	DatafilesStore() *DatafilesStore
 	DatadirsStore() *DatadirsStore
+	FileLoadsStore() *FileLoadsStore
 }
 
 type DBRethinkdb struct {
@@ -35,6 +36,10 @@ func (db *DBRethinkdb) DatadirsStore() *DatadirsStore {
 	return NewDatadirsStore(NewDatadirsStoreEngineRethinkdb(db.Session))
 }
 
+func (db *DBRethinkdb) FileLoadsStore() *FileLoadsStore {
+	return NewFileLoadsStore(NewFileLoadsStoreEngineRethinkdb(db.Session))
+}
+
 type DBMemory struct{}
 
 func (db *DBMemory) ProjectsStore() *ProjectsStore {
@@ -51,4 +56,8 @@ func (db *DBMemory) DatafilesStore() *DatafilesStore {
 
 func (db *DBMemory) DatadirsStore() *DatadirsStore {
 	return NewDatadirsStore(NewDatadirsStoreEngineMemory())
+}
+
+func (db *DBMemory) FileLoadsStore() *FileLoadsStore {
+	return NewFileLoadsStore(NewFileLoadsStoreEngineMemory())
 }
