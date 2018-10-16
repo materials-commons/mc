@@ -42,3 +42,11 @@ func (s *FileLoadsStore) GetFileLoad(id string) (FileLoadSchema, error) {
 func (s *FileLoadsStore) GetAllFileLoads() ([]FileLoadSchema, error) {
 	return s.flStoreEngine.GetAllFileLoads()
 }
+
+func (s *FileLoadsStore) MarkAllNotLoading() error {
+	return s.flStoreEngine.MarkAllNotLoading()
+}
+
+func (s *FileLoadsStore) UpdateLoading(id string, loading bool) error {
+	return s.flStoreEngine.UpdateLoading(id, loading)
+}

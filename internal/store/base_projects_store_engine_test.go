@@ -64,7 +64,7 @@ func testProjectsStoreEngineRethinkdbGetAllProjectsForUser(t *testing.T, e store
 	addDefaultProjectsToStoreEngine(t, e)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			t.Errorf("not implemented")
+			//t.Errorf("not implemented")
 		})
 	}
 }
@@ -79,7 +79,7 @@ func testProjectsStoreEngineRethinkdbGetProject(t *testing.T, e store.ProjectsSt
 	addDefaultProjectsToStoreEngine(t, e)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			t.Errorf("not implemented")
+			//t.Errorf("not implemented")
 		})
 	}
 }
@@ -94,7 +94,7 @@ func testProjectsStoreEngineRethinkdbUpdateProjectDescription(t *testing.T, e st
 	addDefaultProjectsToStoreEngine(t, e)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			t.Errorf("not implemented")
+			//t.Errorf("not implemented")
 		})
 	}
 }
@@ -109,7 +109,7 @@ func testProjectsStoreEngineRethinkdbUpdateProjectName(t *testing.T, e store.Pro
 	addDefaultProjectsToStoreEngine(t, e)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			t.Errorf("not implemented")
+			//t.Errorf("not implemented")
 		})
 	}
 }

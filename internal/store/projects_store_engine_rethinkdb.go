@@ -137,12 +137,12 @@ func (e *ProjectsStoreEngineRethinkdb) DeleteProject(id string) error {
 
 func (e *ProjectsStoreEngineRethinkdb) UpdateProjectName(id string, name string, updatedAt time.Time) error {
 	resp, err := r.Table("projects").Get(id).
-		Update(map[string]interface{}{"name": name, "updated_at": updatedAt}).RunWrite(e.Session)
+		Update(map[string]interface{}{"name": name, "updated_at": updatedAt}, r.UpdateOpts{ReturnChanges: true}).RunWrite(e.Session)
 	return checkRethinkdbUpdateError(resp, err, fmt.Sprintf("Unable to update name to '%s' for project %s", name, id))
 }
 
 func (e *ProjectsStoreEngineRethinkdb) UpdateProjectDescription(id string, description string, updatedAt time.Time) error {
 	resp, err := r.Table("projects").Get(id).
-		Update(map[string]interface{}{"description": description, "updated_at": updatedAt}).RunWrite(e.Session)
+		Update(map[string]interface{}{"description": description, "updated_at": updatedAt}, r.UpdateOpts{ReturnChanges: true}).RunWrite(e.Session)
 	return checkRethinkdbUpdateError(resp, err, fmt.Sprintf("Unable to update desciption to '%s' for project %s", description, id))
 }

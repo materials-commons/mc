@@ -6,28 +6,14 @@ import (
 	"github.com/materials-commons/mc/internal/store"
 
 	"github.com/labstack/echo"
-	"github.com/materials-commons/mc/internal/file"
 )
 
-type fileLoaderStores struct {
-	projectsStore  *store.ProjectsStore
-	datafilesStore *store.DatafilesStore
-	datadirsStore  *store.DatadirsStore
+type FileLoaderController struct {
 	fileloadsStore *store.FileLoadsStore
 }
 
-type FileLoaderController struct {
-	stores *fileLoaderStores
-}
-
 func NewFileLoaderController(db store.DB) *FileLoaderController {
-	stores := &fileLoaderStores{
-		projectsStore:  db.ProjectsStore(),
-		datafilesStore: db.DatafilesStore(),
-		datadirsStore:  db.DatadirsStore(),
-		fileloadsStore: db.FileLoadsStore(),
-	}
-	return &FileLoaderController{stores: stores}
+	return &FileLoaderController{fileloadsStore: db.FileLoadsStore()}
 }
 
 type LoadFilesReq struct {
@@ -49,21 +35,7 @@ func (f *FileLoaderController) LoadFilesFromDirectory(c echo.Context) error {
 		return err
 	}
 
-	proj, err := f.stores.projectsStore.GetProjectSimple(req.ProjectID)
-	if err != nil {
-		return err
-	}
-
-	go f.loadFiles(req, proj)
-
 	return c.JSON(http.StatusOK, map[string]interface{}{"file_load_id": fileLoadID})
-}
-
-func (f *FileLoaderController) loadFiles(req LoadFilesReq, proj store.ProjectSimpleModel) {
-	loader := file.NewMCFileLoader(req.Path, req.User, proj, f.stores.datafilesStore, f.stores.datadirsStore)
-	skipper := file.NewExcludeListSkipper(req.Exclude)
-	fl := file.NewFileLoader(skipper.Skipper, loader)
-	_ = fl.LoadFiles(req.Path)
 }
 
 func (f *FileLoaderController) createLoadReq(req LoadFilesReq) (id string, err error) {
@@ -74,6 +46,6 @@ func (f *FileLoaderController) createLoadReq(req LoadFilesReq) (id string, err e
 		Exclude:   req.Exclude,
 	}
 
-	fl, err := f.stores.fileloadsStore.AddFileLoad(flAdd)
+	fl, err := f.fileloadsStore.AddFileLoad(flAdd)
 	return fl.ID, err
 }

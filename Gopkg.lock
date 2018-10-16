@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  name = "github.com/Jeffail/tunny"
+  packages = ["."]
+  revision = "59cfa8fcb19f5acba8db07a0dd3cb2fa7edbc228"
+  version = "0.1.1"
+
+[[projects]]
   name = "github.com/asaskevich/govalidator"
   packages = ["."]
   revision = "ccb8e960c48f04d6935e72476ae4a51028f9e22f"
@@ -298,6 +304,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "517ebe29ebe9f8e1f995d013b30ff11555958b547ebff5122f33aa013f0fbe3d"
+  inputs-digest = "4f9d55cba52b4f28c8f0acbf795537c1fcade3c9b19b163a8c05e2ec127d0367"
   solver-name = "gps-cdcl"
   solver-version = 1

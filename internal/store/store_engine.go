@@ -66,4 +66,6 @@ type FileLoadsStoreEngine interface {
 	DeleteFileLoad(id string) error
 	GetFileLoad(id string) (FileLoadSchema, error)
 	GetAllFileLoads() ([]FileLoadSchema, error)
+	MarkAllNotLoading() error
+	UpdateLoading(id string, loading bool) error
 }

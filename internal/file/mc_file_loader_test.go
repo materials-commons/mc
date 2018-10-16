@@ -38,7 +38,8 @@ func TestMCFileLoaderLoadOnlyADirectory(t *testing.T) {
 	projDataDir, err = ddStore.AddDatadir(dirToAdd)
 	assert.Okf(t, err, "Unable to add project dir %s", err)
 
-	mcFileLoader := file.NewMCFileLoader("/tmp", "mctest", project, store.NewDatafilesStore(nil), ddStore)
+	mcFileLoader := file.NewMCFileLoader("/tmp", "mctest", "/tmp/mcdir", project, store.NewDatafilesStore(nil), ddStore)
+	defer os.RemoveAll("/tmp/mcdir")
 
 	// Load /tmp/dir for the first time
 	t.Run("Initial load of directory /tmp/dir", func(t *testing.T) {
@@ -104,7 +105,8 @@ func TestMCFileLoaderLoadOnlyAFile(t *testing.T) {
 	projDataDir, err = ddStore.AddDatadir(dirToAdd)
 	assert.Okf(t, err, "Unable to add project dir %s", err)
 
-	mcFileLoader := file.NewMCFileLoader("/tmp", "mctest@test.com", project, dfStore, ddStore)
+	mcFileLoader := file.NewMCFileLoader("/tmp", "mctest@test.com", "/tmp/mcdir", project, dfStore, ddStore)
+	defer os.RemoveAll("/tmp/mcdir")
 
 	t.Run("Check simple file load works", func(t *testing.T) {
 		var df store.DatafileSchema

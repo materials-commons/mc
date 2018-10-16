@@ -19,6 +19,7 @@ import (
 
 type MCFileLoader struct {
 	root               string
+	mcdir              string
 	dfStore            *store.DatafilesStore
 	ddStore            *store.DatadirsStore
 	project            store.ProjectSimpleModel // Project we are adding entries to
@@ -26,13 +27,14 @@ type MCFileLoader struct {
 	owner              string                   // Owner here is the MC user we are performing the processing on behalf, and not the project owner
 }
 
-func NewMCFileLoader(root, owner string, project store.ProjectSimpleModel, dfStore *store.DatafilesStore, ddStore *store.DatadirsStore) *MCFileLoader {
+func NewMCFileLoader(root, owner, mcdir string, project store.ProjectSimpleModel, dfStore *store.DatafilesStore, ddStore *store.DatadirsStore) *MCFileLoader {
 	return &MCFileLoader{
 		root:    root,
 		owner:   owner,
 		dfStore: dfStore,
 		ddStore: ddStore,
 		project: project,
+		mcdir:   mcdir,
 	}
 }
 
@@ -153,9 +155,14 @@ func (l *MCFileLoader) loadFile(path string, finfo os.FileInfo) error {
 		}
 	}
 
-	_, err = l.dfStore.AddDatafile(addFile)
+	var f store.DatafileSchema
 
-	return err
+	f, err = l.dfStore.AddDatafile(addFile)
+	if err != nil {
+		return err
+	}
+
+	return l.moveFile(path, f) // TODO: Delete file in database if movefile fails...
 }
 
 func (l *MCFileLoader) computeFileChecksum(path string) (string, error) {
@@ -172,4 +179,46 @@ func (l *MCFileLoader) computeFileChecksum(path string) (string, error) {
 	}
 
 	return fmt.Sprintf("%x", hasher.Sum(nil)), nil
+}
+
+func (l *MCFileLoader) moveFile(path string, f store.DatafileSchema) error {
+	dirPath := fileDir(l.mcdir, f.ID)
+	if err := os.MkdirAll(dirPath, 0700); err != nil {
+		return err
+	}
+
+	if err := os.Rename(path, filepath.Join(dirPath, f.ID)); err != nil {
+		// If rename fails try directly copying the file
+		if err := copyFile(path, filepath.Join(dirPath, f.ID)); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// copyFile the src file to dst. Any existing file will be overwritten and will not
+// copy file attributes.
+func copyFile(src, dst string) error {
+	in, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+
+	out, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, in)
+	if err != nil {
+		return err
+	}
+	return out.Close()
+}
+
+func fileDir(path, fileID string) string {
+	idSegments := strings.Split(fileID, "-")
+	return filepath.Join(path, idSegments[1][0:2], idSegments[1][2:4])
 }

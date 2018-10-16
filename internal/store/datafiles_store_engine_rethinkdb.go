@@ -81,7 +81,7 @@ func (e *DatafilesStoreEngineRethinkdb) UpdateFileCurrentFlag(id string, current
 	errMsg := fmt.Sprintf("failed updated file %s current flag", id)
 
 	resp, err := r.Table("datafiles").Get(id).
-		Update(map[string]interface{}{"current": current}).RunWrite(e.Session)
+		Update(map[string]interface{}{"current": current}, r.UpdateOpts{ReturnChanges: true}).RunWrite(e.Session)
 
 	return checkRethinkdbUpdateError(resp, err, errMsg)
 }

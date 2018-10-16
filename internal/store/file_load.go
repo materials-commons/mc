@@ -12,6 +12,7 @@ type FileLoadSchema struct {
 	Path      string   `db:"path" json:"path" r:"path"`
 	Owner     string   `db:"owner" json:"owner" r:"path"`
 	Exclude   []string `json:"exclude" r:"exclude"`
+	Loading   bool     `db:"loading" json:"loading" r:"loading"`
 }
 
 type AddFileLoadModel struct {

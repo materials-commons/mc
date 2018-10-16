@@ -56,3 +56,16 @@ func (e *FileLoadsStoreEngineRethinkdb) GetAllFileLoads() ([]FileLoadSchema, err
 	err = res.All(uploads)
 	return uploads, err
 }
+
+func (e *FileLoadsStoreEngineRethinkdb) MarkAllNotLoading() error {
+	errMsg := fmt.Sprintf("Unable to upload file loads")
+	resp, err := r.Table("file_loads").Update(map[string]interface{}{"loading": false}).RunWrite(e.Session)
+	return checkRethinkdbWriteError(resp, err, errMsg)
+}
+
+func (e *FileLoadsStoreEngineRethinkdb) UpdateLoading(id string, loading bool) error {
+	errMsg := fmt.Sprintf("Unable to update file load %s", id)
+	resp, err := r.Table("file_loads").
+		Update(map[string]interface{}{"loading": loading}, r.UpdateOpts{ReturnChanges: true}).RunWrite(e.Session)
+	return checkRethinkdbWriteError(resp, err, errMsg)
+}

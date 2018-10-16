@@ -48,3 +48,23 @@ func (e *FileLoadsStoreEngineMemory) GetAllFileLoads() ([]FileLoadSchema, error)
 
 	return fileLoads, nil
 }
+
+func (e *FileLoadsStoreEngineMemory) MarkAllNotLoading() error {
+	for _, entry := range e.DB {
+		entry.Loading = false
+		e.DB[entry.ID] = entry
+	}
+
+	return nil
+}
+
+func (e *FileLoadsStoreEngineMemory) UpdateLoading(id string, loading bool) error {
+	entry, ok := e.DB[id]
+	if !ok {
+		return ErrNotFound
+	}
+
+	entry.Loading = loading
+	e.DB[entry.ID] = entry
+	return nil
+}
