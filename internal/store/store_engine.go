@@ -60,3 +60,10 @@ type AssociationsStoreEngine interface {
 	AssociateSampleWithExperiment(sampleID, experimentID string) error
 	AssociateSampleWithFile(sampleID, fileID string) error
 }
+
+type UploadStoreEngine interface {
+	AddUpload(upload UploadSchema) (UploadSchema, error)
+	DeleteUpload(uploadID string) error
+	GetUpload(uploadID string) (UploadSchema, error)
+	GetAllUploads() ([]UploadSchema, error)
+}
