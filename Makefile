@@ -7,13 +7,13 @@ fmt:
 
 bin: server cli
 
-server:
-
 cli:
+
+server:
 	(cd ./cmd/mcserv; go build)
 
-run: cli
-	(cd ./cmd/mcserv; ov site)
+run: server
+	(cd ./cmd/mcserv; mcserv run)
 
 devrun:
 	-reflex -r '\.go$\' -s make run
