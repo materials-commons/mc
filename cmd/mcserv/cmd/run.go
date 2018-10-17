@@ -18,15 +18,11 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
-
-	"github.com/materials-commons/mc/internal/file"
-
-	"github.com/Jeffail/tunny"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/materials-commons/mc/internal/controllers/api"
+	"github.com/materials-commons/mc/internal/file"
 	"github.com/materials-commons/mc/internal/store"
 	"github.com/spf13/cobra"
 	r "gopkg.in/gorethink/gorethink.v4"
@@ -45,8 +41,15 @@ to quickly create a Cobra application.`,
 	Run: cliCmdRun,
 }
 
+var (
+	port            int
+	numberOfWorkers int
+)
+
 func init() {
 	rootCmd.AddCommand(runCmd)
+	runCmd.Flags().IntVarP(&port, "port", "p", 4000, "Port to listen on")
+	runCmd.Flags().IntVarP(&numberOfWorkers, "workers", "w", 10, "Number of workers to use for processing uploads")
 }
 
 func cliCmdRun(cmd *cobra.Command, args []string) {
@@ -54,7 +57,9 @@ func cliCmdRun(cmd *cobra.Command, args []string) {
 	e := setupEcho()
 	setupAPIRoutes(e, db)
 	mcdir := getMCDir()
-	startBackgroundFileLoads(10, mcdir, db)
+	backgroundLoader := file.NewBackgroundLoader(mcdir, numberOfWorkers, db)
+	backgroundLoader.Start()
+	e.Start(fmt.Sprintf(":%d", port))
 }
 
 func connectToDB() store.DB {
@@ -103,81 +108,4 @@ func getMCDir() string {
 		mcdir = "/mcfs/data/materialscommons"
 	}
 	return mcdir
-}
-
-func startBackgroundFileLoads(numberOfWorkers int, mcdir string, db store.DB) {
-	pool := createPool(numberOfWorkers, mcdir, db)
-	fileloadsStore := db.FileLoadsStore()
-
-	// There may have been jobs in process when the server was stopped. Mark those jobs
-	// at not currently being processed, this will cause them to be re-processed.
-	if err := fileloadsStore.MarkAllNotLoading(); err != nil {
-		panic(fmt.Sprintf("Unable to mark current jobs as not loading: %s", err))
-	}
-
-	// Loop through all file load requests and look for any that are not currently being processed.
-	// The call to pool.Process(req) will block until the request is completed, so each processing
-	// request is started in a new go routine. The pool will limit how many of these are currently
-	// being processed.
-	for {
-		requests, err := fileloadsStore.GetAllFileLoads()
-		if err != nil {
-			break
-		}
-
-		for _, req := range requests {
-			if !req.Loading {
-
-				// Mark job as loading so it will be ignored in later processing
-				err := fileloadsStore.UpdateLoading(req.ID, true)
-				if err != nil {
-					fmt.Printf("Unable to update file load request %s: %s", req.ID, err)
-
-					// If the job cannot be marked as loading then skip processing it
-					continue
-				}
-
-				// pool.Process() is synchronous, so run in separate routine and let the pool control
-				// how many jobs are running simultaneously.
-				go func() {
-					pool.Process(req)
-				}()
-			}
-		}
-
-		// Sleep for 10 seconds before getting the next set of loading requests.
-		time.Sleep(10 * time.Second)
-	}
-}
-
-func createPool(numberOfWorkers int, mcdir string, db store.DB) *tunny.Pool {
-	pool := tunny.NewFunc(numberOfWorkers, func(args interface{}) interface{} {
-		dfStore := db.DatafilesStore()
-		ddStore := db.DatadirsStore()
-		projStore := db.ProjectsStore()
-		flStore := db.FileLoadsStore()
-
-		req := args.(store.FileLoadSchema)
-
-		proj, err := projStore.GetProjectSimple(req.ProjectID)
-		if err != nil {
-			return err
-		}
-
-		loader := file.NewMCFileLoader(req.Path, req.Owner, mcdir, proj, dfStore, ddStore)
-		skipper := file.NewExcludeListSkipper(req.Exclude)
-		fl := file.NewFileLoader(skipper.Skipper, loader)
-
-		if err := fl.LoadFiles(req.Path); err != nil {
-			return err
-		} else {
-			// if loading files was successful then
-			//    remove path since all files were processed and
-			//    delete this file load request
-			_ = os.RemoveAll(req.Path)
-			return flStore.DeleteFileLoad(req.ID)
-		}
-	})
-
-	return pool
 }
