@@ -5,6 +5,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/Jeffail/tunny"
 	"github.com/materials-commons/mc/internal/store"
 )
@@ -40,8 +42,9 @@ func (l *BackgroundLoader) loadFilesInBackground() {
 	// Loop through all file load requests and look for any that are not currently being processed.
 	for {
 		requests, err := fileloadsStore.GetAllFileLoads()
-		if err != nil {
-			break
+		fmt.Printf("processing file loads %#v: %s\n", requests, err)
+		if err != nil && errors.Cause(err) != store.ErrNotFound {
+			fmt.Println("Error retrieving requests:", err)
 		}
 
 		for _, req := range requests {
