@@ -40,24 +40,62 @@ func (db *DBRethinkdb) FileLoadsStore() *FileLoadsStore {
 	return NewFileLoadsStore(NewFileLoadsStoreEngineRethinkdb(db.Session))
 }
 
-type DBMemory struct{}
+type DBMemory struct {
+	dbProj      map[string]ProjectSchema
+	dbUsers     map[string]UserSchema
+	dbDatadirs  map[string]DatadirSchema
+	dbDatafiles map[string]DatafileSchemaInMemory
+	dbFileLoads map[string]FileLoadSchema
+}
+
+func NewDBMemory() *DBMemory {
+	return &DBMemory{
+		dbProj:      make(map[string]ProjectSchema),
+		dbUsers:     make(map[string]UserSchema),
+		dbDatadirs:  make(map[string]DatadirSchema),
+		dbDatafiles: make(map[string]DatafileSchemaInMemory),
+		dbFileLoads: make(map[string]FileLoadSchema),
+	}
+}
 
 func (db *DBMemory) ProjectsStore() *ProjectsStore {
-	return NewProjectsStore(NewProjectsStoreEngineMemory())
+	if db.dbProj == nil {
+		return NewProjectsStore(NewProjectsStoreEngineMemory())
+	}
+
+	return NewProjectsStore(NewProjectsStoreEngineMemoryWithDB(db.dbProj))
 }
 
 func (db *DBMemory) UsersStore() *UsersStore {
-	return NewUsersStore(NewUsersStoreEngineMemory())
+	if db.dbUsers == nil {
+		return NewUsersStore(NewUsersStoreEngineMemory())
+	}
+
+	return NewUsersStore(NewUsersStoreEngineMemoryWithDB(db.dbUsers))
 }
 
 func (db *DBMemory) DatafilesStore() *DatafilesStore {
-	return NewDatafilesStore(NewDatafilesStoreEngineMemory())
+	if db.dbDatafiles == nil {
+		return NewDatafilesStore(NewDatafilesStoreEngineMemory())
+	}
+
+	return NewDatafilesStore(NewDatafilesStoreEngineMemoryWithDB(db.dbDatafiles))
 }
 
 func (db *DBMemory) DatadirsStore() *DatadirsStore {
-	return NewDatadirsStore(NewDatadirsStoreEngineMemory())
+	if db.dbDatadirs == nil {
+		return NewDatadirsStore(NewDatadirsStoreEngineMemory())
+	}
+
+	return NewDatadirsStore(NewDatadirsStoreEngineMemoryWithDB(db.dbDatadirs))
 }
 
 func (db *DBMemory) FileLoadsStore() *FileLoadsStore {
-	return NewFileLoadsStore(NewFileLoadsStoreEngineMemory())
+	if db.dbFileLoads == nil {
+		return NewFileLoadsStore(NewFileLoadsStoreEngineMemory())
+	}
+
+	return NewFileLoadsStore(NewFileLoadsStoreEngineMemoryWithDB(db.dbFileLoads))
 }
+
+var InMemory = NewDBMemory() // Global for testing purposes, allows a single db to be shared across test instances

@@ -17,6 +17,12 @@ func NewDatafilesStoreEngineMemory() *DatafilesStoreEngineMemory {
 	}
 }
 
+func NewDatafilesStoreEngineMemoryWithDB(db map[string]DatafileSchemaInMemory) *DatafilesStoreEngineMemory {
+	return &DatafilesStoreEngineMemory{
+		DB: db,
+	}
+}
+
 func (e *DatafilesStoreEngineMemory) AddFile(file DatafileSchema, projectID, datadirID string) (DatafileSchema, error) {
 	var err error
 	if file.ID, err = uuid.GenerateUUID(); err != nil {

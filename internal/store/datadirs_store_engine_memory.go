@@ -12,6 +12,12 @@ func NewDatadirsStoreEngineMemory() *DatadirsStoreEngineMemory {
 	}
 }
 
+func NewDatadirsStoreEngineMemoryWithDB(db map[string]DatadirSchema) *DatadirsStoreEngineMemory {
+	return &DatadirsStoreEngineMemory{
+		DB: db,
+	}
+}
+
 func (e *DatadirsStoreEngineMemory) AddDir(dir DatadirSchema) (DatadirSchema, error) {
 	var err error
 	if dir.ID, err = uuid.GenerateUUID(); err != nil {

@@ -12,6 +12,12 @@ func NewFileLoadsStoreEngineMemory() *FileLoadsStoreEngineMemory {
 	}
 }
 
+func NewFileLoadsStoreEngineMemoryWithDB(db map[string]FileLoadSchema) *FileLoadsStoreEngineMemory {
+	return &FileLoadsStoreEngineMemory{
+		DB: db,
+	}
+}
+
 func (e *FileLoadsStoreEngineMemory) AddFileLoad(fload FileLoadSchema) (FileLoadSchema, error) {
 	var err error
 	if fload.ID, err = uuid.GenerateUUID(); err != nil {

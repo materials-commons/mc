@@ -15,6 +15,12 @@ func NewUsersStoreEngineMemory() *UsersStoreEngineMemory {
 	}
 }
 
+func NewUsersStoreEngineMemoryWithDB(db map[string]UserSchema) *UsersStoreEngineMemory {
+	return &UsersStoreEngineMemory{
+		DB: db,
+	}
+}
+
 func (e *UsersStoreEngineMemory) AddUser(user UserSchema) (UserSchema, error) {
 	_, ok := e.DB[user.ID]
 	if ok {

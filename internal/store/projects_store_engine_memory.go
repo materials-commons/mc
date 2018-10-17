@@ -12,6 +12,12 @@ func NewProjectsStoreEngineMemory() *ProjectsStoreEngineMemory {
 	}
 }
 
+func NewProjectsStoreEngineMemoryWithDB(db map[string]ProjectSchema) *ProjectsStoreEngineMemory {
+	return &ProjectsStoreEngineMemory{
+		DB: db,
+	}
+}
+
 func (e *ProjectsStoreEngineMemory) AddProject(project ProjectSchema) (ProjectSchema, error) {
 	return ProjectSchema{}, nil
 }
