@@ -26,10 +26,10 @@ func NewBackgroundLoader(mcdir string, numberOfWorkers int, db store.DB) *Backgr
 }
 
 func (l *BackgroundLoader) Start() {
-	go l.loadFilesInBackground()
+	go l.loadFiles()
 }
 
-func (l *BackgroundLoader) loadFilesInBackground() {
+func (l *BackgroundLoader) loadFiles() {
 	pool := tunny.NewFunc(l.numberOfWorkers, l.worker)
 	fileloadsStore := l.db.FileLoadsStore()
 
