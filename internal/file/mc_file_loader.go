@@ -74,7 +74,7 @@ func (l *MCFileLoader) LoadFileOrDir(path string, finfo os.FileInfo) error {
 // loadDirectory adds a directory to a project in Materials Commons if the directory doesn't exist. It takes
 // care of constructing the name of the directory to include the project name as the root of the path.
 func (l *MCFileLoader) loadDirectory(path string, finfo os.FileInfo) error {
-	// Construct name as it exists in Materials Commons project-name/dirpath, see comment above in LoadFileOrDir
+	// Construct name as it exists in Materials Commons: project-name/dirpath, see comment above in LoadFileOrDir
 	// on how and why this is done.
 	dirPath := filepath.Join(l.project.Name, strings.TrimPrefix(path, l.root+"/"))
 	if _, err := l.ddStore.GetDatadirByPathInProject(dirPath, l.project.ID); err == nil {

@@ -62,6 +62,7 @@ func (l *BackgroundLoader) processLoadFileRequests() {
 				// pool.Process() is synchronous, so run in separate routine and let the pool control
 				// how many jobs are running simultaneously.
 				go func() {
+					// pool.Process will call the worker function (below) for processing the request
 					pool.Process(req)
 				}()
 			}
@@ -73,6 +74,8 @@ func (l *BackgroundLoader) processLoadFileRequests() {
 	}
 }
 
+// worker is the worker function for the pool. A new worker will run for each request that
+// is being run up to the pool limit.
 func (l *BackgroundLoader) worker(args interface{}) interface{} {
 	dfStore := l.db.DatafilesStore()
 	ddStore := l.db.DatadirsStore()
