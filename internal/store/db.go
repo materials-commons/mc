@@ -41,61 +41,61 @@ func (db *DBRethinkdb) FileLoadsStore() *FileLoadsStore {
 }
 
 type DBMemory struct {
-	dbProj      map[string]ProjectSchema
-	dbUsers     map[string]UserSchema
-	dbDatadirs  map[string]DatadirSchema
-	dbDatafiles map[string]DatafileSchemaInMemory
-	dbFileLoads map[string]FileLoadSchema
+	DBProj      map[string]ProjectSchema
+	DBUsers     map[string]UserSchema
+	DBDatadirs  map[string]DatadirSchema
+	DBDatafiles map[string]DatafileSchemaInMemory
+	DBFileLoads map[string]FileLoadSchema
 }
 
 func NewDBMemory() *DBMemory {
 	return &DBMemory{
-		dbProj:      make(map[string]ProjectSchema),
-		dbUsers:     make(map[string]UserSchema),
-		dbDatadirs:  make(map[string]DatadirSchema),
-		dbDatafiles: make(map[string]DatafileSchemaInMemory),
-		dbFileLoads: make(map[string]FileLoadSchema),
+		DBProj:      make(map[string]ProjectSchema),
+		DBUsers:     make(map[string]UserSchema),
+		DBDatadirs:  make(map[string]DatadirSchema),
+		DBDatafiles: make(map[string]DatafileSchemaInMemory),
+		DBFileLoads: make(map[string]FileLoadSchema),
 	}
 }
 
 func (db *DBMemory) ProjectsStore() *ProjectsStore {
-	if db.dbProj == nil {
+	if db.DBProj == nil {
 		return NewProjectsStore(NewProjectsStoreEngineMemory())
 	}
 
-	return NewProjectsStore(NewProjectsStoreEngineMemoryWithDB(db.dbProj))
+	return NewProjectsStore(NewProjectsStoreEngineMemoryWithDB(db.DBProj))
 }
 
 func (db *DBMemory) UsersStore() *UsersStore {
-	if db.dbUsers == nil {
+	if db.DBUsers == nil {
 		return NewUsersStore(NewUsersStoreEngineMemory())
 	}
 
-	return NewUsersStore(NewUsersStoreEngineMemoryWithDB(db.dbUsers))
+	return NewUsersStore(NewUsersStoreEngineMemoryWithDB(db.DBUsers))
 }
 
 func (db *DBMemory) DatafilesStore() *DatafilesStore {
-	if db.dbDatafiles == nil {
+	if db.DBDatafiles == nil {
 		return NewDatafilesStore(NewDatafilesStoreEngineMemory())
 	}
 
-	return NewDatafilesStore(NewDatafilesStoreEngineMemoryWithDB(db.dbDatafiles))
+	return NewDatafilesStore(NewDatafilesStoreEngineMemoryWithDB(db.DBDatafiles))
 }
 
 func (db *DBMemory) DatadirsStore() *DatadirsStore {
-	if db.dbDatadirs == nil {
+	if db.DBDatadirs == nil {
 		return NewDatadirsStore(NewDatadirsStoreEngineMemory())
 	}
 
-	return NewDatadirsStore(NewDatadirsStoreEngineMemoryWithDB(db.dbDatadirs))
+	return NewDatadirsStore(NewDatadirsStoreEngineMemoryWithDB(db.DBDatadirs))
 }
 
 func (db *DBMemory) FileLoadsStore() *FileLoadsStore {
-	if db.dbFileLoads == nil {
+	if db.DBFileLoads == nil {
 		return NewFileLoadsStore(NewFileLoadsStoreEngineMemory())
 	}
 
-	return NewFileLoadsStore(NewFileLoadsStoreEngineMemoryWithDB(db.dbFileLoads))
+	return NewFileLoadsStore(NewFileLoadsStoreEngineMemoryWithDB(db.DBFileLoads))
 }
 
 var InMemory = NewDBMemory() // Global for testing purposes, allows a single db to be shared across test instances
