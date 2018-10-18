@@ -1,5 +1,10 @@
 package store
 
+import (
+	"github.com/go-ozzo/ozzo-validation"
+	"github.com/pkg/errors"
+)
+
 type ProjectSchema struct {
 	Model
 	Description string `db:"description" json:"description"`
@@ -31,4 +36,22 @@ type ProjectUserModel struct {
 type ProjectSimpleModel struct {
 	ProjectSchema
 	RootDir []DatadirSchema `json:"root_dir" r:"root_dir"`
+}
+
+type AddProjectModel struct {
+	Name        string
+	Owner       string
+	Description string
+}
+
+func (p AddProjectModel) Validate() error {
+	err := validation.ValidateStruct(&p,
+		validation.Field(&p.Name, validation.Required),
+		validation.Field(&p.Owner, validation.Required))
+
+	if err != nil {
+		return errors.WithMessage(ErrValidation, err.Error())
+	}
+
+	return nil
 }
