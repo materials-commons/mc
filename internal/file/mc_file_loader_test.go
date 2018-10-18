@@ -9,6 +9,7 @@ import (
 	"github.com/materials-commons/mc/internal/file"
 
 	"github.com/materials-commons/mc/internal/store"
+	"github.com/materials-commons/mc/pkg/tutils"
 	"github.com/materials-commons/mc/pkg/tutils/assert"
 )
 
@@ -69,7 +70,7 @@ func TestMCFileLoaderLoadOnlyADirectory(t *testing.T) {
 }
 
 func TestMCFileLoaderLoadOnlyAFile(t *testing.T) {
-	tmpFile, err := createTmpFile("/tmp", "loadFile")
+	tmpFile, err := tutils.CreateTmpFile("/tmp", "loadFile")
 	assert.Okf(t, err, "Unable to create temporary file: %s", err)
 	defer os.Remove(tmpFile)
 

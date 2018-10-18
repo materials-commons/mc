@@ -2,13 +2,13 @@ package file_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/materials-commons/mc/internal/file"
 
+	"github.com/materials-commons/mc/pkg/tutils"
 	"github.com/materials-commons/mc/pkg/tutils/assert"
 )
 
@@ -22,11 +22,11 @@ func (l *loader) LoadFileOrDir(path string, info os.FileInfo) error {
 
 func TestLoadFiles(t *testing.T) {
 	var tmpFile string
-	tmpDir, err := prepareTestDirTree("test/dir")
+	tmpDir, err := tutils.PrepareTestDirTree("test/dir")
 	assert.Okf(t, err, "Unable to create test dir %s", err)
 	defer os.RemoveAll(tmpDir)
 
-	tmpFile, err = createTmpFile(filepath.Join(tmpDir, "test"), "test file contents 1")
+	tmpFile, err = tutils.CreateTmpFile(filepath.Join(tmpDir, "test"), "test file contents 1")
 	assert.Okf(t, err, "Unable to create tmpfile %s", err)
 
 	results := []string{""}
@@ -106,36 +106,4 @@ func compareArrays(expected, what []string) bool {
 	}
 
 	return true
-}
-
-func prepareTestDirTree(tree string) (string, error) {
-	tmpDir, err := ioutil.TempDir("", "")
-	if err != nil {
-		return "", fmt.Errorf("error creating temp directory: %v\n", err)
-	}
-
-	err = os.MkdirAll(filepath.Join(tmpDir, tree), 0755)
-	if err != nil {
-		os.RemoveAll(tmpDir)
-		return "", err
-	}
-
-	return tmpDir, nil
-}
-
-func createTmpFile(path, contents string) (string, error) {
-	content := []byte(contents)
-	tmpfile, err := ioutil.TempFile(path, "tmpfile.txt")
-	if err != nil {
-		return "", err
-	}
-
-	if _, err := tmpfile.Write(content); err != nil {
-		return "", err
-	}
-	if err := tmpfile.Close(); err != nil {
-		return "", err
-	}
-
-	return tmpfile.Name(), nil
 }
