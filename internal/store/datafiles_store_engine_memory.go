@@ -3,8 +3,8 @@ package store
 import "github.com/hashicorp/go-uuid"
 
 type DatafileSchemaInMemory struct {
-	dataFile  DatafileSchema
-	datadirID string
+	DataFile  DatafileSchema
+	DatadirID string
 }
 
 type DatafilesStoreEngineMemory struct {
@@ -30,12 +30,12 @@ func (e *DatafilesStoreEngineMemory) AddFile(file DatafileSchema, projectID, dat
 	}
 
 	df := DatafileSchemaInMemory{
-		dataFile:  file,
-		datadirID: datadirID,
+		DataFile:  file,
+		DatadirID: datadirID,
 	}
 
-	e.DB[df.dataFile.ID] = df
-	return df.dataFile, nil
+	e.DB[df.DataFile.ID] = df
+	return df.DataFile, nil
 }
 
 func (e *DatafilesStoreEngineMemory) GetFile(id string) (DatafileSchema, error) {
@@ -44,13 +44,13 @@ func (e *DatafilesStoreEngineMemory) GetFile(id string) (DatafileSchema, error) 
 		return DatafileSchema{}, ErrNotFound
 	}
 
-	return dfEntry.dataFile, nil
+	return dfEntry.DataFile, nil
 }
 
 func (e *DatafilesStoreEngineMemory) GetFileWithChecksum(checksum string) (DatafileSchema, error) {
 	for _, dfEntry := range e.DB {
-		if dfEntry.dataFile.Checksum == checksum {
-			return dfEntry.dataFile, nil
+		if dfEntry.DataFile.Checksum == checksum {
+			return dfEntry.DataFile, nil
 		}
 	}
 
@@ -59,8 +59,8 @@ func (e *DatafilesStoreEngineMemory) GetFileWithChecksum(checksum string) (Dataf
 
 func (e *DatafilesStoreEngineMemory) GetFileInDir(name string, dirID string) (DatafileSchema, error) {
 	for _, dfEntry := range e.DB {
-		if dfEntry.datadirID == dirID && dfEntry.dataFile.Name == name && dfEntry.dataFile.Current {
-			return dfEntry.dataFile, nil
+		if dfEntry.DatadirID == dirID && dfEntry.DataFile.Name == name && dfEntry.DataFile.Current {
+			return dfEntry.DataFile, nil
 		}
 	}
 
@@ -73,7 +73,7 @@ func (e *DatafilesStoreEngineMemory) UpdateFileCurrentFlag(id string, current bo
 		return ErrNotFound
 	}
 
-	dfEntry.dataFile.Current = current
+	dfEntry.DataFile.Current = current
 	e.DB[id] = dfEntry
 	return nil
 }
