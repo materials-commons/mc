@@ -182,7 +182,7 @@ func (l *MCFileLoader) computeFileChecksum(path string) (string, error) {
 }
 
 func (l *MCFileLoader) moveFile(path string, f store.DatafileSchema) error {
-	dirPath := fileDir(l.mcdir, f.ID)
+	dirPath := MCFileDir(l.mcdir, f.ID)
 	if err := os.MkdirAll(dirPath, 0700); err != nil {
 		return err
 	}
@@ -218,7 +218,7 @@ func copyFile(src, dst string) error {
 	return out.Close()
 }
 
-func fileDir(path, fileID string) string {
+func MCFileDir(path, fileID string) string {
 	idSegments := strings.Split(fileID, "-")
 	return filepath.Join(path, idSegments[1][0:2], idSegments[1][2:4])
 }
