@@ -13,7 +13,7 @@ server:
 	(cd ./cmd/mcserv; go build)
 
 run: server
-	(cd ./cmd/mcserv; mcserv run)
+	(cd ./cmd/mcserv; mcserv)
 
 devrun:
 	-reflex -r '\.go$\' -s make run

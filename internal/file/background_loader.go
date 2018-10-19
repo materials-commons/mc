@@ -42,7 +42,7 @@ func (l *BackgroundLoader) processLoadFileRequests() {
 	// Loop through all file load requests and look for any that are not currently being processed.
 	for {
 		requests, err := fileloadsStore.GetAllFileLoads()
-		fmt.Printf("processing file loads %#v: %s\n", requests, err)
+		//fmt.Printf("processing file loads %#v: %s\n", requests, err)
 		if err != nil && errors.Cause(err) != store.ErrNotFound {
 			fmt.Println("Error retrieving requests:", err)
 		}

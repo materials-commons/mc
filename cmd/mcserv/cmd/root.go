@@ -17,27 +17,37 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
-	homedir "github.com/mitchellh/go-homedir"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
+	"github.com/materials-commons/mc/internal/controllers/api"
+	"github.com/materials-commons/mc/internal/file"
+	"github.com/materials-commons/mc/internal/store"
+
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	r "gopkg.in/gorethink/gorethink.v4"
 )
 
-var cfgFile string
+var (
+	port            int
+	numberOfWorkers int
+	cfgFile         string
+	mcdir           string
+	dbConnection    string
+	dbName          string
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "mcserv",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	//	Run: func(cmd *cobra.Command, args []string) { },
+	Short: "Runs the mcserv file processor and API",
+	Long: `mcserv provides and API and background processor for loading files into Materials Commons 
+that were uploaded into a given directory.`,
+	Run: cliCmdRoot,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -52,14 +62,24 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.mcserv.yaml)")
+	rootCmd.Flags().IntVarP(&port, "port", "p", 4000, "Port to listen on")
+	rootCmd.Flags().IntVarP(&numberOfWorkers, "workers", "w", 10, "Number of workers to use for processing uploads")
+	rootCmd.Flags().StringVarP(&mcdir, "mcdir", "m", "/mcfs/data/materialscommons", "Locations of materials commons repo (MCDIR), can be colon separated list")
+	rootCmd.Flags().StringVarP(&dbConnection, "db-connection", "c", "localhost:28015", "Database connection string (MCDB_CONNECTION)")
+	rootCmd.Flags().StringVarP(&dbName, "db-name", "n", "materialscommons", "Database name to use (MCDB)")
+	setMCDir()
+	setDBParams()
+}
 
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+func cliCmdRoot(cmd *cobra.Command, args []string) {
+	db := connectToDB()
+	e := setupEcho()
+	setupAPIRoutes(e, db)
+	loaderDir := strings.Split(mcdir, ":")[0]
+	backgroundLoader := file.NewBackgroundLoader(loaderDir, numberOfWorkers, db)
+	backgroundLoader.Start()
+	e.Start(fmt.Sprintf(":%d", port))
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -85,5 +105,55 @@ func initConfig() {
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	}
+}
+
+func connectToDB() store.DB {
+	session, err := r.Connect(r.ConnectOpts{Database: dbName, Address: dbConnection})
+	if err != nil {
+		panic(fmt.Sprintf("unable to connect to rethinkdb server, database: %s, address: %s, error: %s", dbName, dbConnection, err))
+	}
+
+	r.SetTags("r")
+
+	return store.NewDBRethinkdb(session)
+}
+
+func setupEcho() *echo.Echo {
+	e := echo.New()
+	e.HideBanner = true
+	e.HidePort = true
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+	return e
+}
+
+func setupAPIRoutes(e *echo.Echo, db store.DB) {
+	g := e.Group("/api")
+
+	//uc := &api.UsersController{}
+	//g.POST("/getUserAPIKey", uc.GetUserByAPIKey).Name = "getUserByAPIKey"
+
+	fileLoaderController := api.NewFileLoaderController(db)
+	g.POST("/loadFilesFromDirectory", fileLoaderController.LoadFilesFromDirectory).Name = "loadFilesFromDirectory"
+	g.POST("/getFilesLoadRequest", fileLoaderController.GetFilesLoadRequest).Name = "getFilesLoadRequest"
+}
+
+func setMCDir() {
+	mcdirEnv := os.Getenv("MCDIR")
+	if mcdirEnv != "" {
+		mcdir = mcdirEnv
+	}
+}
+
+func setDBParams() {
+	mcdb := os.Getenv("MCDB")
+	if mcdb != "" {
+		dbName = mcdb
+	}
+
+	mcdbConnection := os.Getenv("MCDB_CONNECTION")
+	if mcdbConnection != "" {
+		dbConnection = mcdbConnection
 	}
 }
