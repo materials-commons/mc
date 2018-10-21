@@ -67,7 +67,7 @@ func init() {
 	rootCmd.Flags().IntVarP(&numberOfWorkers, "workers", "w", 10, "Number of workers to use for processing uploads")
 	rootCmd.Flags().StringVarP(&mcdir, "mcdir", "m", "/mcfs/data/materialscommons", "Locations of materials commons repo (MCDIR), can be colon separated list")
 	rootCmd.Flags().StringVarP(&dbConnection, "db-connection", "c", "localhost:28015", "Database connection string (MCDB_CONNECTION)")
-	rootCmd.Flags().StringVarP(&dbName, "db-name", "n", "materialscommons", "Database name to use (MCDB)")
+	rootCmd.Flags().StringVarP(&dbName, "db-name", "n", "materialscommons", "Database name to use (MCDB_NAME)")
 	setMCDir()
 	setDBParams()
 }
@@ -147,7 +147,7 @@ func setMCDir() {
 }
 
 func setDBParams() {
-	mcdb := os.Getenv("MCDB")
+	mcdb := os.Getenv("MCDB_NAME")
 	if mcdb != "" {
 		dbName = mcdb
 	}
