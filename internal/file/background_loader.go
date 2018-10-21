@@ -1,6 +1,7 @@
 package file
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"time"
@@ -25,11 +26,11 @@ func NewBackgroundLoader(mcdir string, numberOfWorkers int, db store.DB) *Backgr
 	}
 }
 
-func (l *BackgroundLoader) Start() {
-	go l.processLoadFileRequests()
+func (l *BackgroundLoader) Start(c context.Context) {
+	go l.processLoadFileRequests(c)
 }
 
-func (l *BackgroundLoader) processLoadFileRequests() {
+func (l *BackgroundLoader) processLoadFileRequests(c context.Context) {
 	pool := tunny.NewFunc(l.numberOfWorkers, l.worker)
 	fileloadsStore := l.db.FileLoadsStore()
 
@@ -70,7 +71,11 @@ func (l *BackgroundLoader) processLoadFileRequests() {
 
 		// Sleep for 10 seconds before getting the next set of loading requests. Ten seconds is an
 		// somewhat arbitrary value chosen to balance time to start processing and load.
-		time.Sleep(10 * time.Second)
+		select {
+		case <-time.After(10 * time.Second):
+		case <-c.Done():
+			return
+		}
 	}
 }
 
