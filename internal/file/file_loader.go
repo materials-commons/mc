@@ -5,8 +5,11 @@
 package file
 
 import (
+	"context"
 	"os"
 	"path/filepath"
+
+	"github.com/pkg/errors"
 )
 
 type DirectoryLoader interface {
@@ -57,35 +60,52 @@ func NewFileLoader(skipper Skipper, loader DirectoryLoader) *Loader {
 
 func (l *Loader) LoadFiles(path string) error {
 	err := filepath.Walk(path, func(fpath string, finfo os.FileInfo, err error) error {
-		switch {
-		case err != nil && os.IsPermission(err):
-			// Permission errors are ignored. Just continue walking the tree
-			// without processing the file or directory.
-			return nil
+		return l.processFile(path, fpath, finfo, err)
+	})
 
-		case err != nil:
-			// All other errors cause walking to stop.
-			return err
+	return err
+}
 
-		case l.Skipper(fpath, finfo):
-			// if Skipper returns true then skip processing this entry.
-			if finfo.IsDir() {
-				// If entry is a directory, then skip processing that
-				// entire sub tree.
-				return filepath.SkipDir
-			}
-			return nil
-
-		case path == fpath:
-			// Always skip processing the root. We assume this entry already exists or that loading is
-			// starting from this entry. For example if you load /tmp/dir, then all entries under /tmp/dir
-			// will be processed, but the /tmp/dir starting dir will be skipped.
-			return nil
-
+func (l *Loader) LoadFilesWithCancel(path string, c context.Context) error {
+	err := filepath.Walk(path, func(fpath string, finfo os.FileInfo, err error) error {
+		select {
+		case <-c.Done():
+			return errors.Errorf("canceled: %s", c.Err())
 		default:
-			return l.DirectoryLoader.LoadFileOrDir(fpath, finfo)
+			return l.processFile(path, fpath, finfo, err)
 		}
 	})
 
 	return err
+}
+
+func (l *Loader) processFile(root, fpath string, finfo os.FileInfo, err error) error {
+	switch {
+	case err != nil && os.IsPermission(err):
+		// Permission errors are ignored. Just continue walking the tree
+		// without processing the file or directory.
+		return nil
+
+	case err != nil:
+		// All other errors cause walking to stop.
+		return err
+
+	case l.Skipper(fpath, finfo):
+		// if Skipper returns true then skip processing this entry.
+		if finfo.IsDir() {
+			// If entry is a directory, then skip processing that
+			// entire sub tree.
+			return filepath.SkipDir
+		}
+		return nil
+
+	case root == fpath:
+		// Always skip processing the root. We assume this entry already exists or that loading is
+		// starting from this entry. For example if you load /tmp/dir, then all entries under /tmp/dir
+		// will be processed, but the /tmp/dir starting dir will be skipped.
+		return nil
+
+	default:
+		return l.DirectoryLoader.LoadFileOrDir(fpath, finfo)
+	}
 }
