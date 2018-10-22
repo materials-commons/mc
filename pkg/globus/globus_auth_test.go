@@ -26,15 +26,13 @@ func TestGetToken(t *testing.T) {
 }
 
 func TestGetTaskList(t *testing.T) {
-	if false {
-		token := "Ag3dv92pXXnbjmjlyG4ar22Ex0ez69m8Kne5DyrDGaQOQWzrlKCVCYddKKnDvbkg73OrYx3YzEVDVniXym3NVCdD7r"
+	if true {
+		token := "AgxBpPJNQ98VY1Q6zk7gn43Y6rnzBywwJD2VzKlVdDjpQYDvV2u8Cleyd0DG1QlwXk2DM3jDdzjl2YfqGmqqghK134"
 		resp, err := r().
 			SetAuthToken(token).
 			SetQueryParams(map[string]string{
-				"filter_endpoint":        "4e9d8294-bdcd-11e8-8c1e-0a1d4c5c824a",
-				"filter_completion_time": "2018-09-23",
-				"filter_status":          "SUCCEEDED",
-				"limit":                  "1000",
+				"filter_endpoint": "4e9d8294-bdcd-11e8-8c1e-0a1d4c5c824a",
+				"limit":           "1000",
 			}).
 			Get("https://transfer.api.globus.org/v0.10/endpoint_manager/task_list")
 		fmt.Println("err", err)
