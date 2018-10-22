@@ -16,6 +16,7 @@ type BackgroundLoader struct {
 	mcdir           string
 	numberOfWorkers int
 	db              store.DB
+	c               context.Context
 }
 
 func NewBackgroundLoader(mcdir string, numberOfWorkers int, db store.DB) *BackgroundLoader {
@@ -31,6 +32,7 @@ func (l *BackgroundLoader) Start(c context.Context) {
 }
 
 func (l *BackgroundLoader) processLoadFileRequests(c context.Context) {
+	l.c = c
 	pool := tunny.NewFunc(l.numberOfWorkers, l.worker)
 	fileloadsStore := l.db.FileLoadsStore()
 
@@ -98,7 +100,7 @@ func (l *BackgroundLoader) worker(args interface{}) interface{} {
 	skipper := NewExcludeListSkipper(req.Exclude)
 	fl := NewFileLoader(skipper.Skipper, loader)
 
-	if err := fl.LoadFiles(req.Path); err != nil {
+	if err := fl.LoadFilesWithCancel(req.Path, l.c); err != nil {
 		return err
 	} else {
 		// if loading files was successful then
