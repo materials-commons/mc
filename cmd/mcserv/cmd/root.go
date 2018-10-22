@@ -74,15 +74,18 @@ func init() {
 }
 
 func cliCmdRoot(cmd *cobra.Command, args []string) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	db := connectToDB()
+
 	e := setupEcho()
 	setupInternalAPIRoutes(e, db)
+
 	loaderDir := strings.Split(mcdir, ":")[0]
 	backgroundLoader := file.NewBackgroundLoader(loaderDir, numberOfWorkers, db)
-	ctx := context.Background()
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
 	backgroundLoader.Start(ctx)
+
 	e.Start(fmt.Sprintf(":%d", port))
 }
 
