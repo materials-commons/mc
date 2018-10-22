@@ -15,6 +15,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strings"
@@ -75,10 +76,13 @@ func init() {
 func cliCmdRoot(cmd *cobra.Command, args []string) {
 	db := connectToDB()
 	e := setupEcho()
-	setupAPIRoutes(e, db)
+	setupInternalAPIRoutes(e, db)
 	loaderDir := strings.Split(mcdir, ":")[0]
 	backgroundLoader := file.NewBackgroundLoader(loaderDir, numberOfWorkers, db)
-	backgroundLoader.Start()
+	ctx := context.Background()
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	backgroundLoader.Start(ctx)
 	e.Start(fmt.Sprintf(":%d", port))
 }
 
@@ -128,8 +132,8 @@ func setupEcho() *echo.Echo {
 	return e
 }
 
-func setupAPIRoutes(e *echo.Echo, db store.DB) {
-	g := e.Group("/api")
+func setupInternalAPIRoutes(e *echo.Echo, db store.DB) {
+	g := e.Group("/intapi")
 
 	//uc := &api.UsersController{}
 	//g.POST("/getUserAPIKey", uc.GetUserByAPIKey).Name = "getUserByAPIKey"
@@ -137,6 +141,9 @@ func setupAPIRoutes(e *echo.Echo, db store.DB) {
 	fileLoaderController := api.NewFileLoaderController(db)
 	g.POST("/loadFilesFromDirectory", fileLoaderController.LoadFilesFromDirectory).Name = "loadFilesFromDirectory"
 	g.POST("/getFilesLoadRequest", fileLoaderController.GetFilesLoadRequest).Name = "getFilesLoadRequest"
+
+	statusController := api.NewStatusController()
+	g.POST("/getServerStatus", statusController.GetServerStatus).Name = "getServerStatus"
 }
 
 func setMCDir() {
