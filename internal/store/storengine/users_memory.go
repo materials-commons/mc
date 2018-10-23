@@ -8,23 +8,23 @@ import (
 	"github.com/materials-commons/mc/pkg/mc"
 )
 
-type UsersStoreEngineMemory struct {
+type UsersMemory struct {
 	DB map[string]model.UserSchema
 }
 
-func NewUsersStoreEngineMemory() *UsersStoreEngineMemory {
-	return &UsersStoreEngineMemory{
+func NewUsersMemory() *UsersMemory {
+	return &UsersMemory{
 		DB: make(map[string]model.UserSchema),
 	}
 }
 
-func NewUsersStoreEngineMemoryWithDB(db map[string]model.UserSchema) *UsersStoreEngineMemory {
-	return &UsersStoreEngineMemory{
+func NewUsersMemoryWithDB(db map[string]model.UserSchema) *UsersMemory {
+	return &UsersMemory{
 		DB: db,
 	}
 }
 
-func (e *UsersStoreEngineMemory) AddUser(user model.UserSchema) (model.UserSchema, error) {
+func (e *UsersMemory) AddUser(user model.UserSchema) (model.UserSchema, error) {
 	_, ok := e.DB[user.ID]
 	if ok {
 		return model.UserSchema{}, fmt.Errorf("user already in shouldFail %s", user.ID)
@@ -35,7 +35,7 @@ func (e *UsersStoreEngineMemory) AddUser(user model.UserSchema) (model.UserSchem
 	return user, nil
 }
 
-func (e *UsersStoreEngineMemory) GetUserByID(id string) (model.UserSchema, error) {
+func (e *UsersMemory) GetUserByID(id string) (model.UserSchema, error) {
 	user, ok := e.DB[id]
 	if !ok {
 		return model.UserSchema{}, mc.ErrNotFound
@@ -44,7 +44,7 @@ func (e *UsersStoreEngineMemory) GetUserByID(id string) (model.UserSchema, error
 	return user, nil
 }
 
-func (e *UsersStoreEngineMemory) GetUserByAPIKey(apikey string) (model.UserSchema, error) {
+func (e *UsersMemory) GetUserByAPIKey(apikey string) (model.UserSchema, error) {
 	for _, user := range e.DB {
 		if user.APIKey == apikey {
 			return user, nil
@@ -54,7 +54,7 @@ func (e *UsersStoreEngineMemory) GetUserByAPIKey(apikey string) (model.UserSchem
 	return model.UserSchema{}, mc.ErrNotFound
 }
 
-func (e *UsersStoreEngineMemory) ModifyUserFullname(id, fullname string, updatedAt time.Time) (model.UserSchema, error) {
+func (e *UsersMemory) ModifyUserFullname(id, fullname string, updatedAt time.Time) (model.UserSchema, error) {
 	user, ok := e.DB[id]
 	if !ok {
 		return model.UserSchema{}, mc.ErrNotFound
@@ -66,7 +66,7 @@ func (e *UsersStoreEngineMemory) ModifyUserFullname(id, fullname string, updated
 	return user, nil
 }
 
-func (e *UsersStoreEngineMemory) ModifyUserPassword(id, password string, updatedAt time.Time) (model.UserSchema, error) {
+func (e *UsersMemory) ModifyUserPassword(id, password string, updatedAt time.Time) (model.UserSchema, error) {
 	user, ok := e.DB[id]
 	if !ok {
 		return model.UserSchema{}, mc.ErrNotFound
@@ -78,7 +78,7 @@ func (e *UsersStoreEngineMemory) ModifyUserPassword(id, password string, updated
 	return user, nil
 }
 
-func (e *UsersStoreEngineMemory) ModifyUserAPIKey(id, apikey string, updatedAt time.Time) (model.UserSchema, error) {
+func (e *UsersMemory) ModifyUserAPIKey(id, apikey string, updatedAt time.Time) (model.UserSchema, error) {
 	user, ok := e.DB[id]
 	if !ok {
 		return model.UserSchema{}, mc.ErrNotFound
@@ -90,6 +90,6 @@ func (e *UsersStoreEngineMemory) ModifyUserAPIKey(id, apikey string, updatedAt t
 	return user, nil
 }
 
-func (e *UsersStoreEngineMemory) Name() string {
-	return "UsersStoreEngineMemory"
+func (e *UsersMemory) Name() string {
+	return "UsersMemory"
 }

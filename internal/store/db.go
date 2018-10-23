@@ -23,11 +23,11 @@ func NewDBRethinkdb(session *r.Session) *DBRethinkdb {
 }
 
 func (db *DBRethinkdb) ProjectsStore() *ProjectsStore {
-	return NewProjectsStore(storengine.NewProjectsStoreEngineRethinkdb(db.Session))
+	return NewProjectsStore(storengine.NewProjectsRethinkdb(db.Session))
 }
 
 func (db *DBRethinkdb) UsersStore() *UsersStore {
-	return NewUsersStore(storengine.NewUsersStoreEngineRethinkdb(db.Session))
+	return NewUsersStore(storengine.NewUsersRethinkdb(db.Session))
 }
 
 func (db *DBRethinkdb) DatafilesStore() *DatafilesStore {
@@ -62,18 +62,18 @@ func NewDBMemory() *DBMemory {
 
 func (db *DBMemory) ProjectsStore() *ProjectsStore {
 	if db.DBProj == nil {
-		return NewProjectsStore(storengine.NewProjectsStoreEngineMemory())
+		return NewProjectsStore(storengine.NewProjectsMemory())
 	}
 
-	return NewProjectsStore(storengine.NewProjectsStoreEngineMemoryWithDB(db.DBProj))
+	return NewProjectsStore(storengine.NewProjectsMemoryWithDB(db.DBProj))
 }
 
 func (db *DBMemory) UsersStore() *UsersStore {
 	if db.DBUsers == nil {
-		return NewUsersStore(storengine.NewUsersStoreEngineMemory())
+		return NewUsersStore(storengine.NewUsersMemory())
 	}
 
-	return NewUsersStore(storengine.NewUsersStoreEngineMemoryWithDB(db.DBUsers))
+	return NewUsersStore(storengine.NewUsersMemoryWithDB(db.DBUsers))
 }
 
 func (db *DBMemory) DatafilesStore() *DatafilesStore {

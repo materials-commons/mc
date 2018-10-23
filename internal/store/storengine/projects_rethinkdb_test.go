@@ -44,10 +44,10 @@ func TestProjectsStoreEngineRethinkdb_UpdateProjectName(t *testing.T) {
 	e.Session.Close()
 }
 
-func createRethinkdbProjectsStoreEngine() *storengine.ProjectsStoreEngineRethinkdb {
+func createRethinkdbProjectsStoreEngine() *storengine.ProjectsRethinkdb {
 	session, _ := r.Connect(r.ConnectOpts{Database: "mctest", Address: "localhost:30815"})
 	r.SetTags("r")
-	e := storengine.NewProjectsStoreEngineRethinkdb(session)
+	e := storengine.NewProjectsRethinkdb(session)
 	cleanupProjectsStoreEngine(e)
 	return e
 }

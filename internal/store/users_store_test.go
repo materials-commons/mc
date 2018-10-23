@@ -218,5 +218,5 @@ func addDefaultUsersToStore(t *testing.T, s *store.UsersStore) {
 }
 
 func newSEMemoryUsersStore() *store.UsersStore {
-	return store.NewUsersStore(storengine.NewUsersStoreEngineMemory())
+	return store.NewUsersStore(storengine.NewUsersMemory())
 }

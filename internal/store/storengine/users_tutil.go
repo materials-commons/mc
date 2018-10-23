@@ -20,7 +20,7 @@ func AddDefaultUsersToStoreEngine(t *testing.T, e UsersStoreEngine) {
 }
 
 func CleanupUsersStoreEngine(e UsersStoreEngine) {
-	if re, ok := e.(*UsersStoreEngineRethinkdb); ok {
+	if re, ok := e.(*UsersRethinkdb); ok {
 		session := re.Session
 		_, _ = r.Table("users").Delete().RunWrite(session)
 	}

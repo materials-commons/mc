@@ -10,15 +10,15 @@ import (
 	"gopkg.in/gorethink/gorethink.v4/encoding"
 )
 
-type ProjectsStoreEngineRethinkdb struct {
+type ProjectsRethinkdb struct {
 	Session *r.Session
 }
 
-func NewProjectsStoreEngineRethinkdb(session *r.Session) *ProjectsStoreEngineRethinkdb {
-	return &ProjectsStoreEngineRethinkdb{Session: session}
+func NewProjectsRethinkdb(session *r.Session) *ProjectsRethinkdb {
+	return &ProjectsRethinkdb{Session: session}
 }
 
-func (e *ProjectsStoreEngineRethinkdb) AddProject(project model.ProjectSchema) (model.ProjectSchema, error) {
+func (e *ProjectsRethinkdb) AddProject(project model.ProjectSchema) (model.ProjectSchema, error) {
 	errMsg := fmt.Sprintf("Unable to add project %+v", project)
 	resp, err := r.Table("projects").Insert(project, r.InsertOpts{ReturnChanges: true}).RunWrite(e.Session)
 	if err := checkRethinkdbInsertError(resp, err, errMsg); err != nil {
@@ -41,7 +41,7 @@ func (e *ProjectsStoreEngineRethinkdb) AddProject(project model.ProjectSchema) (
 	return proj, err
 }
 
-func (e *ProjectsStoreEngineRethinkdb) GetProjectSimple(id string) (model.ProjectSimpleModel, error) {
+func (e *ProjectsRethinkdb) GetProjectSimple(id string) (model.ProjectSimpleModel, error) {
 	var project model.ProjectSimpleModel
 	errMsg := fmt.Sprintf("No such project %s", id)
 	res, err := r.Table("projects").Get(id).Merge(projectTopLevelDir).Run(e.Session)
@@ -62,7 +62,7 @@ func projectTopLevelDir(p r.Term) interface{} {
 	}
 }
 
-func (e *ProjectsStoreEngineRethinkdb) GetProject(id string) (model.ProjectExtendedModel, error) {
+func (e *ProjectsRethinkdb) GetProject(id string) (model.ProjectExtendedModel, error) {
 	var project model.ProjectExtendedModel
 	errMsg := fmt.Sprintf("No such project %s", id)
 	res, err := r.Table("projects").Get(id).Merge(projectDetails).Run(e.Session)
@@ -76,7 +76,7 @@ func (e *ProjectsStoreEngineRethinkdb) GetProject(id string) (model.ProjectExten
 	return project, err
 }
 
-func (e *ProjectsStoreEngineRethinkdb) GetAllProjectsForUser(user string) ([]model.ProjectExtendedModel, error) {
+func (e *ProjectsRethinkdb) GetAllProjectsForUser(user string) ([]model.ProjectExtendedModel, error) {
 	var (
 		userProjects     []model.ProjectExtendedModel
 		projectsMemberOf []model.ProjectExtendedModel
@@ -127,7 +127,7 @@ func projectDetails(p r.Term) interface{} {
 	}
 }
 
-func (e *ProjectsStoreEngineRethinkdb) DeleteProject(id string) error {
+func (e *ProjectsRethinkdb) DeleteProject(id string) error {
 	errMsg := fmt.Sprintf("failed deleting project %s", id)
 
 	resp, err := r.Table("projects").Get(id).
@@ -141,13 +141,13 @@ func (e *ProjectsStoreEngineRethinkdb) DeleteProject(id string) error {
 	return checkRethinkdbWriteError(resp, err, errMsg)
 }
 
-func (e *ProjectsStoreEngineRethinkdb) UpdateProjectName(id string, name string, updatedAt time.Time) error {
+func (e *ProjectsRethinkdb) UpdateProjectName(id string, name string, updatedAt time.Time) error {
 	resp, err := r.Table("projects").Get(id).
 		Update(map[string]interface{}{"name": name, "updated_at": updatedAt}, r.UpdateOpts{ReturnChanges: true}).RunWrite(e.Session)
 	return checkRethinkdbUpdateError(resp, err, fmt.Sprintf("Unable to update name to '%s' for project %s", name, id))
 }
 
-func (e *ProjectsStoreEngineRethinkdb) UpdateProjectDescription(id string, description string, updatedAt time.Time) error {
+func (e *ProjectsRethinkdb) UpdateProjectDescription(id string, description string, updatedAt time.Time) error {
 	resp, err := r.Table("projects").Get(id).
 		Update(map[string]interface{}{"description": description, "updated_at": updatedAt}, r.UpdateOpts{ReturnChanges: true}).RunWrite(e.Session)
 	return checkRethinkdbUpdateError(resp, err, fmt.Sprintf("Unable to update desciption to '%s' for project %s", description, id))

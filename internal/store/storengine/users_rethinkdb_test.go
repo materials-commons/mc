@@ -44,10 +44,10 @@ func TestUsersStoreEngineRethinkdb_ModifyUserAPIKey(t *testing.T) {
 	e.Session.Close()
 }
 
-func createRethinkdbUsersStoreEngine() *storengine.UsersStoreEngineRethinkdb {
+func createRethinkdbUsersStoreEngine() *storengine.UsersRethinkdb {
 	session, _ := r.Connect(r.ConnectOpts{Database: "mctest", Address: "localhost:30815"})
 	r.SetTags("r")
-	e := storengine.NewUsersStoreEngineRethinkdb(session)
+	e := storengine.NewUsersRethinkdb(session)
 	storengine.CleanupUsersStoreEngine(e)
 	return e
 }

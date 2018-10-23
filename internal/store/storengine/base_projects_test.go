@@ -134,7 +134,7 @@ func addDefaultProjectsToStoreEngine(t *testing.T, e storengine.ProjectsStoreEng
 }
 
 func cleanupProjectsStoreEngine(e storengine.ProjectsStoreEngine) {
-	if re, ok := e.(*storengine.ProjectsStoreEngineRethinkdb); ok {
+	if re, ok := e.(*storengine.ProjectsRethinkdb); ok {
 		session := re.Session
 		_, _ = r.Table("projects").Delete().RunWrite(session)
 		_, _ = r.Table("datadirs").Delete().RunWrite(session)

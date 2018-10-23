@@ -11,22 +11,22 @@ import (
 	"github.com/gocraft/dbr"
 )
 
-type UsersStoreEngineSQL struct {
+type UsersSQL struct {
 	conn *dbr.Connection
 }
 
-func (e *UsersStoreEngineSQL) AddUser(user model.UserSchema) (model.UserSchema, error) {
+func (e *UsersSQL) AddUser(user model.UserSchema) (model.UserSchema, error) {
 	return model.UserSchema{}, nil
 }
 
-func (e *UsersStoreEngineSQL) GetUserByID(id string) (model.UserSchema, error) {
+func (e *UsersSQL) GetUserByID(id string) (model.UserSchema, error) {
 	var user model.UserSchema
 	session := e.conn.NewSession(nil)
 	err := session.Select("*").From("users").Where(dbr.Eq("id", id)).LoadOne(&user)
 	return user, getDBError(err, fmt.Sprintf("No such user %s", id))
 }
 
-func (e *UsersStoreEngineSQL) GetUserByAPIKey(apikey string) (model.UserSchema, error) {
+func (e *UsersSQL) GetUserByAPIKey(apikey string) (model.UserSchema, error) {
 	var user model.UserSchema
 	session := e.conn.NewSession(nil)
 	err := session.Select("*").From("users").Where(dbr.Eq("apikey", apikey)).LoadOne(&user)

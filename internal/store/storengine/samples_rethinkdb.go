@@ -10,15 +10,15 @@ import (
 	"gopkg.in/gorethink/gorethink.v4/encoding"
 )
 
-type SamplesStoreEngineRethinkdb struct {
+type SamplesRethinkdb struct {
 	Session *r.Session
 }
 
-func NewSamplesStoreEngineRethinkdb(session *r.Session) *SamplesStoreEngineRethinkdb {
-	return &SamplesStoreEngineRethinkdb{Session: session}
+func NewSamplesRethinkdb(session *r.Session) *SamplesRethinkdb {
+	return &SamplesRethinkdb{Session: session}
 }
 
-func (e *SamplesStoreEngineRethinkdb) AddSample(sample model.SampleSchema) (model.SampleSchema, error) {
+func (e *SamplesRethinkdb) AddSample(sample model.SampleSchema) (model.SampleSchema, error) {
 	errMsg := fmt.Sprintf("Unable to add sample %+v", sample)
 
 	resp, err := r.Table("samples").Insert(sample, r.InsertOpts{ReturnChanges: true}).RunWrite(e.Session)
@@ -31,13 +31,13 @@ func (e *SamplesStoreEngineRethinkdb) AddSample(sample model.SampleSchema) (mode
 	return createdSample, err
 }
 
-func (e *SamplesStoreEngineRethinkdb) DeleteSample(sampleID string) error {
+func (e *SamplesRethinkdb) DeleteSample(sampleID string) error {
 	errMsg := fmt.Sprintf("Unable to delete sample %s", sampleID)
 	resp, err := r.Table("samples").Get(sampleID).Delete().RunWrite(e.Session)
 	return checkRethinkdbDeleteError(resp, err, errMsg)
 }
 
-func (e *SamplesStoreEngineRethinkdb) GetSample(sampleID string) (model.SampleSchema, error) {
+func (e *SamplesRethinkdb) GetSample(sampleID string) (model.SampleSchema, error) {
 	errMsg := fmt.Sprintf("No such sample %s", sampleID)
 	res, err := r.Table("samples").Get(sampleID).Run(e.Session)
 	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
@@ -50,7 +50,7 @@ func (e *SamplesStoreEngineRethinkdb) GetSample(sampleID string) (model.SampleSc
 	return sample, err
 }
 
-func (e *SamplesStoreEngineRethinkdb) ModifySampleName(sampleID, name string, updatedAt time.Time) error {
+func (e *SamplesRethinkdb) ModifySampleName(sampleID, name string, updatedAt time.Time) error {
 	errMsg := fmt.Sprintf("Unable to update sample %s name to %s", sampleID, name)
 	resp, err := r.Table("samples").Get(sampleID).
 		Update(map[string]interface{}{"name": name, "updated_at": updatedAt}).RunWrite(e.Session)
