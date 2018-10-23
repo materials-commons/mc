@@ -3,6 +3,8 @@ package store
 import (
 	"fmt"
 
+	"github.com/materials-commons/mc/internal/store/model"
+
 	r "gopkg.in/gorethink/gorethink.v4"
 	"gopkg.in/gorethink/gorethink.v4/encoding"
 )
@@ -15,7 +17,7 @@ func NewProcessesStoreEngineRethinkdb(session *r.Session) *ProcessesStoreEngineR
 	return &ProcessesStoreEngineRethinkdb{Session: session}
 }
 
-func (e *ProcessesStoreEngineRethinkdb) AddProcess(process ProcessSchema) (ProcessSchema, error) {
+func (e *ProcessesStoreEngineRethinkdb) AddProcess(process model.ProcessSchema) (model.ProcessSchema, error) {
 	errMsg := fmt.Sprintf("Unable to add process %+v", process)
 
 	resp, err := r.Table("processes").Insert(process, r.InsertOpts{ReturnChanges: true}).RunWrite(e.Session)
@@ -23,13 +25,13 @@ func (e *ProcessesStoreEngineRethinkdb) AddProcess(process ProcessSchema) (Proce
 		return process, err
 	}
 
-	var createdProcess ProcessSchema
+	var createdProcess model.ProcessSchema
 	err = encoding.Decode(&createdProcess, resp.Changes[0].NewValue)
 	return createdProcess, err
 }
 
-func (e *ProcessesStoreEngineRethinkdb) GetProcess(processID string) (ProcessExtendedModel, error) {
-	var process ProcessExtendedModel
+func (e *ProcessesStoreEngineRethinkdb) GetProcess(processID string) (model.ProcessExtendedModel, error) {
+	var process model.ProcessExtendedModel
 	errMsg := fmt.Sprintf("No such process %s", processID)
 	res, err := r.Table("processes").Get(processID).Merge(processDetails).Run(e.Session)
 	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {

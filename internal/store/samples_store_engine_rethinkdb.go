@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/materials-commons/mc/internal/store/model"
+
 	r "gopkg.in/gorethink/gorethink.v4"
 	"gopkg.in/gorethink/gorethink.v4/encoding"
 )
@@ -16,7 +18,7 @@ func NewSamplesStoreEngineRethinkdb(session *r.Session) *SamplesStoreEngineRethi
 	return &SamplesStoreEngineRethinkdb{Session: session}
 }
 
-func (e *SamplesStoreEngineRethinkdb) AddSample(sample SampleSchema) (SampleSchema, error) {
+func (e *SamplesStoreEngineRethinkdb) AddSample(sample model.SampleSchema) (model.SampleSchema, error) {
 	errMsg := fmt.Sprintf("Unable to add sample %+v", sample)
 
 	resp, err := r.Table("samples").Insert(sample, r.InsertOpts{ReturnChanges: true}).RunWrite(e.Session)
@@ -24,7 +26,7 @@ func (e *SamplesStoreEngineRethinkdb) AddSample(sample SampleSchema) (SampleSche
 		return sample, err
 	}
 
-	var createdSample SampleSchema
+	var createdSample model.SampleSchema
 	err = encoding.Decode(&createdSample, resp.Changes[0].NewValue)
 	return createdSample, err
 }
@@ -35,15 +37,15 @@ func (e *SamplesStoreEngineRethinkdb) DeleteSample(sampleID string) error {
 	return checkRethinkdbDeleteError(resp, err, errMsg)
 }
 
-func (e *SamplesStoreEngineRethinkdb) GetSample(sampleID string) (SampleSchema, error) {
+func (e *SamplesStoreEngineRethinkdb) GetSample(sampleID string) (model.SampleSchema, error) {
 	errMsg := fmt.Sprintf("No such sample %s", sampleID)
 	res, err := r.Table("samples").Get(sampleID).Run(e.Session)
 	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
-		return SampleSchema{}, err
+		return model.SampleSchema{}, err
 	}
 	defer res.Close()
 
-	var sample SampleSchema
+	var sample model.SampleSchema
 	err = res.One(&sample)
 	return sample, err
 }

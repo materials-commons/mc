@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/materials-commons/mc/internal/store/model"
+	"github.com/materials-commons/mc/pkg/mc"
+
 	"github.com/pkg/errors"
 
 	"github.com/Jeffail/tunny"
@@ -45,7 +48,7 @@ func (l *BackgroundLoader) processLoadFileRequests(c context.Context) {
 	for {
 		requests, err := fileloadsStore.GetAllFileLoads()
 		//fmt.Printf("processing file loads %#v: %s\n", requests, err)
-		if err != nil && errors.Cause(err) != store.ErrNotFound {
+		if err != nil && errors.Cause(err) != mc.ErrNotFound {
 			fmt.Println("Error retrieving requests:", err)
 		}
 
@@ -89,7 +92,7 @@ func (l *BackgroundLoader) worker(args interface{}) interface{} {
 	projStore := l.db.ProjectsStore()
 	flStore := l.db.FileLoadsStore()
 
-	req := args.(store.FileLoadSchema)
+	req := args.(model.FileLoadSchema)
 
 	proj, err := projStore.GetProjectSimple(req.ProjectID)
 	if err != nil {

@@ -1,6 +1,10 @@
 package store
 
-import "time"
+import (
+	"time"
+
+	"github.com/materials-commons/mc/internal/store/model"
+)
 
 type ProjectsStore struct {
 	pStoreEngine ProjectsStoreEngine
@@ -10,15 +14,15 @@ func NewProjectsStore(e ProjectsStoreEngine) *ProjectsStore {
 	return &ProjectsStore{pStoreEngine: e}
 }
 
-func (s *ProjectsStore) AddProject(pModel AddProjectModel) (ProjectSchema, error) {
+func (s *ProjectsStore) AddProject(pModel model.AddProjectModel) (model.ProjectSchema, error) {
 	if err := pModel.Validate(); err != nil {
-		return ProjectSchema{}, err
+		return model.ProjectSchema{}, err
 	}
 
 	now := time.Now()
 
-	p := ProjectSchema{
-		Model: Model{
+	p := model.ProjectSchema{
+		Model: model.Model{
 			Name:      pModel.Name,
 			Owner:     pModel.Owner,
 			Birthtime: now,
@@ -31,6 +35,6 @@ func (s *ProjectsStore) AddProject(pModel AddProjectModel) (ProjectSchema, error
 	return s.pStoreEngine.AddProject(p)
 }
 
-func (s *ProjectsStore) GetProjectSimple(id string) (ProjectSimpleModel, error) {
+func (s *ProjectsStore) GetProjectSimple(id string) (model.ProjectSimpleModel, error) {
 	return s.pStoreEngine.GetProjectSimple(id)
 }

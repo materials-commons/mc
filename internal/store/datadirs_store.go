@@ -1,6 +1,10 @@
 package store
 
-import "time"
+import (
+	"time"
+
+	"github.com/materials-commons/mc/internal/store/model"
+)
 
 type DatadirsStore struct {
 	ddStoreEngine DatadirsStoreEngine
@@ -10,15 +14,15 @@ func NewDatadirsStore(e DatadirsStoreEngine) *DatadirsStore {
 	return &DatadirsStore{ddStoreEngine: e}
 }
 
-func (s *DatadirsStore) AddDatadir(ddModel AddDatadirModel) (DatadirSchema, error) {
+func (s *DatadirsStore) AddDatadir(ddModel model.AddDatadirModel) (model.DatadirSchema, error) {
 	if err := ddModel.Validate(); err != nil {
-		return DatadirSchema{}, err
+		return model.DatadirSchema{}, err
 	}
 
 	now := time.Now()
 
-	dd := DatadirSchema{
-		Model: Model{
+	dd := model.DatadirSchema{
+		Model: model.Model{
 			Name:      ddModel.Name,
 			Owner:     ddModel.Owner,
 			Birthtime: now,
@@ -32,10 +36,10 @@ func (s *DatadirsStore) AddDatadir(ddModel AddDatadirModel) (DatadirSchema, erro
 	return s.ddStoreEngine.AddDir(dd)
 }
 
-func (s *DatadirsStore) GetDatadirByPathInProject(path, projectID string) (DatadirSchema, error) {
+func (s *DatadirsStore) GetDatadirByPathInProject(path, projectID string) (model.DatadirSchema, error) {
 	return s.ddStoreEngine.GetDatadirByPathInProject(path, projectID)
 }
 
-func (s *DatadirsStore) GetDatadirByID(id string) (DatadirSchema, error) {
+func (s *DatadirsStore) GetDatadirByID(id string) (model.DatadirSchema, error) {
 	return s.ddStoreEngine.GetDatadir(id)
 }

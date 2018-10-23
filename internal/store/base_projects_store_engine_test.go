@@ -3,6 +3,8 @@ package store_test
 import (
 	"testing"
 
+	"github.com/materials-commons/mc/internal/store/model"
+
 	"github.com/materials-commons/mc/pkg/tutils/assert"
 
 	"github.com/materials-commons/mc/internal/store"
@@ -11,12 +13,12 @@ import (
 
 func testProjectsStoreEngineRethinkdbAddProject(t *testing.T, e store.ProjectsStoreEngine) {
 	tests := []struct {
-		project    store.ProjectSchema
+		project    model.ProjectSchema
 		shouldFail bool
 		name       string
 	}{
-		{project: store.ProjectSchema{Model: store.Model{ID: "project1"}}, shouldFail: false, name: "Add project"},
-		{project: store.ProjectSchema{Model: store.Model{ID: "project1"}}, shouldFail: true, name: "Add duplicate project"},
+		{project: model.ProjectSchema{Model: model.Model{ID: "project1"}}, shouldFail: false, name: "Add project"},
+		{project: model.ProjectSchema{Model: model.Model{ID: "project1"}}, shouldFail: true, name: "Add duplicate project"},
 	}
 
 	for _, test := range tests {
@@ -56,7 +58,7 @@ func testProjectsStoreEngineRethinkdbDeleteProject(t *testing.T, e store.Project
 
 func testProjectsStoreEngineRethinkdbGetAllProjectsForUser(t *testing.T, e store.ProjectsStoreEngine) {
 	tests := []struct {
-		project    store.ProjectSchema
+		project    model.ProjectSchema
 		shouldFail bool
 		name       string
 	}{{shouldFail: false}}
@@ -71,7 +73,7 @@ func testProjectsStoreEngineRethinkdbGetAllProjectsForUser(t *testing.T, e store
 
 func testProjectsStoreEngineRethinkdbGetProject(t *testing.T, e store.ProjectsStoreEngine) {
 	tests := []struct {
-		project    store.ProjectSchema
+		project    model.ProjectSchema
 		shouldFail bool
 		name       string
 	}{{shouldFail: false}}
@@ -86,7 +88,7 @@ func testProjectsStoreEngineRethinkdbGetProject(t *testing.T, e store.ProjectsSt
 
 func testProjectsStoreEngineRethinkdbUpdateProjectDescription(t *testing.T, e store.ProjectsStoreEngine) {
 	tests := []struct {
-		project    store.ProjectSchema
+		project    model.ProjectSchema
 		shouldFail bool
 		name       string
 	}{{shouldFail: false}}
@@ -101,7 +103,7 @@ func testProjectsStoreEngineRethinkdbUpdateProjectDescription(t *testing.T, e st
 
 func testProjectsStoreEngineRethinkdbUpdateProjectName(t *testing.T, e store.ProjectsStoreEngine) {
 	tests := []struct {
-		project    store.ProjectSchema
+		project    model.ProjectSchema
 		shouldFail bool
 		name       string
 	}{{shouldFail: false}}
@@ -115,8 +117,8 @@ func testProjectsStoreEngineRethinkdbUpdateProjectName(t *testing.T, e store.Pro
 }
 
 func addDefaultProjectsToStoreEngine(t *testing.T, e store.ProjectsStoreEngine) {
-	projects := []store.ProjectSchema{
-		{Model: store.Model{ID: "project1", Name: "project1", OType: "project", Owner: "tuser@test.com"}, Description: "project1 description"},
+	projects := []model.ProjectSchema{
+		{Model: model.Model{ID: "project1", Name: "project1", OType: "project", Owner: "tuser@test.com"}, Description: "project1 description"},
 	}
 
 	for _, project := range projects {

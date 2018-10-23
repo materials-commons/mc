@@ -3,9 +3,12 @@ package store_test
 import (
 	"testing"
 
+	"github.com/materials-commons/mc/internal/store"
+
+	"github.com/materials-commons/mc/internal/store/model"
+
 	"github.com/materials-commons/mc/pkg/tutils/assert"
 
-	"github.com/materials-commons/mc/internal/store"
 	r "gopkg.in/gorethink/gorethink.v4"
 )
 
@@ -34,12 +37,12 @@ func testDatafilesStoreEngineGetFile(t *testing.T, e store.DatafilesStoreEngine)
 
 func testDatafilesStoreEngineAddFile(t *testing.T, e store.DatafilesStoreEngine) {
 	tests := []struct {
-		file       store.DatafileSchema
+		file       model.DatafileSchema
 		shouldFail bool
 		name       string
 	}{
-		{file: store.DatafileSchema{Model: store.Model{ID: "datafile1"}}, shouldFail: true, name: "Add existing"},
-		{file: store.DatafileSchema{Model: store.Model{Name: "newfile"}}, shouldFail: false, name: "Add new file"},
+		{file: model.DatafileSchema{Model: model.Model{ID: "datafile1"}}, shouldFail: true, name: "Add existing"},
+		{file: model.DatafileSchema{Model: model.Model{Name: "newfile"}}, shouldFail: false, name: "Add new file"},
 	}
 
 	addDefaultDatafilesToStoreEngine(t, e)
@@ -83,8 +86,8 @@ func testDatafilesStoreEngineGetFileInDir(t *testing.T, e store.DatafilesStoreEn
 }
 
 func addDefaultDatafilesToStoreEngine(t *testing.T, e store.DatafilesStoreEngine) {
-	datafiles := []store.DatafileSchema{
-		{Model: store.Model{ID: "datafile1"}, Checksum: "csumdatafile1"},
+	datafiles := []model.DatafileSchema{
+		{Model: model.Model{ID: "datafile1"}, Checksum: "csumdatafile1"},
 	}
 
 	for _, datafile := range datafiles {

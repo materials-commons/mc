@@ -3,6 +3,8 @@ package store
 import (
 	"fmt"
 
+	"github.com/materials-commons/mc/internal/store/model"
+
 	r "gopkg.in/gorethink/gorethink.v4"
 	"gopkg.in/gorethink/gorethink.v4/encoding"
 )
@@ -15,7 +17,7 @@ func NewAccessStoreEngineRethinkdb(session *r.Session) *AccessStoreEngineRethink
 	return &AccessStoreEngineRethinkdb{Session: session}
 }
 
-func (e *AccessStoreEngineRethinkdb) AddAccessEntry(entry AccessSchema) (AccessSchema, error) {
+func (e *AccessStoreEngineRethinkdb) AddAccessEntry(entry model.AccessSchema) (model.AccessSchema, error) {
 	errMsg := fmt.Sprintf("Unable to insert access entry %+v", entry)
 
 	resp, err := r.Table("access").Insert(entry, r.InsertOpts{ReturnChanges: true}).RunWrite(e.Session)
@@ -23,7 +25,7 @@ func (e *AccessStoreEngineRethinkdb) AddAccessEntry(entry AccessSchema) (AccessS
 		return entry, err
 	}
 
-	var accessEntry AccessSchema
+	var accessEntry model.AccessSchema
 	err = encoding.Decode(&accessEntry, resp.Changes[0].NewValue)
 	return accessEntry, err
 }
@@ -41,8 +43,8 @@ func (e *AccessStoreEngineRethinkdb) DeleteAllAccessForProject(projectID string)
 	return checkRethinkdbDeleteError(resp, err, errMsg)
 }
 
-func (e *AccessStoreEngineRethinkdb) GetProjectAccessEntries(projectID string) ([]AccessSchema, error) {
-	var entries []AccessSchema
+func (e *AccessStoreEngineRethinkdb) GetProjectAccessEntries(projectID string) ([]model.AccessSchema, error) {
+	var entries []model.AccessSchema
 	errMsg := fmt.Sprintf("Can't retrieve entries for project %s", projectID)
 
 	res, err := r.Table("access").GetAllByIndex("project_id", projectID).Run(e.Session)
@@ -55,8 +57,8 @@ func (e *AccessStoreEngineRethinkdb) GetProjectAccessEntries(projectID string) (
 	return entries, err
 }
 
-func (e *AccessStoreEngineRethinkdb) GetUserAccessEntries(userID string) ([]AccessSchema, error) {
-	var entries []AccessSchema
+func (e *AccessStoreEngineRethinkdb) GetUserAccessEntries(userID string) ([]model.AccessSchema, error) {
+	var entries []model.AccessSchema
 	errMsg := fmt.Sprintf("Can't retrieve access entries for user %s", userID)
 	res, err := r.Table("access").GetAllByIndex("user_id", userID).Run(e.Session)
 	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {

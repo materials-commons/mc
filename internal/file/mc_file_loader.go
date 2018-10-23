@@ -12,6 +12,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/materials-commons/mc/internal/store/model"
+	"github.com/materials-commons/mc/pkg/mc"
+
 	"github.com/pkg/errors"
 
 	"github.com/materials-commons/mc/internal/store"
@@ -22,12 +25,12 @@ type MCFileLoader struct {
 	mcdir              string
 	dfStore            *store.DatafilesStore
 	ddStore            *store.DatadirsStore
-	project            store.ProjectSimpleModel // Project we are adding entries to
-	currentRootDatadir store.DatadirSchema      // Track which Materials Commons directory we are currently adding entries to
+	project            model.ProjectSimpleModel // Project we are adding entries to
+	currentRootDatadir model.DatadirSchema      // Track which Materials Commons directory we are currently adding entries to
 	owner              string                   // Owner here is the MC user we are performing the processing on behalf, and not the project owner
 }
 
-func NewMCFileLoader(root, owner, mcdir string, project store.ProjectSimpleModel, dfStore *store.DatafilesStore, ddStore *store.DatadirsStore) *MCFileLoader {
+func NewMCFileLoader(root, owner, mcdir string, project model.ProjectSimpleModel, dfStore *store.DatafilesStore, ddStore *store.DatadirsStore) *MCFileLoader {
 	return &MCFileLoader{
 		root:    root,
 		owner:   owner,
@@ -81,7 +84,7 @@ func (l *MCFileLoader) loadDirectory(path string, finfo os.FileInfo) error {
 		return nil
 	}
 
-	dir := store.AddDatadirModel{
+	dir := model.AddDatadirModel{
 		Name:      dirPath,
 		Owner:     l.owner,
 		Parent:    l.currentRootDatadir.ID,
@@ -98,7 +101,7 @@ func (l *MCFileLoader) loadDirectory(path string, finfo os.FileInfo) error {
 func (l *MCFileLoader) loadFile(path string, finfo os.FileInfo) error {
 	var (
 		checksum string
-		df       store.DatafileSchema
+		df       model.DatafileSchema
 		err      error
 	)
 	checksum, err = l.computeFileChecksum(path)
@@ -108,14 +111,14 @@ func (l *MCFileLoader) loadFile(path string, finfo os.FileInfo) error {
 
 	mediatype := GetMediaTypeByExtension(path)
 
-	addFile := store.AddDatafileModel{
+	addFile := model.AddDatafileModel{
 		Name:      filepath.Base(path),
 		Owner:     l.owner,
 		Checksum:  checksum,
 		Size:      finfo.Size(),
 		ProjectID: l.project.ID,
 		DatadirID: l.currentRootDatadir.ID,
-		MediaType: store.DatafileMediaType{
+		MediaType: model.DatafileMediaType{
 			Mime:        mediatype.Mime,
 			Description: mediatype.Description,
 		},
@@ -125,7 +128,7 @@ func (l *MCFileLoader) loadFile(path string, finfo os.FileInfo) error {
 	// set this entries UsesID to point at it.
 	df, err = l.dfStore.GetDatafileWithChecksum(checksum)
 	switch {
-	case err != nil && errors.Cause(err) == store.ErrNotFound:
+	case err != nil && errors.Cause(err) == mc.ErrNotFound:
 		// Nothing to do, here for documentation purposes:
 		// We didn't find a file with a matching checksum, so this is a brand
 		// new file we are creating.
@@ -142,7 +145,7 @@ func (l *MCFileLoader) loadFile(path string, finfo os.FileInfo) error {
 	// not current.
 	df, err = l.dfStore.GetDatafileInDir(addFile.Name, addFile.DatadirID)
 	switch {
-	case err != nil && errors.Cause(err) == store.ErrNotFound:
+	case err != nil && errors.Cause(err) == mc.ErrNotFound:
 		// Nothing to do, here for documentation purposes:
 		// We didn't find a file with the same name in the given directory
 		// so no need to create another version
@@ -155,7 +158,7 @@ func (l *MCFileLoader) loadFile(path string, finfo os.FileInfo) error {
 		}
 	}
 
-	var f store.DatafileSchema
+	var f model.DatafileSchema
 
 	f, err = l.dfStore.AddDatafile(addFile)
 	if err != nil {
@@ -181,7 +184,7 @@ func (l *MCFileLoader) computeFileChecksum(path string) (string, error) {
 	return fmt.Sprintf("%x", hasher.Sum(nil)), nil
 }
 
-func (l *MCFileLoader) moveFile(path string, f store.DatafileSchema) error {
+func (l *MCFileLoader) moveFile(path string, f model.DatafileSchema) error {
 	dirPath := MCFileDir(l.mcdir, f.ID)
 	if err := os.MkdirAll(dirPath, 0700); err != nil {
 		return err

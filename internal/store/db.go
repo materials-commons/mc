@@ -1,6 +1,8 @@
 package store
 
 import (
+	"github.com/materials-commons/mc/internal/store/model"
+	"github.com/materials-commons/mc/internal/store/storengine"
 	r "gopkg.in/gorethink/gorethink.v4"
 )
 
@@ -33,7 +35,7 @@ func (db *DBRethinkdb) DatafilesStore() *DatafilesStore {
 }
 
 func (db *DBRethinkdb) DatadirsStore() *DatadirsStore {
-	return NewDatadirsStore(NewDatadirsStoreEngineRethinkdb(db.Session))
+	return NewDatadirsStore(storengine.NewDatadirsRethinkdb(db.Session))
 }
 
 func (db *DBRethinkdb) FileLoadsStore() *FileLoadsStore {
@@ -41,20 +43,20 @@ func (db *DBRethinkdb) FileLoadsStore() *FileLoadsStore {
 }
 
 type DBMemory struct {
-	DBProj      map[string]ProjectSchema
-	DBUsers     map[string]UserSchema
-	DBDatadirs  map[string]DatadirSchema
+	DBProj      map[string]model.ProjectSchema
+	DBUsers     map[string]model.UserSchema
+	DBDatadirs  map[string]model.DatadirSchema
 	DBDatafiles map[string]DatafileSchemaInMemory
-	DBFileLoads map[string]FileLoadSchema
+	DBFileLoads map[string]model.FileLoadSchema
 }
 
 func NewDBMemory() *DBMemory {
 	return &DBMemory{
-		DBProj:      make(map[string]ProjectSchema),
-		DBUsers:     make(map[string]UserSchema),
-		DBDatadirs:  make(map[string]DatadirSchema),
+		DBProj:      make(map[string]model.ProjectSchema),
+		DBUsers:     make(map[string]model.UserSchema),
+		DBDatadirs:  make(map[string]model.DatadirSchema),
 		DBDatafiles: make(map[string]DatafileSchemaInMemory),
-		DBFileLoads: make(map[string]FileLoadSchema),
+		DBFileLoads: make(map[string]model.FileLoadSchema),
 	}
 }
 
@@ -84,10 +86,10 @@ func (db *DBMemory) DatafilesStore() *DatafilesStore {
 
 func (db *DBMemory) DatadirsStore() *DatadirsStore {
 	if db.DBDatadirs == nil {
-		return NewDatadirsStore(NewDatadirsStoreEngineMemory())
+		return NewDatadirsStore(storengine.NewDatadirsMemory())
 	}
 
-	return NewDatadirsStore(NewDatadirsStoreEngineMemoryWithDB(db.DBDatadirs))
+	return NewDatadirsStore(storengine.NewDatadirsMemoryWithDB(db.DBDatadirs))
 }
 
 func (db *DBMemory) FileLoadsStore() *FileLoadsStore {

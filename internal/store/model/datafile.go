@@ -1,8 +1,9 @@
-package store
+package model
 
 import (
 	"github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
+	"github.com/materials-commons/mc/pkg/mc"
 	"github.com/pkg/errors"
 )
 
@@ -44,7 +45,7 @@ func (d AddDatafileModel) Validate() error {
 		validation.Field(&d.Size, validation.Required, validation.Min(1)))
 
 	if err != nil {
-		return errors.WithMessage(ErrValidation, err.Error())
+		return errors.WithMessage(mc.ErrValidation, err.Error())
 	}
 
 	return nil

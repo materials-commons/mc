@@ -1,34 +1,36 @@
-package store
+package storengine
 
 import (
 	"fmt"
 	"time"
+
+	"github.com/materials-commons/mc/internal/store/model"
 
 	"gopkg.in/gorethink/gorethink.v4/encoding"
 
 	r "gopkg.in/gorethink/gorethink.v4"
 )
 
-type DatadirsStoreEngineRethinkdb struct {
+type DatadirsRethinkdb struct {
 	Session *r.Session
 }
 
-func NewDatadirsStoreEngineRethinkdb(session *r.Session) *DatadirsStoreEngineRethinkdb {
-	return &DatadirsStoreEngineRethinkdb{Session: session}
+func NewDatadirsRethinkdb(session *r.Session) *DatadirsRethinkdb {
+	return &DatadirsRethinkdb{Session: session}
 }
 
-func (e *DatadirsStoreEngineRethinkdb) AddDir(dir DatadirSchema) (DatadirSchema, error) {
-	return addDatadir(dir, e.Session)
+func (e *DatadirsRethinkdb) AddDir(dir model.DatadirSchema) (model.DatadirSchema, error) {
+	return AddDatadir(dir, e.Session)
 }
 
-func addDatadir(dir DatadirSchema, session *r.Session) (DatadirSchema, error) {
+func AddDatadir(dir model.DatadirSchema, session *r.Session) (model.DatadirSchema, error) {
 	errMsg := fmt.Sprintf("Unable to add datadir: %+v", dir)
 	resp, err := r.Table("datadirs").Insert(dir, r.InsertOpts{ReturnChanges: true}).RunWrite(session)
 	if err := checkRethinkdbInsertError(resp, err, errMsg); err != nil {
 		return dir, err
 	}
 
-	var d DatadirSchema
+	var d model.DatadirSchema
 	if err := encoding.Decode(&d, resp.Changes[0].NewValue); err != nil {
 		return d, err
 	}
@@ -44,11 +46,11 @@ func addDatadir(dir DatadirSchema, session *r.Session) (DatadirSchema, error) {
 	return d, nil
 }
 
-func toDatadirSchema(ddModel AddDatadirModel) DatadirSchema {
+func ToDatadirSchema(ddModel model.AddDatadirModel) model.DatadirSchema {
 	now := time.Now()
 
-	dd := DatadirSchema{
-		Model: Model{
+	dd := model.DatadirSchema{
+		Model: model.Model{
 			Name:      ddModel.Name,
 			Owner:     ddModel.Owner,
 			Birthtime: now,
@@ -62,8 +64,8 @@ func toDatadirSchema(ddModel AddDatadirModel) DatadirSchema {
 	return dd
 }
 
-func (e *DatadirsStoreEngineRethinkdb) GetDatadirByPathInProject(path, projectID string) (DatadirSchema, error) {
-	var dir DatadirSchema
+func (e *DatadirsRethinkdb) GetDatadirByPathInProject(path, projectID string) (model.DatadirSchema, error) {
+	var dir model.DatadirSchema
 	errMsg := fmt.Sprintf("Unable to find datadir path %s in project %s", path, projectID)
 	res, err := r.Table("datadirs").
 		GetAllByIndex("datadir_project_name", []interface{}{projectID, path}).Run(e.Session)
@@ -76,8 +78,8 @@ func (e *DatadirsStoreEngineRethinkdb) GetDatadirByPathInProject(path, projectID
 	return dir, err
 }
 
-func (e *DatadirsStoreEngineRethinkdb) GetDatadir(id string) (DatadirSchema, error) {
-	var dir DatadirSchema
+func (e *DatadirsRethinkdb) GetDatadir(id string) (model.DatadirSchema, error) {
+	var dir model.DatadirSchema
 	errMsg := fmt.Sprintf("Unable to find datadir %s", id)
 	res, err := r.Table("datadirs").Get(id).Run(e.Session)
 	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {

@@ -3,6 +3,8 @@ package store
 import (
 	"fmt"
 
+	"github.com/materials-commons/mc/internal/store/model"
+
 	r "gopkg.in/gorethink/gorethink.v4"
 	"gopkg.in/gorethink/gorethink.v4/encoding"
 )
@@ -15,14 +17,14 @@ func NewFileLoadsStoreEngineRethinkdb(session *r.Session) *FileLoadsStoreEngineR
 	return &FileLoadsStoreEngineRethinkdb{Session: session}
 }
 
-func (e *FileLoadsStoreEngineRethinkdb) AddFileLoad(upload FileLoadSchema) (FileLoadSchema, error) {
+func (e *FileLoadsStoreEngineRethinkdb) AddFileLoad(upload model.FileLoadSchema) (model.FileLoadSchema, error) {
 	errMsg := fmt.Sprintf("Unable to add file load request %#v", upload)
 	resp, err := r.Table("file_loads").Insert(upload, r.InsertOpts{ReturnChanges: true}).RunWrite(e.Session)
 	if err := checkRethinkdbInsertError(resp, err, errMsg); err != nil {
 		return upload, err
 	}
 
-	var uploadCreated FileLoadSchema
+	var uploadCreated model.FileLoadSchema
 	err = encoding.Decode(&uploadCreated, resp.Changes[0].NewValue)
 	return uploadCreated, err
 }
@@ -33,8 +35,8 @@ func (e *FileLoadsStoreEngineRethinkdb) DeleteFileLoad(id string) error {
 	return checkRethinkdbWriteError(resp, err, errMsg)
 }
 
-func (e *FileLoadsStoreEngineRethinkdb) GetFileLoad(uploadID string) (FileLoadSchema, error) {
-	var upload FileLoadSchema
+func (e *FileLoadsStoreEngineRethinkdb) GetFileLoad(uploadID string) (model.FileLoadSchema, error) {
+	var upload model.FileLoadSchema
 	errMsg := fmt.Sprintf("No such file load request %s", uploadID)
 	res, err := r.Table("file_loads").Get(uploadID).Run(e.Session)
 	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
@@ -46,7 +48,7 @@ func (e *FileLoadsStoreEngineRethinkdb) GetFileLoad(uploadID string) (FileLoadSc
 	return upload, err
 }
 
-func (e *FileLoadsStoreEngineRethinkdb) GetAllFileLoads() ([]FileLoadSchema, error) {
+func (e *FileLoadsStoreEngineRethinkdb) GetAllFileLoads() ([]model.FileLoadSchema, error) {
 	errMsg := fmt.Sprintf("Unable to retrieve file loads")
 	res, err := r.Table("file_loads").Run(e.Session)
 	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
@@ -54,7 +56,7 @@ func (e *FileLoadsStoreEngineRethinkdb) GetAllFileLoads() ([]FileLoadSchema, err
 	}
 	defer res.Close()
 
-	var uploads []FileLoadSchema
+	var uploads []model.FileLoadSchema
 	err = res.All(uploads)
 	return uploads, err
 }

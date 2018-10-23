@@ -6,6 +6,10 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/materials-commons/mc/internal/store/model"
+
+	"github.com/materials-commons/mc/internal/store/storengine"
+
 	"github.com/materials-commons/mc/internal/file"
 
 	"github.com/materials-commons/mc/internal/store"
@@ -18,18 +22,18 @@ func TestMCFileLoaderLoadOnlyADirectory(t *testing.T) {
 	finfo, err := os.Stat(".")
 	assert.Okf(t, err, "Unable to stat current dir %s", err)
 
-	ddStoreEngine := store.NewDatadirsStoreEngineMemory()
+	ddStoreEngine := storengine.NewDatadirsMemory()
 	ddStore := store.NewDatadirsStore(ddStoreEngine)
 
 	var (
-		project     store.ProjectSimpleModel
-		projDataDir store.DatadirSchema
-		dir         store.DatadirSchema
+		project     model.ProjectSimpleModel
+		projDataDir model.DatadirSchema
+		dir         model.DatadirSchema
 	)
 	project.Name = "My Project"
 	project.ID = "My Project ID"
 
-	dirToAdd := store.AddDatadirModel{
+	dirToAdd := model.AddDatadirModel{
 		Name:      project.Name,
 		Owner:     "mctest",
 		Parent:    "",
@@ -82,21 +86,21 @@ func TestMCFileLoaderLoadOnlyAFile(t *testing.T) {
 	finfo, err := os.Stat(tmpFile)
 	assert.Okf(t, err, "Unable to stat current tmpFile (%s): %s", tmpFile, err)
 
-	ddStoreEngine := store.NewDatadirsStoreEngineMemory()
+	ddStoreEngine := storengine.NewDatadirsMemory()
 	ddStore := store.NewDatadirsStore(ddStoreEngine)
 
 	dfStoreEngine := store.NewDatafilesStoreEngineMemory()
 	dfStore := store.NewDatafilesStore(dfStoreEngine)
 
 	var (
-		project     store.ProjectSimpleModel
-		projDataDir store.DatadirSchema
-		//dir         store.DatadirSchema
+		project     model.ProjectSimpleModel
+		projDataDir model.DatadirSchema
+		//dir         model.DatadirSchema
 	)
 	project.Name = "My Project"
 	project.ID = "My Project ID"
 
-	dirToAdd := store.AddDatadirModel{
+	dirToAdd := model.AddDatadirModel{
 		Name:      project.Name,
 		Owner:     "mctest",
 		Parent:    "",
@@ -110,7 +114,7 @@ func TestMCFileLoaderLoadOnlyAFile(t *testing.T) {
 	defer os.RemoveAll("/tmp/mcdir")
 
 	t.Run("Check simple file load works", func(t *testing.T) {
-		var df store.DatafileSchema
+		var df model.DatafileSchema
 		err := mcFileLoader.LoadFileOrDir(tmpFile, finfo)
 		assert.Okf(t, err, "Unable to load file %s: %s", tmpFile, err)
 
@@ -126,8 +130,8 @@ func TestMCFileLoaderLoadOnlyAFile(t *testing.T) {
 
 	t.Run("Check parent is correctly set", func(t *testing.T) {
 		var (
-			df  store.DatafileSchema
-			df2 store.DatafileSchema
+			df  model.DatafileSchema
+			df2 model.DatafileSchema
 		)
 		finfo, err := os.Stat(secondFile)
 		assert.Okf(t, err, "Unable to stat %s: %s", secondFile, err)

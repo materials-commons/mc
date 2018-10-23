@@ -1,4 +1,4 @@
-package store
+package storengine
 
 import (
 	"github.com/materials-commons/mc/pkg/mc"

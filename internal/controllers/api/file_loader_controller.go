@@ -3,6 +3,8 @@ package api
 import (
 	"net/http"
 
+	"github.com/materials-commons/mc/internal/store/model"
+
 	"github.com/materials-commons/mc/internal/store"
 
 	"github.com/labstack/echo"
@@ -42,7 +44,7 @@ func (f *FileLoaderController) LoadFilesFromDirectory(c echo.Context) error {
 }
 
 func (f *FileLoaderController) createLoadReq(req LoadFilesReq) (id string, err error) {
-	flAdd := store.AddFileLoadModel{
+	flAdd := model.AddFileLoadModel{
 		ProjectID: req.ProjectID,
 		Owner:     req.User,
 		Path:      req.Path,

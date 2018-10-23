@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/materials-commons/mc/internal/store/model"
+	"github.com/materials-commons/mc/internal/store/storengine"
+
 	r "gopkg.in/gorethink/gorethink.v4"
 	"gopkg.in/gorethink/gorethink.v4/encoding"
 )
@@ -16,31 +19,31 @@ func NewProjectsStoreEngineRethinkdb(session *r.Session) *ProjectsStoreEngineRet
 	return &ProjectsStoreEngineRethinkdb{Session: session}
 }
 
-func (e *ProjectsStoreEngineRethinkdb) AddProject(project ProjectSchema) (ProjectSchema, error) {
+func (e *ProjectsStoreEngineRethinkdb) AddProject(project model.ProjectSchema) (model.ProjectSchema, error) {
 	errMsg := fmt.Sprintf("Unable to add project %+v", project)
 	resp, err := r.Table("projects").Insert(project, r.InsertOpts{ReturnChanges: true}).RunWrite(e.Session)
 	if err := checkRethinkdbInsertError(resp, err, errMsg); err != nil {
 		return project, err
 	}
 
-	var proj ProjectSchema
+	var proj model.ProjectSchema
 	if err := encoding.Decode(&proj, resp.Changes[0].NewValue); err != nil {
 		return proj, err
 	}
 
-	ddirModel := AddDatadirModel{
+	ddirModel := model.AddDatadirModel{
 		Name:      project.Name,
 		Owner:     project.Owner,
 		ProjectID: proj.ID,
 	}
 
-	_, err = addDatadir(toDatadirSchema(ddirModel), e.Session)
+	_, err = storengine.AddDatadir(storengine.ToDatadirSchema(ddirModel), e.Session)
 
 	return proj, err
 }
 
-func (e *ProjectsStoreEngineRethinkdb) GetProjectSimple(id string) (ProjectSimpleModel, error) {
-	var project ProjectSimpleModel
+func (e *ProjectsStoreEngineRethinkdb) GetProjectSimple(id string) (model.ProjectSimpleModel, error) {
+	var project model.ProjectSimpleModel
 	errMsg := fmt.Sprintf("No such project %s", id)
 	res, err := r.Table("projects").Get(id).Merge(projectTopLevelDir).Run(e.Session)
 
@@ -60,8 +63,8 @@ func projectTopLevelDir(p r.Term) interface{} {
 	}
 }
 
-func (e *ProjectsStoreEngineRethinkdb) GetProject(id string) (ProjectExtendedModel, error) {
-	var project ProjectExtendedModel
+func (e *ProjectsStoreEngineRethinkdb) GetProject(id string) (model.ProjectExtendedModel, error) {
+	var project model.ProjectExtendedModel
 	errMsg := fmt.Sprintf("No such project %s", id)
 	res, err := r.Table("projects").Get(id).Merge(projectDetails).Run(e.Session)
 
@@ -74,10 +77,10 @@ func (e *ProjectsStoreEngineRethinkdb) GetProject(id string) (ProjectExtendedMod
 	return project, err
 }
 
-func (e *ProjectsStoreEngineRethinkdb) GetAllProjectsForUser(user string) ([]ProjectExtendedModel, error) {
+func (e *ProjectsStoreEngineRethinkdb) GetAllProjectsForUser(user string) ([]model.ProjectExtendedModel, error) {
 	var (
-		userProjects     []ProjectExtendedModel
-		projectsMemberOf []ProjectExtendedModel
+		userProjects     []model.ProjectExtendedModel
+		projectsMemberOf []model.ProjectExtendedModel
 	)
 
 	res, err := r.Table("projects").GetAllByIndex("owner", user).Merge(projectDetails).Run(e.Session)

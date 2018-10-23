@@ -1,10 +1,11 @@
-package store
+package model
 
 import (
 	"time"
 
 	"github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
+	"github.com/materials-commons/mc/pkg/mc"
 	"github.com/pkg/errors"
 )
 
@@ -33,7 +34,7 @@ func (u AddUserModel) Validate() error {
 		validation.Field(&u.Email, validation.Required, is.Email),
 		validation.Field(&u.Password, validation.Required, validation.Length(1, 100)))
 	if err != nil {
-		return errors.WithMessage(ErrValidation, err.Error())
+		return errors.WithMessage(mc.ErrValidation, err.Error())
 	}
 
 	return nil

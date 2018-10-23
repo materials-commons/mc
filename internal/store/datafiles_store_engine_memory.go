@@ -1,9 +1,13 @@
 package store
 
-import "github.com/hashicorp/go-uuid"
+import (
+	"github.com/hashicorp/go-uuid"
+	"github.com/materials-commons/mc/internal/store/model"
+	"github.com/materials-commons/mc/pkg/mc"
+)
 
 type DatafileSchemaInMemory struct {
-	DataFile  DatafileSchema
+	DataFile  model.DatafileSchema
 	DatadirID string
 }
 
@@ -23,10 +27,10 @@ func NewDatafilesStoreEngineMemoryWithDB(db map[string]DatafileSchemaInMemory) *
 	}
 }
 
-func (e *DatafilesStoreEngineMemory) AddFile(file DatafileSchema, projectID, datadirID string) (DatafileSchema, error) {
+func (e *DatafilesStoreEngineMemory) AddFile(file model.DatafileSchema, projectID, datadirID string) (model.DatafileSchema, error) {
 	var err error
 	if file.ID, err = uuid.GenerateUUID(); err != nil {
-		return DatafileSchema{}, err
+		return model.DatafileSchema{}, err
 	}
 
 	df := DatafileSchemaInMemory{
@@ -38,39 +42,39 @@ func (e *DatafilesStoreEngineMemory) AddFile(file DatafileSchema, projectID, dat
 	return df.DataFile, nil
 }
 
-func (e *DatafilesStoreEngineMemory) GetFile(id string) (DatafileSchema, error) {
+func (e *DatafilesStoreEngineMemory) GetFile(id string) (model.DatafileSchema, error) {
 	dfEntry, ok := e.DB[id]
 	if !ok {
-		return DatafileSchema{}, ErrNotFound
+		return model.DatafileSchema{}, mc.ErrNotFound
 	}
 
 	return dfEntry.DataFile, nil
 }
 
-func (e *DatafilesStoreEngineMemory) GetFileWithChecksum(checksum string) (DatafileSchema, error) {
+func (e *DatafilesStoreEngineMemory) GetFileWithChecksum(checksum string) (model.DatafileSchema, error) {
 	for _, dfEntry := range e.DB {
 		if dfEntry.DataFile.Checksum == checksum {
 			return dfEntry.DataFile, nil
 		}
 	}
 
-	return DatafileSchema{}, ErrNotFound
+	return model.DatafileSchema{}, mc.ErrNotFound
 }
 
-func (e *DatafilesStoreEngineMemory) GetFileInDir(name string, dirID string) (DatafileSchema, error) {
+func (e *DatafilesStoreEngineMemory) GetFileInDir(name string, dirID string) (model.DatafileSchema, error) {
 	for _, dfEntry := range e.DB {
 		if dfEntry.DatadirID == dirID && dfEntry.DataFile.Name == name && dfEntry.DataFile.Current {
 			return dfEntry.DataFile, nil
 		}
 	}
 
-	return DatafileSchema{}, ErrNotFound
+	return model.DatafileSchema{}, mc.ErrNotFound
 }
 
 func (e *DatafilesStoreEngineMemory) UpdateFileCurrentFlag(id string, current bool) error {
 	dfEntry, ok := e.DB[id]
 	if !ok {
-		return ErrNotFound
+		return mc.ErrNotFound
 	}
 
 	dfEntry.DataFile.Current = current

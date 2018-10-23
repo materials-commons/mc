@@ -2,6 +2,8 @@ package store
 
 import (
 	"time"
+
+	"github.com/materials-commons/mc/internal/store/model"
 )
 
 type DatafilesStore struct {
@@ -12,14 +14,14 @@ func NewDatafilesStore(e DatafilesStoreEngine) *DatafilesStore {
 	return &DatafilesStore{dfStoreEngine: e}
 }
 
-func (s *DatafilesStore) AddDatafile(dfModel AddDatafileModel) (DatafileSchema, error) {
+func (s *DatafilesStore) AddDatafile(dfModel model.AddDatafileModel) (model.DatafileSchema, error) {
 	if err := dfModel.Validate(); err != nil {
-		return DatafileSchema{}, err
+		return model.DatafileSchema{}, err
 	}
 
 	now := time.Now()
-	df := DatafileSchema{
-		Model: Model{
+	df := model.DatafileSchema{
+		Model: model.Model{
 			Owner:     dfModel.Owner,
 			Name:      dfModel.Name,
 			Birthtime: now,
@@ -38,15 +40,15 @@ func (s *DatafilesStore) AddDatafile(dfModel AddDatafileModel) (DatafileSchema, 
 	return s.dfStoreEngine.AddFile(df, dfModel.ProjectID, dfModel.DatadirID)
 }
 
-func (s *DatafilesStore) GetDatafileByID(id string) (DatafileSchema, error) {
+func (s *DatafilesStore) GetDatafileByID(id string) (model.DatafileSchema, error) {
 	return s.dfStoreEngine.GetFile(id)
 }
 
-func (s *DatafilesStore) GetDatafileWithChecksum(checksum string) (DatafileSchema, error) {
+func (s *DatafilesStore) GetDatafileWithChecksum(checksum string) (model.DatafileSchema, error) {
 	return s.dfStoreEngine.GetFileWithChecksum(checksum)
 }
 
-func (s *DatafilesStore) GetDatafileInDir(name, datadirID string) (DatafileSchema, error) {
+func (s *DatafilesStore) GetDatafileInDir(name, datadirID string) (model.DatafileSchema, error) {
 	return s.dfStoreEngine.GetFileInDir(name, datadirID)
 }
 

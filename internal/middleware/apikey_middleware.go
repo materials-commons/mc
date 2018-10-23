@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/materials-commons/mc/internal/store/model"
+
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"github.com/materials-commons/mc/internal/store"
 )
 
-type APIKeyRetriever func(string, echo.Context) (*store.UserSchema, error)
+type APIKeyRetriever func(string, echo.Context) (*model.UserSchema, error)
 
 type APIKeyConfig struct {
 	Skipper   middleware.Skipper

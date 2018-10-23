@@ -1,4 +1,4 @@
-package store
+package model
 
 type Process2Sample struct {
 	SampleID      string `db:"sample_id" json:"sample_id"`

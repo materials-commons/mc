@@ -1,9 +1,11 @@
 package api
 
 import (
+	"net/http"
+
 	"github.com/labstack/echo"
 	"github.com/materials-commons/mc/internal/store"
-	"net/http"
+	"github.com/materials-commons/mc/internal/store/model"
 )
 
 type UsersController struct {
@@ -11,7 +13,7 @@ type UsersController struct {
 }
 
 func (u *UsersController) AddUser(c echo.Context) error {
-	var req store.AddUserModel
+	var req model.AddUserModel
 
 	if err := c.Bind(&req); err != nil {
 		return err

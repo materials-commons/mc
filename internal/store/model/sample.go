@@ -1,4 +1,4 @@
-package store
+package model
 
 type SampleSchema struct {
 	Model

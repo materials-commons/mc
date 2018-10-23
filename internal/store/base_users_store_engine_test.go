@@ -4,6 +4,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/materials-commons/mc/internal/store/model"
+
 	"github.com/materials-commons/mc/internal/store"
 	"github.com/materials-commons/mc/pkg/tutils/assert"
 	r "gopkg.in/gorethink/gorethink.v4"
@@ -11,12 +13,12 @@ import (
 
 func testUsersStoreEngineAddUser(t *testing.T, e store.UsersStoreEngine) {
 	tests := []struct {
-		user       store.UserSchema
+		user       model.UserSchema
 		shouldFail bool
 		name       string
 	}{
-		{user: store.UserSchema{ModelSimple: store.ModelSimple{ID: "tusernew@test.com"}}, shouldFail: false, name: "New user"},
-		{user: store.UserSchema{ModelSimple: store.ModelSimple{ID: "tuser@test.com"}}, shouldFail: true, name: "Existing user"},
+		{user: model.UserSchema{ModelSimple: model.ModelSimple{ID: "tusernew@test.com"}}, shouldFail: false, name: "New user"},
+		{user: model.UserSchema{ModelSimple: model.ModelSimple{ID: "tuser@test.com"}}, shouldFail: true, name: "Existing user"},
 	}
 
 	addDefaultUsersToStoreEngine(t, e)
@@ -164,8 +166,8 @@ func testUsersStoreEngineModifyUserAPIKey(t *testing.T, e store.UsersStoreEngine
 }
 
 func addDefaultUsersToStoreEngine(t *testing.T, e store.UsersStoreEngine) {
-	users := []store.UserSchema{
-		{ModelSimple: store.ModelSimple{ID: "tuser@test.com"}, APIKey: "tuser@test.com apikey", Fullname: "tuser", Password: "tuser-password"},
+	users := []model.UserSchema{
+		{ModelSimple: model.ModelSimple{ID: "tuser@test.com"}, APIKey: "tuser@test.com apikey", Fullname: "tuser", Password: "tuser-password"},
 	}
 
 	for _, user := range users {

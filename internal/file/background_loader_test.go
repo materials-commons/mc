@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/materials-commons/mc/internal/store/model"
+
 	"github.com/materials-commons/mc/pkg/tutils"
 
 	"github.com/materials-commons/mc/pkg/tutils/assert"
@@ -18,8 +20,8 @@ func TestBackgroundLoader_loadFiles(t *testing.T) {
 	var (
 		loadTree string
 		tmpFile  string
-		proj     store.ProjectSchema
-		fl       store.FileLoadSchema
+		proj     model.ProjectSchema
+		fl       model.FileLoadSchema
 	)
 	tdir, err := tutils.PrepareTestDirTree("mcdir")
 	assert.Okf(t, err, "Unable to create temporary dir: %s", err)
@@ -41,14 +43,14 @@ func TestBackgroundLoader_loadFiles(t *testing.T) {
 	projectsStore := store.InMemory.ProjectsStore()
 	ddirStore := store.InMemory.DatadirsStore()
 
-	pAdd := store.AddProjectModel{
+	pAdd := model.AddProjectModel{
 		Name:  "proj1",
 		Owner: "test@mc.org",
 	}
 	proj, err = projectsStore.AddProject(pAdd)
 	assert.Okf(t, err, "Unable to add project: %s", err)
 
-	dAdd := store.AddDatadirModel{
+	dAdd := model.AddDatadirModel{
 		Name:      proj.Name,
 		Owner:     proj.Owner,
 		ProjectID: proj.ID,
@@ -56,7 +58,7 @@ func TestBackgroundLoader_loadFiles(t *testing.T) {
 	_, err = ddirStore.AddDatadir(dAdd)
 	assert.Okf(t, err, "Unable to add directory: %s", err)
 
-	flAddModel := store.AddFileLoadModel{
+	flAddModel := model.AddFileLoadModel{
 		ProjectID: proj.ID,
 		Path:      loadTree,
 		Owner:     proj.Owner,

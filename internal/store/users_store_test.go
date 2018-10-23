@@ -3,6 +3,8 @@ package store_test
 import (
 	"testing"
 
+	"github.com/materials-commons/mc/internal/store/model"
+
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/materials-commons/mc/pkg/tutils/assert"
@@ -12,16 +14,16 @@ import (
 
 func TestUsersStore_AddUser(t *testing.T) {
 	tests := []struct {
-		user       store.AddUserModel
+		user       model.AddUserModel
 		shouldFail bool
 		name       string
 	}{
-		{user: store.AddUserModel{Email: "biff@bob.com", Password: "abc123", Fullname: "Bob"}, shouldFail: false, name: "Test add valid user"},
-		{user: store.AddUserModel{Email: "biff@bob.com", Password: "abc123", Fullname: "Bob"}, shouldFail: true, name: "Test add duplicate user"},
-		{user: store.AddUserModel{Email: "bi&$bob.com", Password: "abc123", Fullname: "Bob"}, shouldFail: true, name: "Test add with bad email"},
-		{user: store.AddUserModel{Email: "", Password: "abc123", Fullname: "Bob"}, shouldFail: true, name: "Test empty email"},
-		{user: store.AddUserModel{Email: "biff2@bob.com", Password: "", Fullname: "Bob"}, shouldFail: true, name: "Test empty password"},
-		{user: store.AddUserModel{Email: "biff2@bob.com", Password: "abc123", Fullname: ""}, shouldFail: true, name: "Test empty fullname"},
+		{user: model.AddUserModel{Email: "biff@bob.com", Password: "abc123", Fullname: "Bob"}, shouldFail: false, name: "Test add valid user"},
+		{user: model.AddUserModel{Email: "biff@bob.com", Password: "abc123", Fullname: "Bob"}, shouldFail: true, name: "Test add duplicate user"},
+		{user: model.AddUserModel{Email: "bi&$bob.com", Password: "abc123", Fullname: "Bob"}, shouldFail: true, name: "Test add with bad email"},
+		{user: model.AddUserModel{Email: "", Password: "abc123", Fullname: "Bob"}, shouldFail: true, name: "Test empty email"},
+		{user: model.AddUserModel{Email: "biff2@bob.com", Password: "", Fullname: "Bob"}, shouldFail: true, name: "Test empty password"},
+		{user: model.AddUserModel{Email: "biff2@bob.com", Password: "abc123", Fullname: ""}, shouldFail: true, name: "Test empty fullname"},
 	}
 
 	s := newSEMemoryUsersStore()
@@ -94,9 +96,9 @@ func TestUsersStore_GetUserByAPIKey(t *testing.T) {
 
 func TestUsersStore_GetAndVerifyUser(t *testing.T) {
 	users := []struct {
-		user store.AddUserModel
+		user model.AddUserModel
 	}{
-		{user: store.AddUserModel{Email: "biff@bob.com", Password: "abc123", Fullname: "Bob"}},
+		{user: model.AddUserModel{Email: "biff@bob.com", Password: "abc123", Fullname: "Bob"}},
 	}
 
 	s := newSEMemoryUsersStore()

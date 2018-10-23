@@ -3,16 +3,18 @@ package cache
 import (
 	"sync"
 
+	"github.com/materials-commons/mc/internal/store/model"
+
 	"github.com/materials-commons/mc/internal/store"
 )
 
 type UsersCacheByAPIKey struct {
 	sync.RWMutex
-	Cache map[string]store.UserSchema
+	Cache map[string]model.UserSchema
 	store.UsersStore
 }
 
-func (c *UsersCacheByAPIKey) Get(apikey string) (*store.UserSchema, error) {
+func (c *UsersCacheByAPIKey) Get(apikey string) (*model.UserSchema, error) {
 	c.RLock()
 	if user, ok := c.Cache[apikey]; ok {
 		c.RUnlock()

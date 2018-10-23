@@ -5,6 +5,7 @@ import (
 
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/hashicorp/go-uuid"
+	"github.com/materials-commons/mc/internal/store/model"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -16,7 +17,7 @@ func NewUsersStore(e UsersStoreEngine) *UsersStore {
 	return &UsersStore{e}
 }
 
-func (s *UsersStore) AddUser(userModel AddUserModel) (user UserSchema, err error) {
+func (s *UsersStore) AddUser(userModel model.AddUserModel) (user model.UserSchema, err error) {
 	if err := userModel.Validate(); err != nil {
 		return user, err
 	}
@@ -28,15 +29,15 @@ func (s *UsersStore) AddUser(userModel AddUserModel) (user UserSchema, err error
 	return s.UsersStoreEngine.AddUser(user)
 }
 
-func (s *UsersStore) GetUserByID(id string) (UserSchema, error) {
+func (s *UsersStore) GetUserByID(id string) (model.UserSchema, error) {
 	return s.UsersStoreEngine.GetUserByID(id)
 }
 
-func (s *UsersStore) GetUserByAPIKey(apikey string) (UserSchema, error) {
+func (s *UsersStore) GetUserByAPIKey(apikey string) (model.UserSchema, error) {
 	return s.UsersStoreEngine.GetUserByAPIKey(apikey)
 }
 
-func (s *UsersStore) GetAndVerifyUser(id, password string) (UserSchema, error) {
+func (s *UsersStore) GetAndVerifyUser(id, password string) (model.UserSchema, error) {
 	user, err := s.UsersStoreEngine.GetUserByID(id)
 	if err != nil {
 		return user, err
@@ -46,44 +47,44 @@ func (s *UsersStore) GetAndVerifyUser(id, password string) (UserSchema, error) {
 	return user, err
 }
 
-func (s *UsersStore) ModifyUserFullname(id, fullname string) (UserSchema, error) {
+func (s *UsersStore) ModifyUserFullname(id, fullname string) (model.UserSchema, error) {
 	if err := validation.Validate(fullname, validation.Required, validation.Length(1, 40)); err != nil {
-		return UserSchema{}, err
+		return model.UserSchema{}, err
 	}
 	return s.UsersStoreEngine.ModifyUserFullname(id, fullname, time.Now())
 }
 
-func (s *UsersStore) ModifyUserPassword(id, password string) (UserSchema, error) {
+func (s *UsersStore) ModifyUserPassword(id, password string) (model.UserSchema, error) {
 	if err := validation.Validate(password, validation.Required, validation.Length(1, 100)); err != nil {
-		return UserSchema{}, err
+		return model.UserSchema{}, err
 	}
 
 	passwordHash, err := generatePasswordHash(password)
 	if err != nil {
-		return UserSchema{}, err
+		return model.UserSchema{}, err
 	}
 
 	return s.UsersStoreEngine.ModifyUserPassword(id, passwordHash, time.Now())
 }
 
-func (s *UsersStore) ModifyUserAPIKey(id string) (UserSchema, error) {
+func (s *UsersStore) ModifyUserAPIKey(id string) (model.UserSchema, error) {
 	apikey, err := uuid.GenerateUUID()
 	if err != nil {
-		return UserSchema{}, err
+		return model.UserSchema{}, err
 	}
 
 	return s.UsersStoreEngine.ModifyUserAPIKey(id, apikey, time.Now())
 }
 
-func prepareUser(userModel AddUserModel) (UserSchema, error) {
+func prepareUser(userModel model.AddUserModel) (model.UserSchema, error) {
 	var (
 		err error
 	)
 
 	now := time.Now()
 
-	u := UserSchema{
-		ModelSimple: ModelSimple{
+	u := model.UserSchema{
+		ModelSimple: model.ModelSimple{
 			Birthtime: now,
 			MTime:     now,
 			ID:        userModel.Email,
