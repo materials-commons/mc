@@ -1,4 +1,4 @@
-package store
+package storengine
 
 import (
 	"fmt"
@@ -9,15 +9,15 @@ import (
 	"gopkg.in/gorethink/gorethink.v4/encoding"
 )
 
-type ProcessesStoreEngineRethinkdb struct {
+type ProcessesRethinkdb struct {
 	Session *r.Session
 }
 
-func NewProcessesStoreEngineRethinkdb(session *r.Session) *ProcessesStoreEngineRethinkdb {
-	return &ProcessesStoreEngineRethinkdb{Session: session}
+func NewProcessesRethinkdb(session *r.Session) *ProcessesRethinkdb {
+	return &ProcessesRethinkdb{Session: session}
 }
 
-func (e *ProcessesStoreEngineRethinkdb) AddProcess(process model.ProcessSchema) (model.ProcessSchema, error) {
+func (e *ProcessesRethinkdb) AddProcess(process model.ProcessSchema) (model.ProcessSchema, error) {
 	errMsg := fmt.Sprintf("Unable to add process %+v", process)
 
 	resp, err := r.Table("processes").Insert(process, r.InsertOpts{ReturnChanges: true}).RunWrite(e.Session)
@@ -30,7 +30,7 @@ func (e *ProcessesStoreEngineRethinkdb) AddProcess(process model.ProcessSchema) 
 	return createdProcess, err
 }
 
-func (e *ProcessesStoreEngineRethinkdb) GetProcess(processID string) (model.ProcessExtendedModel, error) {
+func (e *ProcessesRethinkdb) GetProcess(processID string) (model.ProcessExtendedModel, error) {
 	var process model.ProcessExtendedModel
 	errMsg := fmt.Sprintf("No such process %s", processID)
 	res, err := r.Table("processes").Get(processID).Merge(processDetails).Run(e.Session)
