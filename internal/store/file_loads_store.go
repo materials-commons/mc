@@ -3,14 +3,16 @@ package store
 import (
 	"time"
 
+	"github.com/materials-commons/mc/internal/store/storengine"
+
 	"github.com/materials-commons/mc/internal/store/model"
 )
 
 type FileLoadsStore struct {
-	flStoreEngine FileLoadsStoreEngine
+	flStoreEngine storengine.FileLoadsStoreEngine
 }
 
-func NewFileLoadsStore(e FileLoadsStoreEngine) *FileLoadsStore {
+func NewFileLoadsStore(e storengine.FileLoadsStoreEngine) *FileLoadsStore {
 	return &FileLoadsStore{flStoreEngine: e}
 }
 

@@ -1,11 +1,10 @@
-package store
+package storengine
 
 import (
 	"fmt"
 	"time"
 
 	"github.com/materials-commons/mc/internal/store/model"
-	"github.com/materials-commons/mc/internal/store/storengine"
 
 	r "gopkg.in/gorethink/gorethink.v4"
 	"gopkg.in/gorethink/gorethink.v4/encoding"
@@ -37,7 +36,7 @@ func (e *ProjectsStoreEngineRethinkdb) AddProject(project model.ProjectSchema) (
 		ProjectID: proj.ID,
 	}
 
-	_, err = storengine.AddDatadir(storengine.ToDatadirSchema(ddirModel), e.Session)
+	_, err = AddDatadir(ToDatadirSchema(ddirModel), e.Session)
 
 	return proj, err
 }

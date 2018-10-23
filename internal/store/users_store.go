@@ -3,6 +3,8 @@ package store
 import (
 	"time"
 
+	"github.com/materials-commons/mc/internal/store/storengine"
+
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/hashicorp/go-uuid"
 	"github.com/materials-commons/mc/internal/store/model"
@@ -10,10 +12,10 @@ import (
 )
 
 type UsersStore struct {
-	UsersStoreEngine UsersStoreEngine
+	UsersStoreEngine storengine.UsersStoreEngine
 }
 
-func NewUsersStore(e UsersStoreEngine) *UsersStore {
+func NewUsersStore(e storengine.UsersStoreEngine) *UsersStore {
 	return &UsersStore{e}
 }
 

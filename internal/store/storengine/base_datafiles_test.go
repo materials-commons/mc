@@ -5,8 +5,6 @@ import (
 
 	"github.com/materials-commons/mc/internal/store/storengine"
 
-	"github.com/materials-commons/mc/internal/store"
-
 	"github.com/materials-commons/mc/internal/store/model"
 
 	"github.com/materials-commons/mc/pkg/tutils/assert"
@@ -14,7 +12,7 @@ import (
 	r "gopkg.in/gorethink/gorethink.v4"
 )
 
-func testDatafilesStoreEngineGetFile(t *testing.T, e store.DatafilesStoreEngine) {
+func testDatafilesStoreEngineGetFile(t *testing.T, e storengine.DatafilesStoreEngine) {
 	tests := []struct {
 		fileid     string
 		shouldFail bool
@@ -37,7 +35,7 @@ func testDatafilesStoreEngineGetFile(t *testing.T, e store.DatafilesStoreEngine)
 	}
 }
 
-func testDatafilesStoreEngineAddFile(t *testing.T, e store.DatafilesStoreEngine) {
+func testDatafilesStoreEngineAddFile(t *testing.T, e storengine.DatafilesStoreEngine) {
 	tests := []struct {
 		file       model.DatafileSchema
 		shouldFail bool
@@ -60,7 +58,7 @@ func testDatafilesStoreEngineAddFile(t *testing.T, e store.DatafilesStoreEngine)
 	}
 }
 
-func testDatafilesStoreEngineGetFileWithChecksum(t *testing.T, e store.DatafilesStoreEngine) {
+func testDatafilesStoreEngineGetFileWithChecksum(t *testing.T, e storengine.DatafilesStoreEngine) {
 	tests := []struct {
 		checksum   string
 		shouldFail bool
@@ -83,11 +81,11 @@ func testDatafilesStoreEngineGetFileWithChecksum(t *testing.T, e store.Datafiles
 	}
 }
 
-func testDatafilesStoreEngineGetFileInDir(t *testing.T, e store.DatafilesStoreEngine) {
+func testDatafilesStoreEngineGetFileInDir(t *testing.T, e storengine.DatafilesStoreEngine) {
 	// To be implemented
 }
 
-func addDefaultDatafilesToStoreEngine(t *testing.T, e store.DatafilesStoreEngine) {
+func addDefaultDatafilesToStoreEngine(t *testing.T, e storengine.DatafilesStoreEngine) {
 	datafiles := []model.DatafileSchema{
 		{Model: model.Model{ID: "datafile1"}, Checksum: "csumdatafile1"},
 	}
@@ -98,7 +96,7 @@ func addDefaultDatafilesToStoreEngine(t *testing.T, e store.DatafilesStoreEngine
 	}
 }
 
-func cleanupDatafilesStoreEngine(e store.DatafilesStoreEngine) {
+func cleanupDatafilesStoreEngine(e storengine.DatafilesStoreEngine) {
 	if re, ok := e.(*storengine.DatafilesRethinkdb); ok {
 		session := re.Session
 		_, _ = r.Table("datafiles").Delete().RunWrite(session)

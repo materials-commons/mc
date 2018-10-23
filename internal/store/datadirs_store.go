@@ -3,14 +3,16 @@ package store
 import (
 	"time"
 
+	"github.com/materials-commons/mc/internal/store/storengine"
+
 	"github.com/materials-commons/mc/internal/store/model"
 )
 
 type DatadirsStore struct {
-	ddStoreEngine DatadirsStoreEngine
+	ddStoreEngine storengine.DatadirsStoreEngine
 }
 
-func NewDatadirsStore(e DatadirsStoreEngine) *DatadirsStore {
+func NewDatadirsStore(e storengine.DatadirsStoreEngine) *DatadirsStore {
 	return &DatadirsStore{ddStoreEngine: e}
 }
 

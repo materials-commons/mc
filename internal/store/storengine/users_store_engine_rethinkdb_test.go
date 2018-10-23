@@ -1,9 +1,10 @@
-package store_test
+package storengine_test
 
 import (
 	"testing"
 
-	"github.com/materials-commons/mc/internal/store"
+	"github.com/materials-commons/mc/internal/store/storengine"
+
 	r "gopkg.in/gorethink/gorethink.v4"
 )
 
@@ -43,10 +44,10 @@ func TestUsersStoreEngineRethinkdb_ModifyUserAPIKey(t *testing.T) {
 	e.Session.Close()
 }
 
-func createRethinkdbUsersStoreEngine() *store.UsersStoreEngineRethinkdb {
+func createRethinkdbUsersStoreEngine() *storengine.UsersStoreEngineRethinkdb {
 	session, _ := r.Connect(r.ConnectOpts{Database: "mctest", Address: "localhost:30815"})
 	r.SetTags("r")
-	e := store.NewUsersStoreEngineRethinkdb(session)
-	cleanupUsersStoreEngine(e)
+	e := storengine.NewUsersStoreEngineRethinkdb(session)
+	storengine.CleanupUsersStoreEngine(e)
 	return e
 }

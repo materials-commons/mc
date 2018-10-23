@@ -3,6 +3,8 @@ package store_test
 import (
 	"testing"
 
+	"github.com/materials-commons/mc/internal/store/storengine"
+
 	"github.com/materials-commons/mc/internal/store/model"
 
 	"golang.org/x/crypto/bcrypt"
@@ -212,9 +214,9 @@ func TestUsersStore_ModifyUserAPIKey(t *testing.T) {
 }
 
 func addDefaultUsersToStore(t *testing.T, s *store.UsersStore) {
-	addDefaultUsersToStoreEngine(t, s.UsersStoreEngine)
+	storengine.AddDefaultUsersToStoreEngine(t, s.UsersStoreEngine)
 }
 
 func newSEMemoryUsersStore() *store.UsersStore {
-	return store.NewUsersStore(store.NewUsersStoreEngineMemory())
+	return store.NewUsersStore(storengine.NewUsersStoreEngineMemory())
 }

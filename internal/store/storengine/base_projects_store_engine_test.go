@@ -1,17 +1,18 @@
-package store_test
+package storengine_test
 
 import (
 	"testing"
+
+	"github.com/materials-commons/mc/internal/store/storengine"
 
 	"github.com/materials-commons/mc/internal/store/model"
 
 	"github.com/materials-commons/mc/pkg/tutils/assert"
 
-	"github.com/materials-commons/mc/internal/store"
 	r "gopkg.in/gorethink/gorethink.v4"
 )
 
-func testProjectsStoreEngineRethinkdbAddProject(t *testing.T, e store.ProjectsStoreEngine) {
+func testProjectsStoreEngineRethinkdbAddProject(t *testing.T, e storengine.ProjectsStoreEngine) {
 	tests := []struct {
 		project    model.ProjectSchema
 		shouldFail bool
@@ -33,7 +34,7 @@ func testProjectsStoreEngineRethinkdbAddProject(t *testing.T, e store.ProjectsSt
 	}
 }
 
-func testProjectsStoreEngineRethinkdbDeleteProject(t *testing.T, e store.ProjectsStoreEngine) {
+func testProjectsStoreEngineRethinkdbDeleteProject(t *testing.T, e storengine.ProjectsStoreEngine) {
 	tests := []struct {
 		id         string
 		shouldFail bool
@@ -56,7 +57,7 @@ func testProjectsStoreEngineRethinkdbDeleteProject(t *testing.T, e store.Project
 	}
 }
 
-func testProjectsStoreEngineRethinkdbGetAllProjectsForUser(t *testing.T, e store.ProjectsStoreEngine) {
+func testProjectsStoreEngineRethinkdbGetAllProjectsForUser(t *testing.T, e storengine.ProjectsStoreEngine) {
 	tests := []struct {
 		project    model.ProjectSchema
 		shouldFail bool
@@ -71,7 +72,7 @@ func testProjectsStoreEngineRethinkdbGetAllProjectsForUser(t *testing.T, e store
 	}
 }
 
-func testProjectsStoreEngineRethinkdbGetProject(t *testing.T, e store.ProjectsStoreEngine) {
+func testProjectsStoreEngineRethinkdbGetProject(t *testing.T, e storengine.ProjectsStoreEngine) {
 	tests := []struct {
 		project    model.ProjectSchema
 		shouldFail bool
@@ -86,7 +87,7 @@ func testProjectsStoreEngineRethinkdbGetProject(t *testing.T, e store.ProjectsSt
 	}
 }
 
-func testProjectsStoreEngineRethinkdbUpdateProjectDescription(t *testing.T, e store.ProjectsStoreEngine) {
+func testProjectsStoreEngineRethinkdbUpdateProjectDescription(t *testing.T, e storengine.ProjectsStoreEngine) {
 	tests := []struct {
 		project    model.ProjectSchema
 		shouldFail bool
@@ -101,7 +102,7 @@ func testProjectsStoreEngineRethinkdbUpdateProjectDescription(t *testing.T, e st
 	}
 }
 
-func testProjectsStoreEngineRethinkdbUpdateProjectName(t *testing.T, e store.ProjectsStoreEngine) {
+func testProjectsStoreEngineRethinkdbUpdateProjectName(t *testing.T, e storengine.ProjectsStoreEngine) {
 	tests := []struct {
 		project    model.ProjectSchema
 		shouldFail bool
@@ -116,7 +117,7 @@ func testProjectsStoreEngineRethinkdbUpdateProjectName(t *testing.T, e store.Pro
 	}
 }
 
-func addDefaultProjectsToStoreEngine(t *testing.T, e store.ProjectsStoreEngine) {
+func addDefaultProjectsToStoreEngine(t *testing.T, e storengine.ProjectsStoreEngine) {
 	projects := []model.ProjectSchema{
 		{Model: model.Model{ID: "project1", Name: "project1", OType: "project", Owner: "tuser@test.com"}, Description: "project1 description"},
 	}
@@ -126,14 +127,14 @@ func addDefaultProjectsToStoreEngine(t *testing.T, e store.ProjectsStoreEngine) 
 		assert.Okf(t, err, "Failed to add project %s", project.ID)
 	}
 
-	//accessEntries := []store.AccessSchema{
+	//accessEntries := []model.AccessSchema{
 	//	{ProjectID: "project1", UserID: "tuser@test.com"},
 	//}
 	//
 }
 
-func cleanupProjectsStoreEngine(e store.ProjectsStoreEngine) {
-	if re, ok := e.(*store.ProjectsStoreEngineRethinkdb); ok {
+func cleanupProjectsStoreEngine(e storengine.ProjectsStoreEngine) {
+	if re, ok := e.(*storengine.ProjectsStoreEngineRethinkdb); ok {
 		session := re.Session
 		_, _ = r.Table("projects").Delete().RunWrite(session)
 		_, _ = r.Table("datadirs").Delete().RunWrite(session)

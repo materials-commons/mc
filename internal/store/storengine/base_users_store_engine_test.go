@@ -1,17 +1,17 @@
-package store_test
+package storengine_test
 
 import (
 	"testing"
 	"time"
 
+	"github.com/materials-commons/mc/internal/store/storengine"
+
 	"github.com/materials-commons/mc/internal/store/model"
 
-	"github.com/materials-commons/mc/internal/store"
 	"github.com/materials-commons/mc/pkg/tutils/assert"
-	r "gopkg.in/gorethink/gorethink.v4"
 )
 
-func testUsersStoreEngineAddUser(t *testing.T, e store.UsersStoreEngine) {
+func testUsersStoreEngineAddUser(t *testing.T, e storengine.UsersStoreEngine) {
 	tests := []struct {
 		user       model.UserSchema
 		shouldFail bool
@@ -21,7 +21,7 @@ func testUsersStoreEngineAddUser(t *testing.T, e store.UsersStoreEngine) {
 		{user: model.UserSchema{ModelSimple: model.ModelSimple{ID: "tuser@test.com"}}, shouldFail: true, name: "Existing user"},
 	}
 
-	addDefaultUsersToStoreEngine(t, e)
+	storengine.AddDefaultUsersToStoreEngine(t, e)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			_, err := e.AddUser(test.user)
@@ -32,10 +32,10 @@ func testUsersStoreEngineAddUser(t *testing.T, e store.UsersStoreEngine) {
 			}
 		})
 	}
-	cleanupUsersStoreEngine(e)
+	storengine.CleanupUsersStoreEngine(e)
 }
 
-func testUsersStoreEngineGetUserByID(t *testing.T, e store.UsersStoreEngine) {
+func testUsersStoreEngineGetUserByID(t *testing.T, e storengine.UsersStoreEngine) {
 	tests := []struct {
 		id         string
 		shouldFail bool
@@ -45,7 +45,7 @@ func testUsersStoreEngineGetUserByID(t *testing.T, e store.UsersStoreEngine) {
 		{id: "nosuchuser@doesnot.exist", shouldFail: true, name: "Fail to find a non-existing user"},
 	}
 
-	addDefaultUsersToStoreEngine(t, e)
+	storengine.AddDefaultUsersToStoreEngine(t, e)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			user, err := e.GetUserByID(test.id)
@@ -57,10 +57,10 @@ func testUsersStoreEngineGetUserByID(t *testing.T, e store.UsersStoreEngine) {
 			}
 		})
 	}
-	cleanupUsersStoreEngine(e)
+	storengine.CleanupUsersStoreEngine(e)
 }
 
-func testUsersStoreEngineGetUserByAPIKey(t *testing.T, e store.UsersStoreEngine) {
+func testUsersStoreEngineGetUserByAPIKey(t *testing.T, e storengine.UsersStoreEngine) {
 	tests := []struct {
 		id         string
 		apikey     string
@@ -71,7 +71,7 @@ func testUsersStoreEngineGetUserByAPIKey(t *testing.T, e store.UsersStoreEngine)
 		{id: "nosuchuser@doesnot.exist", apikey: "no such key", shouldFail: true, name: "Lookup apikey that doesn't exist"},
 	}
 
-	addDefaultUsersToStoreEngine(t, e)
+	storengine.AddDefaultUsersToStoreEngine(t, e)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			user, err := e.GetUserByAPIKey(test.apikey)
@@ -84,10 +84,10 @@ func testUsersStoreEngineGetUserByAPIKey(t *testing.T, e store.UsersStoreEngine)
 			}
 		})
 	}
-	cleanupUsersStoreEngine(e)
+	storengine.CleanupUsersStoreEngine(e)
 }
 
-func testUsersStoreEngineModifyUserFullname(t *testing.T, e store.UsersStoreEngine) {
+func testUsersStoreEngineModifyUserFullname(t *testing.T, e storengine.UsersStoreEngine) {
 	tests := []struct {
 		id          string
 		newFullname string
@@ -98,7 +98,7 @@ func testUsersStoreEngineModifyUserFullname(t *testing.T, e store.UsersStoreEngi
 		{id: "doesnot@exist.com", newFullname: "nosuch-changed", shouldFail: true, name: "Set fullname for non-existing user"},
 	}
 
-	addDefaultUsersToStoreEngine(t, e)
+	storengine.AddDefaultUsersToStoreEngine(t, e)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			user, err := e.ModifyUserFullname(test.id, test.newFullname, time.Now())
@@ -110,10 +110,10 @@ func testUsersStoreEngineModifyUserFullname(t *testing.T, e store.UsersStoreEngi
 			}
 		})
 	}
-	cleanupUsersStoreEngine(e)
+	storengine.CleanupUsersStoreEngine(e)
 }
 
-func testUsersStoreEngineModifyUserPassword(t *testing.T, e store.UsersStoreEngine) {
+func testUsersStoreEngineModifyUserPassword(t *testing.T, e storengine.UsersStoreEngine) {
 	tests := []struct {
 		id          string
 		newPassword string
@@ -124,7 +124,7 @@ func testUsersStoreEngineModifyUserPassword(t *testing.T, e store.UsersStoreEngi
 		{id: "doesnot@exist.com", newPassword: "nosuch-changed", shouldFail: true, name: "Set fullname for non-existing user"},
 	}
 
-	addDefaultUsersToStoreEngine(t, e)
+	storengine.AddDefaultUsersToStoreEngine(t, e)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			user, err := e.ModifyUserPassword(test.id, test.newPassword, time.Now())
@@ -136,10 +136,10 @@ func testUsersStoreEngineModifyUserPassword(t *testing.T, e store.UsersStoreEngi
 			}
 		})
 	}
-	cleanupUsersStoreEngine(e)
+	storengine.CleanupUsersStoreEngine(e)
 }
 
-func testUsersStoreEngineModifyUserAPIKey(t *testing.T, e store.UsersStoreEngine) {
+func testUsersStoreEngineModifyUserAPIKey(t *testing.T, e storengine.UsersStoreEngine) {
 	tests := []struct {
 		id         string
 		newAPIKey  string
@@ -150,7 +150,7 @@ func testUsersStoreEngineModifyUserAPIKey(t *testing.T, e store.UsersStoreEngine
 		{id: "doesnot@exist.com", newAPIKey: "nosuch-changed", shouldFail: true, name: "Set fullname for non-existing user"},
 	}
 
-	addDefaultUsersToStoreEngine(t, e)
+	storengine.AddDefaultUsersToStoreEngine(t, e)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			user, err := e.ModifyUserAPIKey(test.id, test.newAPIKey, time.Now())
@@ -162,23 +162,5 @@ func testUsersStoreEngineModifyUserAPIKey(t *testing.T, e store.UsersStoreEngine
 			}
 		})
 	}
-	cleanupUsersStoreEngine(e)
-}
-
-func addDefaultUsersToStoreEngine(t *testing.T, e store.UsersStoreEngine) {
-	users := []model.UserSchema{
-		{ModelSimple: model.ModelSimple{ID: "tuser@test.com"}, APIKey: "tuser@test.com apikey", Fullname: "tuser", Password: "tuser-password"},
-	}
-
-	for _, user := range users {
-		_, err := e.AddUser(user)
-		assert.Okf(t, err, "Failed to add user %s", user.ID)
-	}
-}
-
-func cleanupUsersStoreEngine(e store.UsersStoreEngine) {
-	if re, ok := e.(*store.UsersStoreEngineRethinkdb); ok {
-		session := re.Session
-		_, _ = r.Table("users").Delete().RunWrite(session)
-	}
+	storengine.CleanupUsersStoreEngine(e)
 }

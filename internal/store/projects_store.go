@@ -3,14 +3,16 @@ package store
 import (
 	"time"
 
+	"github.com/materials-commons/mc/internal/store/storengine"
+
 	"github.com/materials-commons/mc/internal/store/model"
 )
 
 type ProjectsStore struct {
-	pStoreEngine ProjectsStoreEngine
+	pStoreEngine storengine.ProjectsStoreEngine
 }
 
-func NewProjectsStore(e ProjectsStoreEngine) *ProjectsStore {
+func NewProjectsStore(e storengine.ProjectsStoreEngine) *ProjectsStore {
 	return &ProjectsStore{pStoreEngine: e}
 }
 

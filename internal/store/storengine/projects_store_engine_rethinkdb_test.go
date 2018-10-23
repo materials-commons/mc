@@ -1,9 +1,10 @@
-package store_test
+package storengine_test
 
 import (
 	"testing"
 
-	"github.com/materials-commons/mc/internal/store"
+	"github.com/materials-commons/mc/internal/store/storengine"
+
 	r "gopkg.in/gorethink/gorethink.v4"
 )
 
@@ -43,10 +44,10 @@ func TestProjectsStoreEngineRethinkdb_UpdateProjectName(t *testing.T) {
 	e.Session.Close()
 }
 
-func createRethinkdbProjectsStoreEngine() *store.ProjectsStoreEngineRethinkdb {
+func createRethinkdbProjectsStoreEngine() *storengine.ProjectsStoreEngineRethinkdb {
 	session, _ := r.Connect(r.ConnectOpts{Database: "mctest", Address: "localhost:30815"})
 	r.SetTags("r")
-	e := store.NewProjectsStoreEngineRethinkdb(session)
+	e := storengine.NewProjectsStoreEngineRethinkdb(session)
 	cleanupProjectsStoreEngine(e)
 	return e
 }

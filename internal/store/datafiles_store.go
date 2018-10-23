@@ -3,14 +3,16 @@ package store
 import (
 	"time"
 
+	"github.com/materials-commons/mc/internal/store/storengine"
+
 	"github.com/materials-commons/mc/internal/store/model"
 )
 
 type DatafilesStore struct {
-	dfStoreEngine DatafilesStoreEngine
+	dfStoreEngine storengine.DatafilesStoreEngine
 }
 
-func NewDatafilesStore(e DatafilesStoreEngine) *DatafilesStore {
+func NewDatafilesStore(e storengine.DatafilesStoreEngine) *DatafilesStore {
 	return &DatafilesStore{dfStoreEngine: e}
 }
 
