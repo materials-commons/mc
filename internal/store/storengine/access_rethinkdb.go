@@ -1,4 +1,4 @@
-package store
+package storengine
 
 import (
 	"fmt"
@@ -9,15 +9,15 @@ import (
 	"gopkg.in/gorethink/gorethink.v4/encoding"
 )
 
-type AccessStoreEngineRethinkdb struct {
+type AccessRethinkdb struct {
 	Session *r.Session
 }
 
-func NewAccessStoreEngineRethinkdb(session *r.Session) *AccessStoreEngineRethinkdb {
-	return &AccessStoreEngineRethinkdb{Session: session}
+func NewAccessRethinkdb(session *r.Session) *AccessRethinkdb {
+	return &AccessRethinkdb{Session: session}
 }
 
-func (e *AccessStoreEngineRethinkdb) AddAccessEntry(entry model.AccessSchema) (model.AccessSchema, error) {
+func (e *AccessRethinkdb) AddAccessEntry(entry model.AccessSchema) (model.AccessSchema, error) {
 	errMsg := fmt.Sprintf("Unable to insert access entry %+v", entry)
 
 	resp, err := r.Table("access").Insert(entry, r.InsertOpts{ReturnChanges: true}).RunWrite(e.Session)
@@ -30,20 +30,20 @@ func (e *AccessStoreEngineRethinkdb) AddAccessEntry(entry model.AccessSchema) (m
 	return accessEntry, err
 }
 
-func (e *AccessStoreEngineRethinkdb) DeleteAccess(projectID, userID string) error {
+func (e *AccessRethinkdb) DeleteAccess(projectID, userID string) error {
 	errMsg := fmt.Sprintf("Unable to delete access entry for user %s from project %s", userID, projectID)
 	resp, err := r.Table("access").GetAllByIndex("user_project", []interface{}{userID, projectID}).
 		Delete().RunWrite(e.Session)
 	return checkRethinkdbDeleteError(resp, err, errMsg)
 }
 
-func (e *AccessStoreEngineRethinkdb) DeleteAllAccessForProject(projectID string) error {
+func (e *AccessRethinkdb) DeleteAllAccessForProject(projectID string) error {
 	errMsg := fmt.Sprintf("Unable to delete access entries for project %s", projectID)
 	resp, err := r.Table("access").GetAllByIndex("project_id", projectID).Delete().RunWrite(e.Session)
 	return checkRethinkdbDeleteError(resp, err, errMsg)
 }
 
-func (e *AccessStoreEngineRethinkdb) GetProjectAccessEntries(projectID string) ([]model.AccessSchema, error) {
+func (e *AccessRethinkdb) GetProjectAccessEntries(projectID string) ([]model.AccessSchema, error) {
 	var entries []model.AccessSchema
 	errMsg := fmt.Sprintf("Can't retrieve entries for project %s", projectID)
 
@@ -57,7 +57,7 @@ func (e *AccessStoreEngineRethinkdb) GetProjectAccessEntries(projectID string) (
 	return entries, err
 }
 
-func (e *AccessStoreEngineRethinkdb) GetUserAccessEntries(userID string) ([]model.AccessSchema, error) {
+func (e *AccessRethinkdb) GetUserAccessEntries(userID string) ([]model.AccessSchema, error) {
 	var entries []model.AccessSchema
 	errMsg := fmt.Sprintf("Can't retrieve access entries for user %s", userID)
 	res, err := r.Table("access").GetAllByIndex("user_id", userID).Run(e.Session)
