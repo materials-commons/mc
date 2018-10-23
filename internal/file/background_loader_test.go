@@ -1,6 +1,7 @@
 package file
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -33,6 +34,9 @@ func TestBackgroundLoader_loadFiles(t *testing.T) {
 	fmt.Println("tmpFile", tmpFile)
 
 	loader := NewBackgroundLoader(mcdir, 1, store.InMemory)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	loader.c = ctx
 	fileloadsStore := store.InMemory.FileLoadsStore()
 	projectsStore := store.InMemory.ProjectsStore()
 	ddirStore := store.InMemory.DatadirsStore()
