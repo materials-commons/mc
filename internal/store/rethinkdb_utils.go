@@ -8,8 +8,10 @@ import (
 func checkRethinkdbQueryError(res *r.Cursor, err error, msg string) error {
 	switch {
 	case err != nil:
+		res.Close()
 		return errors.Wrapf(err, msg)
 	case res.IsNil():
+		res.Close()
 		return errors.Wrapf(ErrNotFound, msg)
 	default:
 		return nil

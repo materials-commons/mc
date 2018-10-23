@@ -45,6 +45,7 @@ func (e *DatafilesStoreEngineRethinkdb) GetFile(id string) (DatafileSchema, erro
 	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
 		return file, err
 	}
+	defer res.Close()
 
 	err = res.One(&file)
 	return file, err
@@ -58,6 +59,7 @@ func (e *DatafilesStoreEngineRethinkdb) GetFileWithChecksum(checksum string) (Da
 	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
 		return file, err
 	}
+	defer res.Close()
 
 	err = res.One(&file)
 	return file, err
@@ -72,6 +74,7 @@ func (e *DatafilesStoreEngineRethinkdb) GetFileInDir(name string, dirID string) 
 	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
 		return file, err
 	}
+	defer res.Close()
 
 	err = res.One(&file)
 	return file, err

@@ -40,6 +40,7 @@ func (e *FileLoadsStoreEngineRethinkdb) GetFileLoad(uploadID string) (FileLoadSc
 	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
 		return upload, err
 	}
+	defer res.Close()
 
 	err = res.One(&upload)
 	return upload, err
@@ -51,6 +52,7 @@ func (e *FileLoadsStoreEngineRethinkdb) GetAllFileLoads() ([]FileLoadSchema, err
 	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
 		return nil, err
 	}
+	defer res.Close()
 
 	var uploads []FileLoadSchema
 	err = res.All(uploads)

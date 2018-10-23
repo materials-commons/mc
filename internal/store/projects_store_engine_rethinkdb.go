@@ -47,6 +47,7 @@ func (e *ProjectsStoreEngineRethinkdb) GetProjectSimple(id string) (ProjectSimpl
 	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
 		return project, err
 	}
+	defer res.Close()
 
 	err = res.One(&project)
 	return project, err
@@ -67,6 +68,7 @@ func (e *ProjectsStoreEngineRethinkdb) GetProject(id string) (ProjectExtendedMod
 	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
 		return project, err
 	}
+	defer res.Close()
 
 	err = res.One(&project)
 	return project, err
@@ -82,6 +84,7 @@ func (e *ProjectsStoreEngineRethinkdb) GetAllProjectsForUser(user string) ([]Pro
 	if err := checkRethinkdbQueryError(res, err, fmt.Sprintf("Can't retrieve projects for user %s", user)); err != nil {
 		return userProjects, err
 	} else if err := res.All(userProjects); err != nil {
+		res.Close()
 		return userProjects, err
 	}
 
@@ -91,6 +94,7 @@ func (e *ProjectsStoreEngineRethinkdb) GetAllProjectsForUser(user string) ([]Pro
 	if err := checkRethinkdbQueryError(res, err, fmt.Sprintf("Can't retrieve projects user (%s) is member of", user)); err != nil {
 		return userProjects, err
 	} else if err := res.All(projectsMemberOf); err != nil {
+		res.Close()
 		return userProjects, err
 	}
 

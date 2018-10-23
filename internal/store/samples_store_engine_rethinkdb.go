@@ -41,6 +41,7 @@ func (e *SamplesStoreEngineRethinkdb) GetSample(sampleID string) (SampleSchema, 
 	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
 		return SampleSchema{}, err
 	}
+	defer res.Close()
 
 	var sample SampleSchema
 	err = res.One(&sample)

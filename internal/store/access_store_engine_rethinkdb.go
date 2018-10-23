@@ -49,6 +49,7 @@ func (e *AccessStoreEngineRethinkdb) GetProjectAccessEntries(projectID string) (
 	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
 		return entries, err
 	}
+	defer res.Close()
 
 	err = res.All(entries)
 	return entries, err
@@ -61,6 +62,7 @@ func (e *AccessStoreEngineRethinkdb) GetUserAccessEntries(userID string) ([]Acce
 	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
 		return entries, err
 	}
+	defer res.Close()
 
 	err = res.All(entries)
 	return entries, err
