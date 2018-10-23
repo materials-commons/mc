@@ -1,9 +1,10 @@
-package store_test
+package storengine_test
 
 import (
 	"testing"
 
-	"github.com/materials-commons/mc/internal/store"
+	"github.com/materials-commons/mc/internal/store/storengine"
+
 	r "gopkg.in/gorethink/gorethink.v4"
 )
 
@@ -31,10 +32,10 @@ func TestDatafilesStoreEngineRethinkdb_GetFileInDir(t *testing.T) {
 	e.Session.Close()
 }
 
-func createRethinkdbDatafilesStoreEngine() *store.DatafilesStoreEngineRethinkdb {
+func createRethinkdbDatafilesStoreEngine() *storengine.DatafilesRethinkdb {
 	session, _ := r.Connect(r.ConnectOpts{Database: "mctest", Address: "localhost:30815"})
 	r.SetTags("r")
-	e := store.NewDatafilesStoreEngineRethinkdb(session)
+	e := storengine.NewDatafilesRethinkdb(session)
 	cleanupDatafilesStoreEngine(e)
 	return e
 }

@@ -89,7 +89,7 @@ func TestMCFileLoaderLoadOnlyAFile(t *testing.T) {
 	ddStoreEngine := storengine.NewDatadirsMemory()
 	ddStore := store.NewDatadirsStore(ddStoreEngine)
 
-	dfStoreEngine := store.NewDatafilesStoreEngineMemory()
+	dfStoreEngine := storengine.NewDatafilesMemory()
 	dfStore := store.NewDatafilesStore(dfStoreEngine)
 
 	var (

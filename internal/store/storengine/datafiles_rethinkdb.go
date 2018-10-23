@@ -1,4 +1,4 @@
-package store
+package storengine
 
 import (
 	"fmt"
@@ -9,15 +9,15 @@ import (
 	"gopkg.in/gorethink/gorethink.v4/encoding"
 )
 
-type DatafilesStoreEngineRethinkdb struct {
+type DatafilesRethinkdb struct {
 	Session *r.Session
 }
 
-func NewDatafilesStoreEngineRethinkdb(session *r.Session) *DatafilesStoreEngineRethinkdb {
-	return &DatafilesStoreEngineRethinkdb{Session: session}
+func NewDatafilesRethinkdb(session *r.Session) *DatafilesRethinkdb {
+	return &DatafilesRethinkdb{Session: session}
 }
 
-func (e *DatafilesStoreEngineRethinkdb) AddFile(file model.DatafileSchema, projectID, datadirID string) (model.DatafileSchema, error) {
+func (e *DatafilesRethinkdb) AddFile(file model.DatafileSchema, projectID, datadirID string) (model.DatafileSchema, error) {
 	errMsg := fmt.Sprintf("Unable to add datafile: %+v", file)
 	resp, err := r.Table("datafiles").Insert(file, r.InsertOpts{ReturnChanges: true}).RunWrite(e.Session)
 	if err := checkRethinkdbInsertError(resp, err, errMsg); err != nil {
@@ -40,7 +40,7 @@ func (e *DatafilesStoreEngineRethinkdb) AddFile(file model.DatafileSchema, proje
 	return f, checkRethinkdbInsertError(resp, err, errMsg)
 }
 
-func (e *DatafilesStoreEngineRethinkdb) GetFile(id string) (model.DatafileSchema, error) {
+func (e *DatafilesRethinkdb) GetFile(id string) (model.DatafileSchema, error) {
 	var file model.DatafileSchema
 	errMsg := fmt.Sprintf("No such datafile %s", id)
 	res, err := r.Table("datafiles").Get(id).Run(e.Session)
@@ -53,7 +53,7 @@ func (e *DatafilesStoreEngineRethinkdb) GetFile(id string) (model.DatafileSchema
 	return file, err
 }
 
-func (e *DatafilesStoreEngineRethinkdb) GetFileWithChecksum(checksum string) (model.DatafileSchema, error) {
+func (e *DatafilesRethinkdb) GetFileWithChecksum(checksum string) (model.DatafileSchema, error) {
 	var file model.DatafileSchema
 	errMsg := fmt.Sprintf("No file matching checksum %s", checksum)
 	res, err := r.Table("datafiles").GetAllByIndex("checksum", checksum).
@@ -67,7 +67,7 @@ func (e *DatafilesStoreEngineRethinkdb) GetFileWithChecksum(checksum string) (mo
 	return file, err
 }
 
-func (e *DatafilesStoreEngineRethinkdb) GetFileInDir(name string, dirID string) (model.DatafileSchema, error) {
+func (e *DatafilesRethinkdb) GetFileInDir(name string, dirID string) (model.DatafileSchema, error) {
 	var file model.DatafileSchema
 	errMsg := fmt.Sprintf("No file %s in dir %s", name, dirID)
 	res, err := r.Table("datadir2datafile").GetAllByIndex("datadir_id", dirID).
@@ -82,7 +82,7 @@ func (e *DatafilesStoreEngineRethinkdb) GetFileInDir(name string, dirID string) 
 	return file, err
 }
 
-func (e *DatafilesStoreEngineRethinkdb) UpdateFileCurrentFlag(id string, current bool) error {
+func (e *DatafilesRethinkdb) UpdateFileCurrentFlag(id string, current bool) error {
 	errMsg := fmt.Sprintf("failed updated file %s current flag", id)
 
 	resp, err := r.Table("datafiles").Get(id).

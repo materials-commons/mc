@@ -1,7 +1,9 @@
-package store_test
+package storengine_test
 
 import (
 	"testing"
+
+	"github.com/materials-commons/mc/internal/store/storengine"
 
 	"github.com/materials-commons/mc/internal/store"
 
@@ -97,7 +99,7 @@ func addDefaultDatafilesToStoreEngine(t *testing.T, e store.DatafilesStoreEngine
 }
 
 func cleanupDatafilesStoreEngine(e store.DatafilesStoreEngine) {
-	if re, ok := e.(*store.DatafilesStoreEngineRethinkdb); ok {
+	if re, ok := e.(*storengine.DatafilesRethinkdb); ok {
 		session := re.Session
 		_, _ = r.Table("datafiles").Delete().RunWrite(session)
 		_, _ = r.Table("project2datafile").Delete().RunWrite(session)

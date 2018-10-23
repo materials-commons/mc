@@ -31,7 +31,7 @@ func (db *DBRethinkdb) UsersStore() *UsersStore {
 }
 
 func (db *DBRethinkdb) DatafilesStore() *DatafilesStore {
-	return NewDatafilesStore(NewDatafilesStoreEngineRethinkdb(db.Session))
+	return NewDatafilesStore(storengine.NewDatafilesRethinkdb(db.Session))
 }
 
 func (db *DBRethinkdb) DatadirsStore() *DatadirsStore {
@@ -46,7 +46,7 @@ type DBMemory struct {
 	DBProj      map[string]model.ProjectSchema
 	DBUsers     map[string]model.UserSchema
 	DBDatadirs  map[string]model.DatadirSchema
-	DBDatafiles map[string]DatafileSchemaInMemory
+	DBDatafiles map[string]storengine.DatafileSchemaInMemory
 	DBFileLoads map[string]model.FileLoadSchema
 }
 
@@ -55,7 +55,7 @@ func NewDBMemory() *DBMemory {
 		DBProj:      make(map[string]model.ProjectSchema),
 		DBUsers:     make(map[string]model.UserSchema),
 		DBDatadirs:  make(map[string]model.DatadirSchema),
-		DBDatafiles: make(map[string]DatafileSchemaInMemory),
+		DBDatafiles: make(map[string]storengine.DatafileSchemaInMemory),
 		DBFileLoads: make(map[string]model.FileLoadSchema),
 	}
 }
@@ -78,10 +78,10 @@ func (db *DBMemory) UsersStore() *UsersStore {
 
 func (db *DBMemory) DatafilesStore() *DatafilesStore {
 	if db.DBDatafiles == nil {
-		return NewDatafilesStore(NewDatafilesStoreEngineMemory())
+		return NewDatafilesStore(storengine.NewDatafilesMemory())
 	}
 
-	return NewDatafilesStore(NewDatafilesStoreEngineMemoryWithDB(db.DBDatafiles))
+	return NewDatafilesStore(storengine.NewDatafilesMemoryWithDB(db.DBDatafiles))
 }
 
 func (db *DBMemory) DatadirsStore() *DatadirsStore {
