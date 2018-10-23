@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -116,7 +117,15 @@ func initConfig() {
 }
 
 func connectToDB() store.DB {
-	session, err := r.Connect(r.ConnectOpts{Database: dbName, Address: dbConnection})
+	opts := r.ConnectOpts{
+		Database:   dbName,
+		Address:    dbConnection,
+		InitialCap: 10,
+		MaxOpen:    20,
+		Timeout:    1 * time.Second,
+		NumRetries: 3,
+	}
+	session, err := r.Connect(opts)
 	if err != nil {
 		panic(fmt.Sprintf("unable to connect to rethinkdb server, database: %s, address: %s, error: %s", dbName, dbConnection, err))
 	}

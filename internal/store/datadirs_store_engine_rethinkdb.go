@@ -70,6 +70,7 @@ func (e *DatadirsStoreEngineRethinkdb) GetDatadirByPathInProject(path, projectID
 	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
 		return dir, err
 	}
+	defer res.Close()
 
 	err = res.One(&dir)
 	return dir, err
@@ -82,6 +83,7 @@ func (e *DatadirsStoreEngineRethinkdb) GetDatadir(id string) (DatadirSchema, err
 	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
 		return dir, err
 	}
+	defer res.Close()
 
 	err = res.One(&dir)
 	return dir, err

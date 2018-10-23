@@ -29,6 +29,7 @@ func (e *UsersStoreEngineRethinkdb) GetUserByID(id string) (UserSchema, error) {
 	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
 		return user, err
 	}
+	defer res.Close()
 
 	err = res.One(&user)
 	return user, err
@@ -41,6 +42,7 @@ func (e *UsersStoreEngineRethinkdb) GetUserByAPIKey(apikey string) (UserSchema, 
 	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
 		return user, err
 	}
+	defer res.Close()
 
 	err = res.One(&user)
 	return user, err

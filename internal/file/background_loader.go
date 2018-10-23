@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/pkg/errors"
 
@@ -51,6 +50,7 @@ func (l *BackgroundLoader) processLoadFileRequests(c context.Context) {
 		}
 
 		for _, req := range requests {
+			fmt.Printf("processing request %#v\n", req)
 			if !req.Loading {
 
 				// Mark job as loading so it will be ignored in later processing
@@ -73,11 +73,11 @@ func (l *BackgroundLoader) processLoadFileRequests(c context.Context) {
 
 		// Sleep for 10 seconds before getting the next set of loading requests. Ten seconds is an
 		// somewhat arbitrary value chosen to balance time to start processing and load.
-		select {
-		case <-time.After(10 * time.Second):
-		case <-c.Done():
-			return
-		}
+		//select {
+		//case <-time.After(100 * time.Millisecond):
+		//case <-c.Done():
+		//	return
+		//}
 	}
 }
 

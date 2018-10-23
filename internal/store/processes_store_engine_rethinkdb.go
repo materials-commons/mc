@@ -35,6 +35,7 @@ func (e *ProcessesStoreEngineRethinkdb) GetProcess(processID string) (ProcessExt
 	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
 		return process, err
 	}
+	defer res.Close()
 
 	err = res.One(&process)
 	return process, err
