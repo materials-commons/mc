@@ -1,4 +1,4 @@
-package store
+package storengine
 
 import (
 	"fmt"
@@ -9,15 +9,15 @@ import (
 	"gopkg.in/gorethink/gorethink.v4/encoding"
 )
 
-type FileLoadsStoreEngineRethinkdb struct {
+type FileLoadsRethinkdb struct {
 	Session *r.Session
 }
 
-func NewFileLoadsStoreEngineRethinkdb(session *r.Session) *FileLoadsStoreEngineRethinkdb {
-	return &FileLoadsStoreEngineRethinkdb{Session: session}
+func NewFileLoadsRethinkdb(session *r.Session) *FileLoadsRethinkdb {
+	return &FileLoadsRethinkdb{Session: session}
 }
 
-func (e *FileLoadsStoreEngineRethinkdb) AddFileLoad(upload model.FileLoadSchema) (model.FileLoadSchema, error) {
+func (e *FileLoadsRethinkdb) AddFileLoad(upload model.FileLoadSchema) (model.FileLoadSchema, error) {
 	errMsg := fmt.Sprintf("Unable to add file load request %#v", upload)
 	resp, err := r.Table("file_loads").Insert(upload, r.InsertOpts{ReturnChanges: true}).RunWrite(e.Session)
 	if err := checkRethinkdbInsertError(resp, err, errMsg); err != nil {
@@ -29,13 +29,13 @@ func (e *FileLoadsStoreEngineRethinkdb) AddFileLoad(upload model.FileLoadSchema)
 	return uploadCreated, err
 }
 
-func (e *FileLoadsStoreEngineRethinkdb) DeleteFileLoad(id string) error {
+func (e *FileLoadsRethinkdb) DeleteFileLoad(id string) error {
 	errMsg := fmt.Sprintf("failed deleting file load entry %s", id)
 	resp, err := r.Table("file_loads").Get(id).Delete().RunWrite(e.Session)
 	return checkRethinkdbWriteError(resp, err, errMsg)
 }
 
-func (e *FileLoadsStoreEngineRethinkdb) GetFileLoad(uploadID string) (model.FileLoadSchema, error) {
+func (e *FileLoadsRethinkdb) GetFileLoad(uploadID string) (model.FileLoadSchema, error) {
 	var upload model.FileLoadSchema
 	errMsg := fmt.Sprintf("No such file load request %s", uploadID)
 	res, err := r.Table("file_loads").Get(uploadID).Run(e.Session)
@@ -48,7 +48,7 @@ func (e *FileLoadsStoreEngineRethinkdb) GetFileLoad(uploadID string) (model.File
 	return upload, err
 }
 
-func (e *FileLoadsStoreEngineRethinkdb) GetAllFileLoads() ([]model.FileLoadSchema, error) {
+func (e *FileLoadsRethinkdb) GetAllFileLoads() ([]model.FileLoadSchema, error) {
 	errMsg := fmt.Sprintf("Unable to retrieve file loads")
 	res, err := r.Table("file_loads").Run(e.Session)
 	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
@@ -61,13 +61,13 @@ func (e *FileLoadsStoreEngineRethinkdb) GetAllFileLoads() ([]model.FileLoadSchem
 	return uploads, err
 }
 
-func (e *FileLoadsStoreEngineRethinkdb) MarkAllNotLoading() error {
+func (e *FileLoadsRethinkdb) MarkAllNotLoading() error {
 	errMsg := fmt.Sprintf("Unable to upload file loads")
 	resp, err := r.Table("file_loads").Update(map[string]interface{}{"loading": false}).RunWrite(e.Session)
 	return checkRethinkdbWriteError(resp, err, errMsg)
 }
 
-func (e *FileLoadsStoreEngineRethinkdb) UpdateLoading(id string, loading bool) error {
+func (e *FileLoadsRethinkdb) UpdateLoading(id string, loading bool) error {
 	errMsg := fmt.Sprintf("Unable to update file load %s", id)
 	resp, err := r.Table("file_loads").
 		Update(map[string]interface{}{"loading": loading}, r.UpdateOpts{ReturnChanges: true}).RunWrite(e.Session)

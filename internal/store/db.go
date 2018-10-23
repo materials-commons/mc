@@ -39,7 +39,7 @@ func (db *DBRethinkdb) DatadirsStore() *DatadirsStore {
 }
 
 func (db *DBRethinkdb) FileLoadsStore() *FileLoadsStore {
-	return NewFileLoadsStore(NewFileLoadsStoreEngineRethinkdb(db.Session))
+	return NewFileLoadsStore(storengine.NewFileLoadsRethinkdb(db.Session))
 }
 
 type DBMemory struct {
@@ -94,10 +94,10 @@ func (db *DBMemory) DatadirsStore() *DatadirsStore {
 
 func (db *DBMemory) FileLoadsStore() *FileLoadsStore {
 	if db.DBFileLoads == nil {
-		return NewFileLoadsStore(NewFileLoadsStoreEngineMemory())
+		return NewFileLoadsStore(storengine.NewFileLoadsMemory())
 	}
 
-	return NewFileLoadsStore(NewFileLoadsStoreEngineMemoryWithDB(db.DBFileLoads))
+	return NewFileLoadsStore(storengine.NewFileLoadsMemoryWithDB(db.DBFileLoads))
 }
 
 var InMemory = NewDBMemory() // Global for testing purposes, allows a single db to be shared across test instances

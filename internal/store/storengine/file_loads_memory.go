@@ -1,4 +1,4 @@
-package store
+package storengine
 
 import (
 	"github.com/hashicorp/go-uuid"
@@ -6,23 +6,23 @@ import (
 	"github.com/materials-commons/mc/pkg/mc"
 )
 
-type FileLoadsStoreEngineMemory struct {
+type FileLoadsMemory struct {
 	DB map[string]model.FileLoadSchema
 }
 
-func NewFileLoadsStoreEngineMemory() *FileLoadsStoreEngineMemory {
-	return &FileLoadsStoreEngineMemory{
+func NewFileLoadsMemory() *FileLoadsMemory {
+	return &FileLoadsMemory{
 		DB: make(map[string]model.FileLoadSchema),
 	}
 }
 
-func NewFileLoadsStoreEngineMemoryWithDB(db map[string]model.FileLoadSchema) *FileLoadsStoreEngineMemory {
-	return &FileLoadsStoreEngineMemory{
+func NewFileLoadsMemoryWithDB(db map[string]model.FileLoadSchema) *FileLoadsMemory {
+	return &FileLoadsMemory{
 		DB: db,
 	}
 }
 
-func (e *FileLoadsStoreEngineMemory) AddFileLoad(fload model.FileLoadSchema) (model.FileLoadSchema, error) {
+func (e *FileLoadsMemory) AddFileLoad(fload model.FileLoadSchema) (model.FileLoadSchema, error) {
 	var err error
 	if fload.ID, err = uuid.GenerateUUID(); err != nil {
 		return model.FileLoadSchema{}, err
@@ -31,7 +31,7 @@ func (e *FileLoadsStoreEngineMemory) AddFileLoad(fload model.FileLoadSchema) (mo
 	return fload, nil
 }
 
-func (e *FileLoadsStoreEngineMemory) DeleteFileLoad(floadID string) error {
+func (e *FileLoadsMemory) DeleteFileLoad(floadID string) error {
 	_, ok := e.DB[floadID]
 	if !ok {
 		return mc.ErrNotFound
@@ -41,7 +41,7 @@ func (e *FileLoadsStoreEngineMemory) DeleteFileLoad(floadID string) error {
 	return nil
 }
 
-func (e *FileLoadsStoreEngineMemory) GetFileLoad(floadID string) (model.FileLoadSchema, error) {
+func (e *FileLoadsMemory) GetFileLoad(floadID string) (model.FileLoadSchema, error) {
 	fload, ok := e.DB[floadID]
 	if !ok {
 		return model.FileLoadSchema{}, mc.ErrNotFound
@@ -50,7 +50,7 @@ func (e *FileLoadsStoreEngineMemory) GetFileLoad(floadID string) (model.FileLoad
 	return fload, nil
 }
 
-func (e *FileLoadsStoreEngineMemory) GetAllFileLoads() ([]model.FileLoadSchema, error) {
+func (e *FileLoadsMemory) GetAllFileLoads() ([]model.FileLoadSchema, error) {
 	var fileLoads []model.FileLoadSchema
 	for _, entry := range e.DB {
 		fileLoads = append(fileLoads, entry)
@@ -59,7 +59,7 @@ func (e *FileLoadsStoreEngineMemory) GetAllFileLoads() ([]model.FileLoadSchema, 
 	return fileLoads, nil
 }
 
-func (e *FileLoadsStoreEngineMemory) MarkAllNotLoading() error {
+func (e *FileLoadsMemory) MarkAllNotLoading() error {
 	for _, entry := range e.DB {
 		entry.Loading = false
 		e.DB[entry.ID] = entry
@@ -68,7 +68,7 @@ func (e *FileLoadsStoreEngineMemory) MarkAllNotLoading() error {
 	return nil
 }
 
-func (e *FileLoadsStoreEngineMemory) UpdateLoading(id string, loading bool) error {
+func (e *FileLoadsMemory) UpdateLoading(id string, loading bool) error {
 	entry, ok := e.DB[id]
 	if !ok {
 		return mc.ErrNotFound
