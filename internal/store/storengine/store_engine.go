@@ -73,3 +73,9 @@ type FileLoadsStoreEngine interface {
 	MarkAllNotLoading() error
 	UpdateLoading(id string, loading bool) error
 }
+
+type PublishedDatasetsStoreEngine interface {
+	GetDatasetProcess(id string)
+	GetDatasetsForTag(tag string)
+	GetAllDatasets()
+}
