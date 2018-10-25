@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/go-ozzo/ozzo-validation"
-	"github.com/go-ozzo/ozzo-validation/is"
 	"github.com/materials-commons/mc/pkg/mc"
 	"github.com/pkg/errors"
 )
@@ -31,7 +30,7 @@ type AddUserModel struct {
 func (u AddUserModel) Validate() error {
 	err := validation.ValidateStruct(&u,
 		validation.Field(&u.Fullname, validation.Required, validation.Length(1, 40)),
-		validation.Field(&u.Email, validation.Required, is.Email),
+		validation.Field(&u.Email, validation.Required, validation.By(IsEmail)),
 		validation.Field(&u.Password, validation.Required, validation.Length(1, 100)))
 	if err != nil {
 		return errors.WithMessage(mc.ErrValidation, err.Error())
