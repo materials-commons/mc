@@ -9,7 +9,7 @@ type PublishedDatasetSchema struct {
 	DOI           string                `json:"doi"`
 	Funding       string                `json:"funding"`
 	Institution   string                `json:"institution"`
-	Keywords      []string              `json:"keywords"` // TBD
+	Keywords      []string              `json:"keywords"`
 	License       License               `json:"license"`
 	Papers        []DatasetPaper        `json:"papers"`
 	Published     bool                  `json:"published"`
@@ -36,6 +36,7 @@ type PublishedDatasetUniqueViewCount struct {
 	Total int `json:"total"`
 	// also, eventually, 'anonymous': items with user_ids that are not users
 	//   and 'authenticated': items with user_ids that are users
+	// Add these items at a later point
 }
 
 type DatasetZip struct {
