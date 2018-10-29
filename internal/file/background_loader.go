@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/materials-commons/mc/internal/store/model"
 	"github.com/materials-commons/mc/pkg/mc"
@@ -76,11 +77,11 @@ func (l *BackgroundLoader) processLoadFileRequests(c context.Context) {
 
 		// Sleep for 10 seconds before getting the next set of loading requests. Ten seconds is an
 		// somewhat arbitrary value chosen to balance time to start processing and load.
-		//select {
-		//case <-time.After(100 * time.Millisecond):
-		//case <-c.Done():
-		//	return
-		//}
+		select {
+		case <-time.After(100 * time.Millisecond):
+		case <-c.Done():
+			return
+		}
 	}
 }
 
