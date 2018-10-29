@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/materials-commons/mc/internal/store/model"
@@ -20,6 +21,7 @@ type BackgroundLoader struct {
 	numberOfWorkers int
 	db              store.DB
 	c               context.Context
+	activeProjects  sync.Map
 }
 
 func NewBackgroundLoader(mcdir string, numberOfWorkers int, db store.DB) *BackgroundLoader {
@@ -56,6 +58,12 @@ func (l *BackgroundLoader) processLoadFileRequests(c context.Context) {
 		for _, req := range requests {
 			fmt.Printf("processing request %#v\n", req)
 			if !req.Loading {
+				// Check if project is already being processed
+				_, ok := l.activeProjects.Load(req.ProjectID)
+				if ok {
+					// There is already a load active for this project
+					continue
+				}
 
 				// Mark job as loading so it will be ignored in later processing
 				err := fileloadsStore.UpdateLoading(req.ID, true)
@@ -65,6 +73,9 @@ func (l *BackgroundLoader) processLoadFileRequests(c context.Context) {
 					// If the job cannot be marked as loading then skip processing it
 					continue
 				}
+
+				// Lock the project so no other uploads for this project will be processed
+				l.activeProjects.Store(req.ProjectID, true)
 
 				// pool.Process() is synchronous, so run in separate routine and let the pool control
 				// how many jobs are running simultaneously.
@@ -105,12 +116,19 @@ func (l *BackgroundLoader) worker(args interface{}) interface{} {
 	fl := NewFileLoader(skipper.Skipper, loader)
 
 	if err := fl.LoadFilesWithCancel(req.Path, l.c); err != nil {
+		// Load wasn't successful. Release the project so other load
+		// requests for the project can proceed. Also, mark this
+		// load request as not being loaded so it can be retried.
+		flStore.UpdateLoading(req.ID, false)
+		l.activeProjects.Delete(req.ProjectID)
 		return err
 	} else {
 		// if loading files was successful then
-		//    remove path since all files were processed and
-		//    delete this file load request
+		//    1. remove path since all files were processed and
+		//    2. remove project from activeProjects map so other requests can be processed
+		//    3. delete this file load request
 		_ = os.RemoveAll(req.Path)
+		l.activeProjects.Delete(req.ProjectID)
 		return flStore.DeleteFileLoad(req.ID)
 	}
 }
