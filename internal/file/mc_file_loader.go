@@ -152,6 +152,13 @@ func (l *MCFileLoader) loadFile(path string, finfo os.FileInfo) error {
 	case err != nil:
 		return err
 	default:
+		// if the files share the same checksum, then there is nothing to do as there
+		// is already a version of the file in the directory with the same checksum.
+		// So delete the uploaded file and return nil for success
+		if checksum == df.Checksum {
+			os.Remove(path)
+			return nil
+		}
 		addFile.Parent = df.ID
 		if err := l.dfStore.UpdateDatafileCurrentFlag(df.ID, false); err != nil {
 			return err
@@ -165,7 +172,7 @@ func (l *MCFileLoader) loadFile(path string, finfo os.FileInfo) error {
 		return err
 	}
 
-	return l.moveFile(path, f) // TODO: Delete file in database if movefile fails...
+	return l.moveFile(path, f) // TODO: Delete file in database if moveFile fails...
 }
 
 func (l *MCFileLoader) computeFileChecksum(path string) (string, error) {
@@ -195,6 +202,8 @@ func (l *MCFileLoader) moveFile(path string, f model.DatafileSchema) error {
 		if err := copyFile(path, filepath.Join(dirPath, f.ID)); err != nil {
 			return err
 		}
+		// File successfully copied so remove it
+		os.Remove(path)
 	}
 	return nil
 }
