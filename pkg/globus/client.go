@@ -3,6 +3,7 @@ package globus
 import (
 	"crypto/tls"
 	"fmt"
+	"strings"
 
 	"gopkg.in/resty.v1"
 
@@ -102,6 +103,22 @@ func (c *Client) GetTaskSuccessfulTransfers(taskID string, marker int) (Transfer
 		err = c.reauthAndRedoGet(request, url)
 	}
 	return items, err
+}
+
+func (c *Client) GetIdentities(users []string) (Identities, error) {
+	url := fmt.Sprintf("%s/api/identities", authURLBase)
+	usernames := strings.Join(users, ",")
+
+	var identities Identities
+	request := r().SetAuthToken(c.token).SetResult(&identities).SetQueryParam("usernames", usernames)
+
+	resp, err := request.Get(url)
+	err = getAPIError(resp, err)
+	if err == ErrGlobusAuth {
+		err = c.reauthAndRedoGet(request, url)
+	}
+
+	return identities, err
 }
 
 func (c *Client) reauthAndRedoGet(request *resty.Request, url string) error {
