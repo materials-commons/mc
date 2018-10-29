@@ -57,37 +57,43 @@ func (l *BackgroundLoader) processLoadFileRequests(c context.Context) {
 
 		for _, req := range requests {
 			fmt.Printf("processing request %#v\n", req)
-			if !req.Loading {
-				// Check if project is already being processed
-				_, ok := l.activeProjects.Load(req.ProjectID)
-				if ok {
-					// There is already a load active for this project
-					continue
-				}
-
-				// Mark job as loading so it will be ignored in later processing
-				err := fileloadsStore.UpdateLoading(req.ID, true)
-				if err != nil {
-					fmt.Printf("Unable to update file load request %s: %s", req.ID, err)
-
-					// If the job cannot be marked as loading then skip processing it
-					continue
-				}
-
-				// Lock the project so no other uploads for this project will be processed
-				l.activeProjects.Store(req.ProjectID, true)
-
-				// pool.Process() is synchronous, so run in separate routine and let the pool control
-				// how many jobs are running simultaneously.
-				go func() {
-					// pool.Process will call the worker function (below) for processing the request
-					pool.Process(req)
-				}()
+			if req.Loading {
+				// This request is already being processed so ignore it
+				continue
 			}
+
+			// Check if project is already being processed
+			if _, ok := l.activeProjects.Load(req.ProjectID); ok {
+				// There is already a load active for this project, so skip
+				// processing this load request
+				continue
+			}
+
+			// If we are here then the current request is not being processed
+			// and it is not for a project that is currently being processed.
+
+			// Mark job as loading so we won't attempt to load this request a second time
+			if err := fileloadsStore.UpdateLoading(req.ID, true); err != nil {
+				fmt.Printf("Unable to update file load request %s: %s", req.ID, err)
+
+				// If the job cannot be marked as loading then skip processing it
+				continue
+			}
+
+			// Lock the project so no other uploads for this project will be processed. This is
+			// done to prevent issues such as checks and writes to the database creating two entries.
+			l.activeProjects.Store(req.ProjectID, true)
+
+			// pool.Process() is synchronous, so run in separate routine and let the pool control
+			// how many jobs are running simultaneously.
+			go func() {
+				// pool.Process will call the worker function (below) for processing the request
+				pool.Process(req)
+			}()
 		}
 
 		// Sleep for 10 seconds before getting the next set of loading requests. Ten seconds is an
-		// somewhat arbitrary value chosen to balance time to start processing and load.
+		// somewhat arbitrary value chosen to balance time to start processing and load on the system.
 		select {
 		case <-time.After(100 * time.Millisecond):
 		case <-c.Done():
@@ -119,6 +125,9 @@ func (l *BackgroundLoader) worker(args interface{}) interface{} {
 		// Load wasn't successful. Release the project so other load
 		// requests for the project can proceed. Also, mark this
 		// load request as not being loaded so it can be retried.
+		//
+		// Ignore errors as we are already in an error situation, either the updates
+		// to the database will work or they won't in which case nothing else will work.
 		flStore.UpdateLoading(req.ID, false)
 		l.activeProjects.Delete(req.ProjectID)
 		return err
