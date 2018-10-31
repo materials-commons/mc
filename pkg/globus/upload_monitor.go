@@ -65,4 +65,21 @@ func (m *UploadMonitor) processTransfers(transfers *TransferItems) {
 
 	// 4. Load the files
 	// 5. Remove the top level directory
+
+	// Some general thoughts -
+	// Most of this logic is already in place in the background loader, so could just
+	// add the item into the file uploads table and let the background loader take
+	// care of loading the files.
+	//
+	// If so, then logic is really simple:
+	//     Look in globus table for request
+	//     if no found then just ignore
+	//     else {
+	//        Delete ACL
+	//        Add into file uploads table
+	//        Delete globus request in table
+	//     }
+	//
+	// With this logic all cancellation, restarts, etc... will be handled in the file loading logic
+	// which already exists.
 }
