@@ -2,7 +2,6 @@ package globus
 
 import (
 	"context"
-	"fmt"
 	"time"
 )
 
@@ -27,7 +26,6 @@ func (m *UploadMonitor) monitorAndProcessUploads(c context.Context) {
 			return
 		case <-time.After(10 * time.Second):
 		}
-
 	}
 }
 
@@ -42,22 +40,29 @@ func (m *UploadMonitor) retrieveAndProcessUploads() {
 		return
 	}
 
-	marker := 0
 	for _, task := range tasks.Tasks {
-		for {
-			transfers, err := m.client.GetTaskSuccessfulTransfers(task.TaskID, marker)
-			if err != nil {
-				continue
-			}
-			for _, transfer := range transfers.Transfers {
-				fmt.Printf("transfer: %#v\n", transfer)
-			}
+		transfers, err := m.client.GetTaskSuccessfulTransfers(task.TaskID, 0)
 
-			if transfers.NextMarker == 0 {
-				break
-			}
-
-			marker = transfers.NextMarker
+		switch {
+		case err != nil:
+			continue
+		case len(transfers.Transfers) == 0:
+			// No files transferred in this request
+			continue
+		default:
+			// Files were transferred for this request
+			m.processTransfers(&transfers)
 		}
 	}
+}
+
+func (m *UploadMonitor) processTransfers(transfers *TransferItems) {
+	// 1. Determine upload id from dir path
+
+	// 2. Lookup the upload id
+	// 2.a if upload id is already being processed then skip it
+	// 2.b other mark it as being processed and delete ACL (acl id in the upload record)
+
+	// 4. Load the files
+	// 5. Remove the top level directory
 }

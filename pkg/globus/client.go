@@ -121,12 +121,86 @@ func (c *Client) GetIdentities(users []string) (Identities, error) {
 	return identities, err
 }
 
+func (c *Client) AddEndpointACLRule(rule EndpointACLRule) (AddEndpointACLRuleResult, error) {
+	req := endpointACLRequest{
+		DataType:      "access",
+		PrincipalType: "identity",
+		Principal:     rule.IdentityID,
+		Path:          rule.Path,
+		Permissions:   rule.Permissions,
+	}
+
+	var result AddEndpointACLRuleResult
+	url := fmt.Sprintf("%s/endpoint/%s/access", transferManagerURLBase, rule.EndpointID)
+	request := r().SetAuthToken(c.token).SetBody(req).SetResult(&result)
+	resp, err := request.Post(url)
+
+	if resp.RawResponse.StatusCode == 409 {
+		// ACL already exists so, not an error
+		return result, nil
+	}
+
+	err = getAPIError(resp, err)
+	if err == ErrGlobusAuth {
+		err = c.reauthAndRedoPost(request, url, true)
+	}
+
+	return result, err
+}
+
+func (c *Client) DeleteEndpointACLRule(endpointID string, accessID int) (DeleteEndpointACLRuleResult, error) {
+	url := fmt.Sprintf("%s/endpoint/%s/access/%d", transferManagerURLBase, endpointID, accessID)
+	var result DeleteEndpointACLRuleResult
+	request := r().SetAuthToken(c.token).SetResult(&result)
+	resp, err := request.Delete(url)
+
+	if resp.RawResponse.StatusCode == 404 {
+		// ACL rule doesn't exist so consider it success as there is nothing that needs to be deleted
+		return result, nil
+	}
+
+	err = getAPIError(resp, err)
+	if err == ErrGlobusAuth {
+		err = c.reauthAndRedoDelete(request, url, true)
+	}
+
+	return result, err
+}
+
 func (c *Client) reauthAndRedoGet(request *resty.Request, url string) error {
 	if err := c.Authenticate(); err != nil {
 		return err
 	}
 
 	resp, err := request.Get(url)
+	return getAPIError(resp, err)
+}
+
+func (c *Client) reauthAndRedoPost(request *resty.Request, url string, notError409 bool) error {
+	if err := c.Authenticate(); err != nil {
+		return err
+	}
+
+	resp, err := request.Post(url)
+	// Some Globus Post calls return 409 when the request doesn't need to do anything
+	if notError409 && resp.RawResponse.StatusCode == 409 {
+		return nil
+	}
+
+	return getAPIError(resp, err)
+}
+
+func (c *Client) reauthAndRedoDelete(request *resty.Request, url string, notError404 bool) error {
+	if err := c.Authenticate(); err != nil {
+		return err
+	}
+
+	resp, err := request.Post(url)
+	// Some Globus Delete calls return 404 when the item to be deleted doesn't exist
+	if notError404 && resp.RawResponse.StatusCode == 404 {
+		return nil
+	}
+
 	return getAPIError(resp, err)
 }
 
