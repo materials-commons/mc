@@ -117,7 +117,7 @@ func connectToDB() store.DB {
 	}
 	session, err := r.Connect(opts)
 	if err != nil {
-		panic(fmt.Sprintf("unable to connect to rethinkdb server, database: %s, address: %s, error: %s", dbName, dbConnection, err))
+		log.Fatalf("unable to connect to rethinkdb server, database: %s, address: %s, error: %s", dbName, dbConnection, err)
 	}
 
 	r.SetTags("r")
