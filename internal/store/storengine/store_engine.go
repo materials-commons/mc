@@ -73,3 +73,9 @@ type FileLoadsStoreEngine interface {
 	MarkAllNotLoading() error
 	UpdateLoading(id string, loading bool) error
 }
+
+type GlobusUploadsStoreEngine interface {
+	AddGlobusUpload(upload model.GlobusUploadSchema) (model.GlobusUploadSchema, error)
+	DeleteGlobusUpload(id string) error
+	GetGlobusUpload(id string) (model.GlobusUploadSchema, error)
+}
