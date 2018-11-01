@@ -54,7 +54,7 @@ func (e *UsersMemory) GetUserByAPIKey(apikey string) (model.UserSchema, error) {
 	return model.UserSchema{}, mc.ErrNotFound
 }
 
-func (e *UsersMemory) ModifyUserFullname(id, fullname string, updatedAt time.Time) (model.UserSchema, error) {
+func (e *UsersMemory) UpdateUserFullname(id, fullname string, updatedAt time.Time) (model.UserSchema, error) {
 	user, ok := e.DB[id]
 	if !ok {
 		return model.UserSchema{}, mc.ErrNotFound
@@ -66,7 +66,7 @@ func (e *UsersMemory) ModifyUserFullname(id, fullname string, updatedAt time.Tim
 	return user, nil
 }
 
-func (e *UsersMemory) ModifyUserPassword(id, password string, updatedAt time.Time) (model.UserSchema, error) {
+func (e *UsersMemory) UpdateUserPassword(id, password string, updatedAt time.Time) (model.UserSchema, error) {
 	user, ok := e.DB[id]
 	if !ok {
 		return model.UserSchema{}, mc.ErrNotFound
@@ -78,7 +78,7 @@ func (e *UsersMemory) ModifyUserPassword(id, password string, updatedAt time.Tim
 	return user, nil
 }
 
-func (e *UsersMemory) ModifyUserAPIKey(id, apikey string, updatedAt time.Time) (model.UserSchema, error) {
+func (e *UsersMemory) UpdateUserAPIKey(id, apikey string, updatedAt time.Time) (model.UserSchema, error) {
 	user, ok := e.DB[id]
 	if !ok {
 		return model.UserSchema{}, mc.ErrNotFound
@@ -90,6 +90,15 @@ func (e *UsersMemory) ModifyUserAPIKey(id, apikey string, updatedAt time.Time) (
 	return user, nil
 }
 
-func (e *UsersMemory) Name() string {
-	return "UsersMemory"
+func (e *UsersMemory) UpdateUsersGlobusUser(id, globusUser string) error {
+	user, ok := e.DB[id]
+	if !ok {
+		return mc.ErrNotFound
+	}
+
+	now := time.Now()
+	user.GlobusUser = globusUser
+	user.MTime = now
+	e.DB[id] = user
+	return nil
 }

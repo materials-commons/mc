@@ -19,6 +19,7 @@ type UserSchema struct {
 	Password        string    `db:"password" json:"-" r:"password"`
 	IsTemplateAdmin bool      `db:"is_template_admin" json:"is_template_admin" r:"is_template_admin"`
 	LastLogin       time.Time `db:"last_login" json:"last_login" r:"last_login"`
+	GlobusUser      string    `db:"globus_user" json:"globus_user" r:"globus_user"`
 }
 
 type AddUserModel struct {

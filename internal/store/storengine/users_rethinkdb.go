@@ -50,19 +50,25 @@ func (e *UsersRethinkdb) GetUserByAPIKey(apikey string) (model.UserSchema, error
 	return user, err
 }
 
-func (e *UsersRethinkdb) ModifyUserFullname(id, fullname string, updatedAt time.Time) (model.UserSchema, error) {
-	return e.modifyUser(id, map[string]interface{}{"fullname": fullname, "updated_at": updatedAt})
+func (e *UsersRethinkdb) UpdateUserFullname(id, fullname string, updatedAt time.Time) (model.UserSchema, error) {
+	return e.updateUser(id, map[string]interface{}{"fullname": fullname, "updated_at": updatedAt})
 }
 
-func (e *UsersRethinkdb) ModifyUserPassword(id, password string, updatedAt time.Time) (model.UserSchema, error) {
-	return e.modifyUser(id, map[string]interface{}{"password": password, "updated_at": updatedAt})
+func (e *UsersRethinkdb) UpdateUserPassword(id, password string, updatedAt time.Time) (model.UserSchema, error) {
+	return e.updateUser(id, map[string]interface{}{"password": password, "updated_at": updatedAt})
 }
 
-func (e *UsersRethinkdb) ModifyUserAPIKey(id, apikey string, updatedAt time.Time) (model.UserSchema, error) {
-	return e.modifyUser(id, map[string]interface{}{"apikey": apikey, "updated_at": updatedAt})
+func (e *UsersRethinkdb) UpdateUserAPIKey(id, apikey string, updatedAt time.Time) (model.UserSchema, error) {
+	return e.updateUser(id, map[string]interface{}{"apikey": apikey, "updated_at": updatedAt})
 }
 
-func (e *UsersRethinkdb) modifyUser(id string, what map[string]interface{}) (model.UserSchema, error) {
+func (e *UsersRethinkdb) UpdateUserGlobusUser(id, globusUser string) error {
+	errMsg := fmt.Sprintf("Unable to modify user %s to set globus user to %s", id, globusUser)
+	resp, err := r.Table("users").Update(map[string]interface{}{"globus_user": globusUser}).RunWrite(e.Session)
+	return checkRethinkdbWriteError(resp, err, errMsg)
+}
+
+func (e *UsersRethinkdb) updateUser(id string, what map[string]interface{}) (model.UserSchema, error) {
 	resp, err := r.Table("users").Get(id).Update(what, r.UpdateOpts{ReturnChanges: true}).RunWrite(e.Session)
 	switch {
 	case err != nil:

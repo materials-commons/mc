@@ -53,7 +53,7 @@ func (s *UsersStore) ModifyUserFullname(id, fullname string) (model.UserSchema, 
 	if err := validation.Validate(fullname, validation.Required, validation.Length(1, 40)); err != nil {
 		return model.UserSchema{}, err
 	}
-	return s.UsersStoreEngine.ModifyUserFullname(id, fullname, time.Now())
+	return s.UsersStoreEngine.UpdateUserFullname(id, fullname, time.Now())
 }
 
 func (s *UsersStore) ModifyUserPassword(id, password string) (model.UserSchema, error) {
@@ -66,7 +66,7 @@ func (s *UsersStore) ModifyUserPassword(id, password string) (model.UserSchema, 
 		return model.UserSchema{}, err
 	}
 
-	return s.UsersStoreEngine.ModifyUserPassword(id, passwordHash, time.Now())
+	return s.UsersStoreEngine.UpdateUserPassword(id, passwordHash, time.Now())
 }
 
 func (s *UsersStore) ModifyUserAPIKey(id string) (model.UserSchema, error) {
@@ -75,7 +75,7 @@ func (s *UsersStore) ModifyUserAPIKey(id string) (model.UserSchema, error) {
 		return model.UserSchema{}, err
 	}
 
-	return s.UsersStoreEngine.ModifyUserAPIKey(id, apikey, time.Now())
+	return s.UsersStoreEngine.UpdateUserAPIKey(id, apikey, time.Now())
 }
 
 func prepareUser(userModel model.AddUserModel) (model.UserSchema, error) {

@@ -101,7 +101,7 @@ func testUsersStoreEngineModifyUserFullname(t *testing.T, e storengine.UsersStor
 	storengine.AddDefaultUsersToStoreEngine(t, e)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			user, err := e.ModifyUserFullname(test.id, test.newFullname, time.Now())
+			user, err := e.UpdateUserFullname(test.id, test.newFullname, time.Now())
 			if !test.shouldFail {
 				assert.Okf(t, err, "Failed to modify existing user fullname id %s", test.id)
 				assert.Truef(t, user.Fullname == test.newFullname, "Expected fullname to equal %s, instead got %s", test.newFullname, user.Fullname)
@@ -127,7 +127,7 @@ func testUsersStoreEngineModifyUserPassword(t *testing.T, e storengine.UsersStor
 	storengine.AddDefaultUsersToStoreEngine(t, e)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			user, err := e.ModifyUserPassword(test.id, test.newPassword, time.Now())
+			user, err := e.UpdateUserPassword(test.id, test.newPassword, time.Now())
 			if !test.shouldFail {
 				assert.Okf(t, err, "Failed to modify existing user password id %s", test.id)
 				assert.Truef(t, user.Password == test.newPassword, "Expected password to equal %s, instead got %s", test.newPassword, user.Password)
@@ -153,7 +153,7 @@ func testUsersStoreEngineModifyUserAPIKey(t *testing.T, e storengine.UsersStoreE
 	storengine.AddDefaultUsersToStoreEngine(t, e)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			user, err := e.ModifyUserAPIKey(test.id, test.newAPIKey, time.Now())
+			user, err := e.UpdateUserAPIKey(test.id, test.newAPIKey, time.Now())
 			if !test.shouldFail {
 				assert.Okf(t, err, "Failed to modify existing user APIKey id %s", test.id)
 				assert.Truef(t, user.APIKey == test.newAPIKey, "Expected APIKey to equal %s, instead got %s", test.newAPIKey, user.APIKey)
