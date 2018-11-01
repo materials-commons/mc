@@ -64,12 +64,12 @@ func (e *FileLoadsRethinkdb) GetAllFileLoads() ([]model.FileLoadSchema, error) {
 func (e *FileLoadsRethinkdb) MarkAllNotLoading() error {
 	errMsg := fmt.Sprintf("Unable to upload file loads")
 	resp, err := r.Table("file_loads").Update(map[string]interface{}{"loading": false}).RunWrite(e.Session)
-	return checkRethinkdbWriteError(resp, err, errMsg)
+	return checkRethinkdbUpdateError(resp, err, errMsg)
 }
 
 func (e *FileLoadsRethinkdb) UpdateLoading(id string, loading bool) error {
 	errMsg := fmt.Sprintf("Unable to update file load %s", id)
-	resp, err := r.Table("file_loads").
+	resp, err := r.Table("file_loads").Get(id).
 		Update(map[string]interface{}{"loading": loading}, r.UpdateOpts{ReturnChanges: true}).RunWrite(e.Session)
-	return checkRethinkdbWriteError(resp, err, errMsg)
+	return checkRethinkdbUpdateError(resp, err, errMsg)
 }
