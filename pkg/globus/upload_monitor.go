@@ -82,4 +82,10 @@ func (m *UploadMonitor) processTransfers(transfers *TransferItems) {
 	//
 	// With this logic all cancellation, restarts, etc... will be handled in the file loading logic
 	// which already exists.
+
+	// GlobusResponse({
+	//    'DATA_TYPE': 'successful_transfer',
+	//    'destination_path': '/__upload_staging/transfer-5ac039c9-6254-4b39-90db-32b89ba6b5a9/hello.titan.txt',
+	//    'source_path': None
+	// })
 }
