@@ -40,7 +40,7 @@ func checkRethinkdbUpdateError(resp r.WriteResponse, err error, msg string) erro
 		return errors.Errorf("%s: %s", msg, resp.FirstError)
 	default:
 		if resp.Updated == 0 && resp.Replaced == 0 {
-			return errors.Errorf("%s: No documents found to change", msg)
+			return mc.ErrNotFound
 		}
 		return nil
 	}
@@ -54,7 +54,7 @@ func checkRethinkdbDeleteError(resp r.WriteResponse, err error, errMsg string) e
 		return errors.Errorf("%s: %s", errMsg, resp.FirstError)
 	default:
 		if resp.Deleted == 0 {
-			return errors.Errorf("%s: No documents found to delete", errMsg)
+			return mc.ErrNotFound
 		}
 		return nil
 	}
