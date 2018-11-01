@@ -72,7 +72,7 @@ func (l *BackgroundLoader) processLoadFileRequests(c context.Context) {
 			log.Printf("processing request %#v\n", req)
 
 			// If we are here then the current request is not being processed
-			// and it is not for a project that is currently being processed.
+			// and it is for a project that is *not* currently being processed.
 
 			// Mark job as loading so we won't attempt to load this request a second time
 			if err := fileloadsStore.UpdateLoading(req.ID, true); err != nil {
