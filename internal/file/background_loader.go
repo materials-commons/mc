@@ -2,7 +2,7 @@ package file
 
 import (
 	"context"
-	"fmt"
+	"log"
 	"os"
 	"sync"
 	"time"
@@ -44,7 +44,7 @@ func (l *BackgroundLoader) processLoadFileRequests(c context.Context) {
 	// There may have been jobs in process when the server was stopped. Mark those jobs
 	// at not currently being processed, this will cause them to be re-processed.
 	if err := fileloadsStore.MarkAllNotLoading(); err != nil && errors.Cause(err) != mc.ErrNotFound {
-		fmt.Printf("Unable to mark current jobs as not loading: %s\n", err)
+		log.Printf("Unable to mark current jobs as not loading: %s\n", err)
 	}
 
 	// Loop through all file load requests and look for any that are not currently being processed.
@@ -52,11 +52,11 @@ func (l *BackgroundLoader) processLoadFileRequests(c context.Context) {
 		requests, err := fileloadsStore.GetAllFileLoads()
 		//fmt.Printf("processing file loads %#v: %s\n", requests, err)
 		if err != nil && errors.Cause(err) != mc.ErrNotFound {
-			fmt.Println("Error retrieving requests:", err)
+			log.Println("Error retrieving requests:", err)
 		}
 
 		for _, req := range requests {
-			fmt.Printf("processing request %#v\n", req)
+
 			if req.Loading {
 				// This request is already being processed so ignore it
 				continue
@@ -69,12 +69,14 @@ func (l *BackgroundLoader) processLoadFileRequests(c context.Context) {
 				continue
 			}
 
+			log.Printf("processing request %#v\n", req)
+
 			// If we are here then the current request is not being processed
 			// and it is not for a project that is currently being processed.
 
 			// Mark job as loading so we won't attempt to load this request a second time
 			if err := fileloadsStore.UpdateLoading(req.ID, true); err != nil {
-				fmt.Printf("Unable to update file load request %s: %s", req.ID, err)
+				log.Printf("Unable to update file load request %s: %s", req.ID, err)
 
 				// If the job cannot be marked as loading then skip processing it
 				continue
