@@ -16,6 +16,10 @@ func NewGlobusUploadsMemory() *GlobusUploadsMemory {
 	}
 }
 
+func NewGlobusUploadsMemoryWithDB(db map[string]model.GlobusUploadSchema) *GlobusUploadsMemory {
+	return &GlobusUploadsMemory{DB: db}
+}
+
 func (e *GlobusUploadsMemory) AddGlobusUpload(upload model.GlobusUploadSchema) (model.GlobusUploadSchema, error) {
 	var err error
 	if upload.ID, err = uuid.GenerateUUID(); err != nil {
