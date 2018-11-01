@@ -90,7 +90,7 @@ func (e *UsersMemory) UpdateUserAPIKey(id, apikey string, updatedAt time.Time) (
 	return user, nil
 }
 
-func (e *UsersMemory) UpdateUsersGlobusUser(id, globusUser string) error {
+func (e *UsersMemory) UpdateUserGlobusUser(id, globusUser string) error {
 	user, ok := e.DB[id]
 	if !ok {
 		return mc.ErrNotFound
