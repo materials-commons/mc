@@ -161,6 +161,8 @@ func setupAPIRoutes(e *echo.Echo, db store.DB, mcdir string) {
 
 	globusController := api.NewGlobusController(db, globusClient, mcdir, globusEndpointID)
 	g.POST("/createGlobusUploadRequest", globusController.CreateGlobusUploadRequest).Name = "createGlobusUploadRequest"
+	g.POST("/getGlobusUploadRequest", globusController.GetGlobusUploadRequest).Name = "getGlobusUploadRequest"
+	g.POST("/listGlobusUploadRequests", globusController.ListGlobusUploadRequests).Name = "listGlobusUploadRequests"
 }
 
 func createAPIKeyMiddleware(db store.DB) echo.MiddlewareFunc {

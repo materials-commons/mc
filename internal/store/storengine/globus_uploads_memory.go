@@ -41,3 +41,25 @@ func (e *GlobusUploadsMemory) GetGlobusUpload(id string) (model.GlobusUploadSche
 
 	return upload, nil
 }
+
+func (e *GlobusUploadsMemory) GetAllGlobusUploads() ([]model.GlobusUploadSchema, error) {
+	var requests []model.GlobusUploadSchema
+
+	for _, entry := range e.DB {
+		requests = append(requests, entry)
+	}
+
+	return requests, nil
+}
+
+func (e *GlobusUploadsMemory) GetAllGlobusUploadsForUser(user string) ([]model.GlobusUploadSchema, error) {
+	var requests []model.GlobusUploadSchema
+
+	for _, entry := range e.DB {
+		if entry.Owner == user {
+			requests = append(requests, entry)
+		}
+	}
+
+	return requests, nil
+}

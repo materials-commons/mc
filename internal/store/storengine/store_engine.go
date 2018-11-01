@@ -79,4 +79,6 @@ type GlobusUploadsStoreEngine interface {
 	AddGlobusUpload(upload model.GlobusUploadSchema) (model.GlobusUploadSchema, error)
 	DeleteGlobusUpload(id string) error
 	GetGlobusUpload(id string) (model.GlobusUploadSchema, error)
+	GetAllGlobusUploads() ([]model.GlobusUploadSchema, error)
+	GetAllGlobusUploadsForUser(user string) ([]model.GlobusUploadSchema, error)
 }

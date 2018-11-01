@@ -46,3 +46,32 @@ func (e *GlobusUploadsRethinkdb) GetGlobusUpload(id string) (model.GlobusUploadS
 	err = res.One(&upload)
 	return upload, err
 }
+
+func (e *GlobusUploadsRethinkdb) GetAllGlobusUploads() ([]model.GlobusUploadSchema, error) {
+	var uploads []model.GlobusUploadSchema
+	errMsg := fmt.Sprintf("Couldn't retrieve all globus uploads")
+	res, err := r.Table("globus_uploads").Run(e.Session)
+	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
+		return uploads, err
+	}
+
+	defer res.Close()
+
+	err = res.All(uploads)
+	return uploads, err
+}
+
+func (e *GlobusUploadsRethinkdb) GetAllGlobusUploadsForUser(user string) ([]model.GlobusUploadSchema, error) {
+	var uploads []model.GlobusUploadSchema
+	errMsg := fmt.Sprintf("Couldn't retrieve globus uploads for user %s", user)
+	res, err := r.Table("globus_uploads").GetAllByIndex("owner", user).Run(e.Session)
+	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
+		return uploads, err
+	}
+
+	defer res.Close()
+
+	err = res.All(uploads)
+	return uploads, err
+
+}

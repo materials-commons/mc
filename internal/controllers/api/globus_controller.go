@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/materials-commons/mc/pkg/mc"
+
 	"github.com/hashicorp/go-uuid"
 
 	"github.com/labstack/echo"
@@ -31,6 +33,72 @@ func NewGlobusController(db store.DB, client *globus.Client, basePath, globusEnd
 		basePath:           basePath,
 		globusEndpointID:   globusEndpointID,
 	}
+}
+
+// GetGlobusUploadRequest will retrieve the specified request so long as the
+// user is the owner of the request, or the user has the Admin flag set to true
+func (g *GlobusController) GetGlobusUploadRequest(c echo.Context) error {
+	var req struct {
+		ID string `json:"id"`
+	}
+
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
+
+	user := c.Get("User").(model.UserSchema)
+
+	globusUploadReq, err := g.globusUploadsStore.GetGlobusUpload(req.ID)
+
+	switch {
+	case errors.Cause(err) == mc.ErrNotFound:
+		return echo.ErrNotFound
+	case err != nil:
+		return err
+	case user.ID != globusUploadReq.Owner && !user.Admin:
+		return echo.ErrUnauthorized
+	default:
+		return c.JSON(http.StatusOK, globusUploadReq)
+	}
+}
+
+// ListGlobusUploadRequests will retrieve all the upload requests for a specific user. Admin
+// users can set user to "all" to retrieve all the known upload requests. Users can only retrieve
+// their own upload requests unless they are an admin. Admins can retrieve other users requests.
+func (g *GlobusController) ListGlobusUploadRequests(c echo.Context) error {
+	var (
+		req struct {
+			User string `json:"user"`
+		}
+		uploads []model.GlobusUploadSchema
+		err     error
+	)
+
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
+
+	user := c.Get("User").(model.UserSchema)
+	switch {
+	case req.User == "all" && user.Admin:
+		// Admin user is allowed to get all requests
+		uploads, err = g.globusUploadsStore.GetAllGlobusUploads()
+	case req.User == "all" && !user.Admin:
+		return echo.ErrUnauthorized
+	case req.User != user.ID && !user.Admin:
+		return echo.ErrUnauthorized
+	default:
+		// Either req.User == user.ID, or req.User != user.ID but user.Admin == True
+		uploads, err = g.globusUploadsStore.GetAllGlobusUploadsForUser(req.User)
+	}
+
+	if err != nil && errors.Cause(err) == mc.ErrNotFound {
+		return echo.ErrNotFound
+	} else if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, uploads)
 }
 
 // CreateGlobusUploadRequests creates a new entry in the globus_uploads table that tracks to a directory on

@@ -46,3 +46,11 @@ func (s *GlobusUploadsStore) DeleteGlobusUpload(id string) error {
 func (s *GlobusUploadsStore) GetGlobusUpload(id string) (model.GlobusUploadSchema, error) {
 	return s.guStoreEngine.GetGlobusUpload(id)
 }
+
+func (s *GlobusUploadsStore) GetAllGlobusUploads() ([]model.GlobusUploadSchema, error) {
+	return s.guStoreEngine.GetAllGlobusUploads()
+}
+
+func (s *GlobusUploadsStore) GetAllGlobusUploadsForUser(user string) ([]model.GlobusUploadSchema, error) {
+	return s.guStoreEngine.GetAllGlobusUploadsForUser(user)
+}
