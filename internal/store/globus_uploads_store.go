@@ -23,6 +23,7 @@ func (s *GlobusUploadsStore) AddGlobusUpload(upload model.AddGlobusUploadModel) 
 	now := time.Now()
 	gupload := model.GlobusUploadSchema{
 		ModelSimple: model.ModelSimple{
+			ID:        upload.ID,
 			Birthtime: now,
 			MTime:     now,
 			OType:     "globus_upload",

@@ -1,7 +1,6 @@
 package storengine
 
 import (
-	"github.com/hashicorp/go-uuid"
 	"github.com/materials-commons/mc/internal/store/model"
 	"github.com/materials-commons/mc/pkg/mc"
 )
@@ -21,11 +20,6 @@ func NewGlobusUploadsMemoryWithDB(db map[string]model.GlobusUploadSchema) *Globu
 }
 
 func (e *GlobusUploadsMemory) AddGlobusUpload(upload model.GlobusUploadSchema) (model.GlobusUploadSchema, error) {
-	var err error
-	if upload.ID, err = uuid.GenerateUUID(); err != nil {
-		return upload, err
-	}
-
 	e.DB[upload.ID] = upload
 	return upload, nil
 }
