@@ -43,8 +43,8 @@ func (l *BackgroundLoader) processLoadFileRequests(c context.Context) {
 
 	// There may have been jobs in process when the server was stopped. Mark those jobs
 	// at not currently being processed, this will cause them to be re-processed.
-	if err := fileloadsStore.MarkAllNotLoading(); err != nil {
-		panic(fmt.Sprintf("Unable to mark current jobs as not loading: %s", err))
+	if err := fileloadsStore.MarkAllNotLoading(); err != nil && errors.Cause(err) != mc.ErrNotFound {
+		fmt.Printf("Unable to mark current jobs as not loading: %s\n", err)
 	}
 
 	// Loop through all file load requests and look for any that are not currently being processed.
