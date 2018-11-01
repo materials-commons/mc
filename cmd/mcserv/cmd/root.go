@@ -21,6 +21,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/labstack/gommon/log"
+	"github.com/materials-commons/mc/pkg/globus"
+
+	"github.com/materials-commons/mc/internal/store/model"
+
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/materials-commons/mc/internal/controllers/api"
@@ -31,6 +36,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
+	m "github.com/materials-commons/mc/internal/middleware"
+
 	r "gopkg.in/gorethink/gorethink.v4"
 )
 
@@ -38,9 +45,18 @@ var (
 	port            int
 	numberOfWorkers int
 	cfgFile         string
-	mcdir           string
-	dbConnection    string
-	dbName          string
+
+	// Materials Commons Object Store path
+	mcdir string
+
+	// Database
+	dbConnection string
+	dbName       string
+
+	// Globus
+	globusEndpointID string
+	globusCCUser     string
+	globusCCToken    string
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -70,8 +86,10 @@ func init() {
 	rootCmd.Flags().StringVarP(&mcdir, "mcdir", "m", "/mcfs/data/materialscommons", "Locations of materials commons repo (MCDIR), can be colon separated list")
 	rootCmd.Flags().StringVarP(&dbConnection, "db-connection", "c", "localhost:28015", "Database connection string (MCDB_CONNECTION)")
 	rootCmd.Flags().StringVarP(&dbName, "db-name", "n", "materialscommons", "Database name to use (MCDB_NAME)")
+
 	setMCDir()
 	setDBParams()
+	setGlobusParams()
 }
 
 func cliCmdRoot(cmd *cobra.Command, args []string) {
@@ -81,10 +99,13 @@ func cliCmdRoot(cmd *cobra.Command, args []string) {
 	db := connectToDB()
 
 	e := setupEcho()
-	setupInternalAPIRoutes(e, db)
 
-	loaderDir := strings.Split(mcdir, ":")[0]
-	backgroundLoader := file.NewBackgroundLoader(loaderDir, numberOfWorkers, db)
+	mcdirFirstEntry := strings.Split(mcdir, ":")[0]
+
+	setupInternalAPIRoutes(e, db)
+	setupAPIRoutes(e, db, mcdirFirstEntry)
+
+	backgroundLoader := file.NewBackgroundLoader(mcdirFirstEntry, numberOfWorkers, db)
 	backgroundLoader.Start(ctx)
 
 	e.Start(fmt.Sprintf(":%d", port))
@@ -158,6 +179,36 @@ func setupInternalAPIRoutes(e *echo.Echo, db store.DB) {
 	g.POST("/getServerStatus", statusController.GetServerStatus).Name = "getServerStatus"
 }
 
+func setupAPIRoutes(e *echo.Echo, db store.DB, mcdir string) {
+	apikey := createAPIKeyMiddleware(db)
+
+	g := e.Group("/api")
+	g.Use(apikey)
+
+	globusClient, err := globus.CreateConfidentialClient(globusCCUser, globusCCToken)
+	if err != nil {
+		log.Fatalf("Unable to create globus client: %s", err)
+	}
+
+	globusController := api.NewGlobusController(db, globusClient, mcdir, globusEndpointID)
+	g.POST("/createGlobusUploadRequest", globusController.CreateGlobusUploadRequest).Name = "createGlobusUploadRequest"
+}
+
+func createAPIKeyMiddleware(db store.DB) echo.MiddlewareFunc {
+	usersStore := db.UsersStore()
+
+	apikeyConfig := m.APIKeyConfig{
+		Skipper: middleware.DefaultSkipper,
+		Keyname: "apikey",
+		Retriever: func(apikey string, c echo.Context) (*model.UserSchema, error) {
+			user, err := usersStore.GetUserByAPIKey(apikey)
+			return &user, err
+		},
+	}
+
+	return m.APIKeyAuth(apikeyConfig)
+}
+
 func setMCDir() {
 	mcdirEnv := os.Getenv("MCDIR")
 	if mcdirEnv != "" {
@@ -174,5 +225,23 @@ func setDBParams() {
 	mcdbConnection := os.Getenv("MCDB_CONNECTION")
 	if mcdbConnection != "" {
 		dbConnection = mcdbConnection
+	}
+}
+
+func setGlobusParams() {
+	globusEndpointID = os.Getenv("MC_CONFIDENTIAL_CLIENT_ENDPOINT")
+	globusCCUser = os.Getenv("MC_CONFIDENTIAL_CLIENT_USER")
+	globusCCToken = os.Getenv("MC_CONFIDENTIAL_CLIENT_PW")
+
+	if globusEndpointID == "" {
+		log.Fatalf("MC_CONFIDENTIAL_CLIENT_ENDPOINT env var is unset")
+	}
+
+	if globusCCUser == "" {
+		log.Fatalf("MC_CONFIDENTIAL_CLIENT_USER env var is unset")
+	}
+
+	if globusCCToken == "" {
+		log.Fatalf("MC_CONFIDENTIAL_CLIENT_PW env var is unset")
 	}
 }
