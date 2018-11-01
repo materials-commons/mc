@@ -2,7 +2,6 @@ package model
 
 import (
 	"github.com/go-ozzo/ozzo-validation"
-	"github.com/go-ozzo/ozzo-validation/is"
 	"github.com/materials-commons/mc/pkg/mc"
 	"github.com/pkg/errors"
 )
@@ -27,7 +26,7 @@ func (m AddFileLoadModel) Validate() error {
 	err := validation.ValidateStruct(&m,
 		validation.Field(&m.ProjectID, validation.Required),
 		validation.Field(&m.Path, validation.Required),
-		validation.Field(&m.Owner, validation.Required, is.Email))
+		validation.Field(&m.Owner, validation.Required, validation.By(IsEmail)))
 	if err != nil {
 		return errors.WithMessage(mc.ErrValidation, err.Error())
 	}
