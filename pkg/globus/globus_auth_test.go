@@ -1,6 +1,7 @@
 package globus_test
 
 import (
+    "os"
 	"crypto/tls"
 	"errors"
 	"fmt"
@@ -11,8 +12,8 @@ import (
 
 func TestGetToken(t *testing.T) {
 	if false {
-		userID := "d8eba3ad-fdd9-468d-95a1-d5c4ff91de3f"
-		userPW := "K3DWTaRt2MT9QzYA+Ttxs++9kea0cUO219wzaElQqP4="
+		userID := os.Getenv("FOO")
+		userPW := os.Getenv("FOO")
 		resp, err := r().
 			SetBasicAuth(userID, userPW).
 			SetQueryParams(map[string]string{
@@ -27,11 +28,11 @@ func TestGetToken(t *testing.T) {
 
 func TestGetTaskList(t *testing.T) {
 	if true {
-		token := "AgxBpPJNQ98VY1Q6zk7gn43Y6rnzBywwJD2VzKlVdDjpQYDvV2u8Cleyd0DG1QlwXk2DM3jDdzjl2YfqGmqqghK134"
+		token := os.Getenv("FOO")
 		resp, err := r().
 			SetAuthToken(token).
 			SetQueryParams(map[string]string{
-				"filter_endpoint": "4e9d8294-bdcd-11e8-8c1e-0a1d4c5c824a",
+				"filter_endpoint": os.Getenv("FOO"),
 				"limit":           "1000",
 			}).
 			Get("https://transfer.api.globus.org/v0.10/endpoint_manager/task_list")
@@ -42,7 +43,7 @@ func TestGetTaskList(t *testing.T) {
 
 func GetIdentities(t *testing.T) {
 	//SetQueryParams(map[string]string{
-	//	"identities": "glenn.tarcea@gmail.com",
+	//	"identities": os.Getenv("FOO"),
 	//	"provision":  "false",
 	//}).
 }
