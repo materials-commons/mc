@@ -1,7 +1,7 @@
 package globus
 
 type Identities struct {
-	Included IncludedProviders `json:"included"`
+	Identities []Identity `json:"identities"`
 }
 
 type IncludedProviders struct {

@@ -175,7 +175,7 @@ func (g *GlobusController) globusSetup(uploadID, path string, globusUser string)
 		return globusIdentityID, aclID, errors.WithMessage(err, fmt.Sprintf("Unable to retrieve globus user from globus api %s", globusUser))
 	}
 
-	globusIdentityID = identities.Included.Identities[0].ID
+	globusIdentityID = identities.Identities[0].ID
 
 	rule := globus.EndpointACLRule{
 		EndpointID:  g.globusEndpointID,
