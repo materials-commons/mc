@@ -73,3 +73,13 @@ type FileLoadsStoreEngine interface {
 	MarkAllNotLoading() error
 	UpdateLoading(id string, loading bool) error
 }
+
+type DataclipsStoreEngine interface {
+	AddDataclip(d model.AddDataclipModel) (model.DataclipSchema, error)
+	DeleteDataclip(id string) error
+	ModifyDataclipAccess(id string) error
+	ModifyDataclipQuery(id string) error
+	GetDataclip(id string) (model.DataclipSchema, error)
+	ModifyDataclipSamples(id string, sampleIDs []string) error
+	ModifyDataclipProcesses(id string, processIDs []string) error
+}

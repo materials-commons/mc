@@ -76,6 +76,11 @@ func RethinkDB(database, address string) error {
 
 		// file loads table
 		r.TableCreate("file_loads"),
+
+		// dataclips table
+		r.TableCreate("dataclips"),
+		r.Table("dataclips").IndexCreate("owner"),
+		r.Table("dataclips").IndexCreate("public"),
 	}
 
 	var errOnExec error
