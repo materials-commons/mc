@@ -34,15 +34,7 @@ func CreateConfidentialClient(ccUser, ccPassword string) (*Client, error) {
 	return c, nil
 }
 
-// Authenticate will authentice with Globus and get a token to use in subsequent calls. The format of
-// the response is:
-//
-// {"access_token":"AgxBpPJNQ98VY1Q6zk7gn43Y6rnzBywwJD2VzKlVdDjpQYDvV2u8Cleyd0DG1QlwXk2DM3jDdzjl2YfqGmqqghK134",
-// "expires_in":172800,
-// "resource_server":"transfer.api.globus.org",
-// "token_type":"Bearer",
-// "other_tokens":[],
-// "scope":"urn:globus:auth:scope:transfer.api.globus.org:all"}
+// Authenticate will authentice with Globus and get a token to use in subsequent calls.
 func (c *Client) Authenticate() error {
 	var authResp struct {
 		Token          string   `json:"access_token"`

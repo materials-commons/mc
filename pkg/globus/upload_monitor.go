@@ -57,6 +57,7 @@ func (m *UploadMonitor) retrieveAndProcessUploads() {
 }
 
 func (m *UploadMonitor) processTransfers(transfers *TransferItems) {
+	//transferItem := transfers.Transfers[0]
 	// 1. Determine upload id from dir path
 
 	// 2. Lookup the upload id
