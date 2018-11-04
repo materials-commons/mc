@@ -10,15 +10,7 @@ import (
 	"gopkg.in/resty.v1"
 )
 
-/*
-{
-  "code": "EndpointNotFound",
-  "message": "No such endpoint '23c1a962-7e68-11e5-ac37-f0def10a689e'",
-  "request_id": "HrbjJy3QJ",
-  "resource": "/endpoint/23c1a962-7e68-11e5-ac37-f0def10a689e"
-}
-*/
-
+// ErrorResponse describes the JSON that Globus responds with when there is an error in an API call
 type ErrorResponse struct {
 	Code      string `json:"code"`
 	Message   string `json:"message"`
