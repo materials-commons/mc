@@ -35,6 +35,12 @@ func (c *UsersCacheByAPIKey) Get(apikey string) (*model.UserSchema, error) {
 	return &user, nil
 }
 
+func (c *UsersCacheByAPIKey) UpdateUser(user model.UserSchema) {
+	c.Lock()
+	c.Cache[user.APIKey] = user
+	c.Unlock()
+}
+
 func (c *UsersCacheByAPIKey) Delete(apikey string) {
 	c.Lock()
 	delete(c.Cache, apikey)
