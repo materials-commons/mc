@@ -169,7 +169,7 @@ func (g *GlobusController) createAndSetupUploadReq(projectID string, user model.
 
 // globusSetup performs a couple of opertions related to globus. It takes the users globus login and translates that into
 // and identity id. The identity id is used to set the ACL on the directory in the end point for materials commons.
-func (g *GlobusController) globusSetup(uploadID, path string, globusUser string) (globusIdentityID string, aclID int, err error) {
+func (g *GlobusController) globusSetup(uploadID, path string, globusUser string) (globusIdentityID string, aclID string, err error) {
 	identities, err := g.client.GetIdentities([]string{globusUser})
 	if err != nil {
 		return globusIdentityID, aclID, errors.WithMessage(err, fmt.Sprintf("Unable to retrieve globus user from globus api %s", globusUser))

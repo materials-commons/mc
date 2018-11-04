@@ -21,7 +21,7 @@ type AddEndpointACLRuleResult struct {
 	Resource  string `json:"resource"`
 	DataType  string `json:"DATA_TYPE"`
 	RequestID string `json:"request_id"`
-	AccessID  int    `json:"access_id"`
+	AccessID  string `json:"access_id"`
 	Message   string `json:"message"`
 }
 

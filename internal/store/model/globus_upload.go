@@ -12,7 +12,7 @@ type GlobusUploadSchema struct {
 	Owner            string `db:"owner" json:"owner" r:"owner"`
 	Path             string `db:"path" json:"path" r:"path"`
 	ProjectID        string `db:"project_id" json:"project_id" r:"project_id"`
-	GlobusAclID      int    `db:"globus_acl_id" json:"globus_acl_id" r:"globus_acl_id"`
+	GlobusAclID      string `db:"globus_acl_id" json:"globus_acl_id" r:"globus_acl_id"`
 	GlobusEndpointID string `db:"globus_endpoint_id" json:"globus_endpoint_id" r:"globus_endpoint_id"`
 	GlobusIdentityID string `db:"globus_identity_id" json:"globus_identity_id" r:"globus_identity_id"`
 }
@@ -22,7 +22,7 @@ type AddGlobusUploadModel struct {
 	Owner            string
 	Path             string
 	ProjectID        string
-	GlobusAclID      int
+	GlobusAclID      string
 	GlobusEndpointID string
 	GlobusIdentityID string
 }
@@ -33,7 +33,7 @@ func (m AddGlobusUploadModel) Validate() error {
 		validation.Field(&m.Owner, validation.Required, validation.By(IsEmail)),
 		validation.Field(&m.Path, validation.Required),
 		validation.Field(&m.ProjectID, validation.Required, is.UUIDv4),
-		validation.Field(&m.GlobusAclID, validation.Required, validation.Min(1)),
+		validation.Field(&m.GlobusAclID, validation.Required),
 		validation.Field(&m.GlobusEndpointID, validation.Required),
 		validation.Field(&m.GlobusIdentityID, validation.Required))
 

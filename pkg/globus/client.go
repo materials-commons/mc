@@ -140,8 +140,8 @@ func (c *Client) AddEndpointACLRule(rule EndpointACLRule) (AddEndpointACLRuleRes
 	return result, err
 }
 
-func (c *Client) DeleteEndpointACLRule(endpointID string, accessID int) (DeleteEndpointACLRuleResult, error) {
-	url := fmt.Sprintf("%s/endpoint/%s/access/%d", transferManagerURLBase, endpointID, accessID)
+func (c *Client) DeleteEndpointACLRule(endpointID string, accessID string) (DeleteEndpointACLRuleResult, error) {
+	url := fmt.Sprintf("%s/endpoint/%s/access/%s", transferManagerURLBase, endpointID, accessID)
 	var result DeleteEndpointACLRuleResult
 	request := r().SetAuthToken(c.token).SetResult(&result)
 	resp, err := request.Delete(url)
