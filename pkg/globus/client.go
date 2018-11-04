@@ -132,6 +132,9 @@ func (c *Client) AddEndpointACLRule(rule EndpointACLRule) (AddEndpointACLRuleRes
 		return result, nil
 	}
 
+	fmt.Println(resp.RawResponse.StatusCode)
+	fmt.Println(resp)
+
 	err = getAPIError(resp, err)
 	if err == ErrGlobusAuth {
 		err = c.reauthAndRedoPost(request, url, true)
@@ -210,7 +213,7 @@ func getAPIError(resp *resty.Response, err error) error {
 	case resp.RawResponse.StatusCode == 401:
 		return ErrGlobusAuth
 	case resp.RawResponse.StatusCode > 299:
-		return errors.New("unable to connect")
+		return ToErrorFromResponse(resp)
 	default:
 		return nil
 	}

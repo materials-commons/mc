@@ -25,7 +25,7 @@ func TestACLs(t *testing.T) {
 
 	rule := globus.EndpointACLRule{
 		EndpointID:  testEndpointID,
-		Path:        "",
+		Path:        "/~/globus-staging",
 		IdentityID:  identities.Identities[0].ID,
 		Permissions: "rw",
 	}
