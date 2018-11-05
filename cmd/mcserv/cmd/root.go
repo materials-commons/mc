@@ -98,11 +98,19 @@ func cliCmdRoot(cmd *cobra.Command, args []string) {
 
 	mcdirFirstEntry := strings.Split(mcdir, ":")[0]
 
+	globusClient, err := globus.CreateConfidentialClient(globusCCUser, globusCCToken)
+	if err != nil {
+		log.Fatalf("Unable to create globus client: %s", err)
+	}
+
 	setupInternalAPIRoutes(e, db)
-	setupAPIRoutes(e, db, mcdirFirstEntry)
+	setupAPIRoutes(e, db, mcdirFirstEntry, globusClient)
 
 	backgroundLoader := file.NewBackgroundLoader(mcdirFirstEntry, numberOfWorkers, db)
 	backgroundLoader.Start(ctx)
+
+	globusMonitor := globus.NewUploadMonitor(globusClient, globusEndpointID, db)
+	globusMonitor.Start(ctx)
 
 	e.Start(fmt.Sprintf(":%d", port))
 }
@@ -149,18 +157,13 @@ func setupInternalAPIRoutes(e *echo.Echo, db store.DB) {
 	g.POST("/getServerStatus", statusController.GetServerStatus).Name = "getServerStatus"
 }
 
-func setupAPIRoutes(e *echo.Echo, db store.DB, mcdir string) {
+func setupAPIRoutes(e *echo.Echo, db store.DB, mcdir string, client *globus.Client) {
 	apikey := createAPIKeyMiddleware(db)
 
 	g := e.Group("/api")
 	g.Use(apikey)
 
-	globusClient, err := globus.CreateConfidentialClient(globusCCUser, globusCCToken)
-	if err != nil {
-		log.Fatalf("Unable to create globus client: %s", err)
-	}
-
-	globusController := api.NewGlobusController(db, globusClient, mcdir, globusEndpointID)
+	globusController := api.NewGlobusController(db, client, mcdir, globusEndpointID)
 	g.POST("/createGlobusUploadRequest", globusController.CreateGlobusUploadRequest).Name = "createGlobusUploadRequest"
 	g.POST("/getGlobusUploadRequest", globusController.GetGlobusUploadRequest).Name = "getGlobusUploadRequest"
 	g.POST("/listGlobusUploadRequests", globusController.ListGlobusUploadRequests).Name = "listGlobusUploadRequests"
