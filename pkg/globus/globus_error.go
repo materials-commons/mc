@@ -18,11 +18,11 @@ type ErrorResponse struct {
 	Resource  string `json:"resource"`
 }
 
-func ToErrorFromResponse(resp *resty.Response) error {
+func ToErrorFromResponse(resp *resty.Response) (*ErrorResponse, error) {
 	var errorResponse ErrorResponse
 	if err := json.Unmarshal(resp.Body(), &errorResponse); err != nil {
-		return errors.WithMessage(mc.ErrGlobusAPI, fmt.Sprintf("(HTTP Status: %d)- unable to parse json error response: %s", resp.RawResponse.StatusCode, err))
+		return nil, errors.WithMessage(mc.ErrGlobusAPI, fmt.Sprintf("(HTTP Status: %d)- unable to parse json error response: %s", resp.RawResponse.StatusCode, err))
 	}
 
-	return errors.WithMessage(mc.ErrGlobusAPI, fmt.Sprintf("(HTTP Status: %d)- %s: %s", resp.RawResponse.StatusCode, errorResponse.Code, errorResponse.Message))
+	return &errorResponse, errors.WithMessage(mc.ErrGlobusAPI, fmt.Sprintf("(HTTP Status: %d)- %s: %s", resp.RawResponse.StatusCode, errorResponse.Code, errorResponse.Message))
 }

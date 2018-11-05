@@ -13,9 +13,10 @@ import (
 var ErrGlobusAuth = errors.New("globus auth")
 
 type Client struct {
-	token      string
-	ccUser     string
-	ccPassword string
+	token               string
+	ccUser              string
+	ccPassword          string
+	globusErrorResponse *ErrorResponse
 }
 
 const authURLBase = "https://auth.globus.org/v2"
@@ -52,7 +53,7 @@ func (c *Client) Authenticate() error {
 			"scope":      "urn:globus:auth:scope:transfer.api.globus.org:all",
 		}).Post(fmt.Sprintf("%s/oauth2/token", authURLBase))
 
-	if err := getAPIError(resp, err); err != nil {
+	if err := c.getAPIError(resp, err); err != nil {
 		return err
 	}
 
@@ -74,7 +75,7 @@ func (c *Client) GetEndpointTaskList(endpointID string, filters map[string]strin
 	url := fmt.Sprintf("%s/endpoint_manager/task_list", transferManagerURLBase)
 
 	resp, err := request.Get(url)
-	err = getAPIError(resp, err)
+	err = c.getAPIError(resp, err)
 	if err == ErrGlobusAuth {
 		err = c.reauthAndRedoGet(request, url)
 	}
@@ -90,7 +91,7 @@ func (c *Client) GetTaskSuccessfulTransfers(taskID string, marker int) (Transfer
 	url := fmt.Sprintf("%s/endpoint_manager/task/%s/successful_transfers", transferManagerURLBase, taskID)
 
 	resp, err := request.Get(url)
-	err = getAPIError(resp, err)
+	err = c.getAPIError(resp, err)
 	if err == ErrGlobusAuth {
 		err = c.reauthAndRedoGet(request, url)
 	}
@@ -105,7 +106,7 @@ func (c *Client) GetIdentities(users []string) (Identities, error) {
 	request := r().SetAuthToken(c.token).SetResult(&identities).SetQueryParam("usernames", usernames)
 
 	resp, err := request.Get(url)
-	err = getAPIError(resp, err)
+	err = c.getAPIError(resp, err)
 	if err == ErrGlobusAuth {
 		err = c.reauthAndRedoGet(request, url)
 	}
@@ -135,7 +136,7 @@ func (c *Client) AddEndpointACLRule(rule EndpointACLRule) (AddEndpointACLRuleRes
 	fmt.Println(resp.RawResponse.StatusCode)
 	fmt.Println(resp)
 
-	err = getAPIError(resp, err)
+	err = c.getAPIError(resp, err)
 	if err == ErrGlobusAuth {
 		err = c.reauthAndRedoPost(request, url, true)
 	}
@@ -154,12 +155,16 @@ func (c *Client) DeleteEndpointACLRule(endpointID string, accessID string) (Dele
 		return result, nil
 	}
 
-	err = getAPIError(resp, err)
+	err = c.getAPIError(resp, err)
 	if err == ErrGlobusAuth {
 		err = c.reauthAndRedoDelete(request, url, true)
 	}
 
 	return result, err
+}
+
+func (c *Client) GetGlobusErrorResponse() *ErrorResponse {
+	return c.globusErrorResponse
 }
 
 func (c *Client) reauthAndRedoGet(request *resty.Request, url string) error {
@@ -168,7 +173,7 @@ func (c *Client) reauthAndRedoGet(request *resty.Request, url string) error {
 	}
 
 	resp, err := request.Get(url)
-	return getAPIError(resp, err)
+	return c.getAPIError(resp, err)
 }
 
 func (c *Client) reauthAndRedoPost(request *resty.Request, url string, notError409 bool) error {
@@ -182,7 +187,7 @@ func (c *Client) reauthAndRedoPost(request *resty.Request, url string, notError4
 		return nil
 	}
 
-	return getAPIError(resp, err)
+	return c.getAPIError(resp, err)
 }
 
 func (c *Client) reauthAndRedoDelete(request *resty.Request, url string, notError404 bool) error {
@@ -196,7 +201,7 @@ func (c *Client) reauthAndRedoDelete(request *resty.Request, url string, notErro
 		return nil
 	}
 
-	return getAPIError(resp, err)
+	return c.getAPIError(resp, err)
 }
 
 var tlsConfig = tls.Config{InsecureSkipVerify: true}
@@ -206,14 +211,17 @@ func r() *resty.Request {
 	return resty.SetTLSClientConfig(&tlsConfig).R()
 }
 
-func getAPIError(resp *resty.Response, err error) error {
+func (c *Client) getAPIError(resp *resty.Response, err error) error {
+	var err2 error
+	c.globusErrorResponse = nil
 	switch {
 	case err != nil:
 		return err
 	case resp.RawResponse.StatusCode == 401:
 		return ErrGlobusAuth
 	case resp.RawResponse.StatusCode > 299:
-		return ToErrorFromResponse(resp)
+		c.globusErrorResponse, err2 = ToErrorFromResponse(resp)
+		return err2
 	default:
 		return nil
 	}
