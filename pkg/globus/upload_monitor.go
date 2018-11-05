@@ -52,14 +52,17 @@ func (m *UploadMonitor) retrieveAndProcessUploads(c context.Context) {
 	})
 
 	if err != nil {
+		log.Infof("globus.GetEndpointTaskList returned the following error: %s - %#v", err, m.client.GetGlobusErrorResponse())
 		return
 	}
 
 	for _, task := range tasks.Tasks {
+		log.Infof("Getting successful transfers for Globus Task %s", task.TaskID)
 		transfers, err := m.client.GetTaskSuccessfulTransfers(task.TaskID, 0)
 
 		switch {
 		case err != nil:
+			log.Infof("globus.GetTaskSuccessfulTransfers(%d) returned error %s - %#v", task.TaskID, err, m.client.GetGlobusErrorResponse())
 			continue
 		case len(transfers.Transfers) == 0:
 			// No files transferred in this request
@@ -103,6 +106,8 @@ func (m *UploadMonitor) processTransfers(transfers *TransferItems) {
 		return
 	}
 
+	log.Infof("Process globus upload %s", id)
+
 	// At this point we have a globus upload. What we are going to do is remove the ACL on the directory
 	// so no more files can be uploaded to it. Then we are going to add that directory to the list of
 	// directories to upload. Then the file loader will eventually get around to loading these files. In
@@ -119,9 +124,11 @@ func (m *UploadMonitor) processTransfers(transfers *TransferItems) {
 		Path:      globusUpload.Path,
 	}
 
-	if _, err := m.fileLoads.AddFileLoad(flAdd); err != nil {
-		log.Infof("Unable to add upload request: %s", err)
+	if fl, err := m.fileLoads.AddFileLoad(flAdd); err != nil {
+		log.Infof("Unable to add file load request: %s", err)
 		return
+	} else {
+		log.Infof("Created file load (id: %s) for globus upload %s", fl.ID, id)
 	}
 
 	// Delete the globus upload request as we have now turned it into a file loading request
