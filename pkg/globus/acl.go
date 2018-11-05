@@ -6,7 +6,7 @@ type endpointACLRequest struct {
 	Principal     string `json:"principal"`
 	Path          string `json:"path"`
 	Permissions   string `json:"permissions"`
-	//NotifyEmail   string `json:"notify_email"`
+	NotifyEmail   string `json:"notify_email,omitempty"`
 }
 
 type EndpointACLRule struct {
