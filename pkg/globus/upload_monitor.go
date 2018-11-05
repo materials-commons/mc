@@ -2,19 +2,29 @@ package globus
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
+
+	"github.com/materials-commons/mc/internal/store"
 
 	"github.com/apex/log"
 )
 
 type UploadMonitor struct {
-	client     *Client
-	endpointID string
+	client        *Client
+	globusUploads *store.GlobusUploadsStore
+	fileLoads     *store.FileLoadsStore
+	endpointID    string
 }
 
-func NewUploadMonitor(client *Client, endpointID string) *UploadMonitor {
-	return &UploadMonitor{client: client, endpointID: endpointID}
+func NewUploadMonitor(client *Client, endpointID string, db store.DB) *UploadMonitor {
+	return &UploadMonitor{
+		client:        client,
+		endpointID:    endpointID,
+		globusUploads: db.GlobusUploadsStore(),
+		fileLoads:     db.FileLoadsStore(),
+	}
 }
 
 func (m *UploadMonitor) Start(c context.Context) {
@@ -65,7 +75,7 @@ func (m *UploadMonitor) processTransfers(transfers *TransferItems) {
 	// Destination path will have the following format:
 	// /__globus_uploads/<id of upload request>/...
 	// So the second entry in the array is the id in the globus_uploads table we want to look up.
-	pieces := strings.Split(transferItem.DestinationPath, "/")[1]
+	pieces := strings.Split(transferItem.DestinationPath, "/")
 	if len(pieces) < 3 {
 		// sanity check, because the destination path should at least be /__globus_uploads/<id>/....
 		// thus should at least have 3 entries in it
@@ -73,10 +83,13 @@ func (m *UploadMonitor) processTransfers(transfers *TransferItems) {
 		return
 	}
 
-	/*
+	id := pieces[1]
+	globusUpload, err := m.globusUploads.GetGlobusUpload(id)
+	if err != nil {
+		log.Infof("Unable to find globus upload request (%s): %s", id, err)
+	}
 
-		internal/controllers/api/users_controller.go
-	*/
+	fmt.Println(globusUpload)
 
 	// 1. Determine upload id from dir path
 
