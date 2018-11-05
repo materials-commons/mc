@@ -18,7 +18,9 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/apex/log"
@@ -112,7 +114,26 @@ func cliCmdRoot(cmd *cobra.Command, args []string) {
 	globusMonitor := globus.NewUploadMonitor(globusClient, globusEndpointID, db)
 	globusMonitor.Start(ctx)
 
-	e.Start(fmt.Sprintf(":%d", port))
+	go func() {
+		if err := e.Start(fmt.Sprintf(":%d", port)); err != nil {
+			log.Infof("Shutting down mcserv: %s", err)
+		}
+	}()
+
+	quit := make(chan os.Signal)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Infof("Received signal, shutting down mcserv")
+	cancel() // Have all the monitors start their shutdown process
+
+	// Wait 2 seconds for everything to shutdown
+	select {
+	case <-time.After(2 * time.Second):
+	}
+
+	if err := e.Shutdown(ctx); err != nil {
+		log.Fatalf("Error shutting down server: %s", err)
+	}
 }
 
 func connectToDB() store.DB {

@@ -37,6 +37,7 @@ func (m *UploadMonitor) monitorAndProcessUploads(c context.Context) {
 		m.retrieveAndProcessUploads(c)
 		select {
 		case <-c.Done():
+			log.Infof("Shutting down globus monitoring...")
 			return
 		case <-time.After(10 * time.Second):
 		}
@@ -71,6 +72,7 @@ func (m *UploadMonitor) retrieveAndProcessUploads(c context.Context) {
 		// Check if we should stop processing requests
 		select {
 		case <-c.Done():
+			break
 		}
 	}
 }
@@ -84,12 +86,11 @@ func getLastWeek() string {
 func (m *UploadMonitor) processTransfers(transfers *TransferItems) {
 	transferItem := transfers.Transfers[0]
 
-	// Destination path will have the following format:
-	// /__globus_uploads/<id of upload request>/...
+	// Destination path will have the following format: /__globus_uploads/<id of upload request>/...rest of path...
 	// So the second entry in the array is the id in the globus_uploads table we want to look up.
 	pieces := strings.Split(transferItem.DestinationPath, "/")
 	if len(pieces) < 3 {
-		// sanity check, because the destination path should at least be /__globus_uploads/<id>/....
+		// sanity check, because the destination path should at least be /__globus_uploads/<id>/...rest of path...
 		// thus should at least have 3 entries in it
 		log.Infof("Invalid globus DestinationPath: %s", transferItem.DestinationPath)
 		return
@@ -123,7 +124,9 @@ func (m *UploadMonitor) processTransfers(transfers *TransferItems) {
 		return
 	}
 
-	// Delete the globus upload request as we have not turned it into a file loading request
-	// and won't have to process this request again.
+	// Delete the globus upload request as we have now turned it into a file loading request
+	// and won't have to process this request again. If the server stops while loading the
+	// request or their is some other failure, the file loader will take care of picking up
+	// where it left off.
 	m.globusUploads.DeleteGlobusUpload(id)
 }

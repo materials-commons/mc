@@ -99,6 +99,7 @@ func (l *BackgroundLoader) processLoadFileRequests(c context.Context) {
 		select {
 		case <-time.After(100 * time.Millisecond):
 		case <-c.Done():
+			log.Infof("Shutting down file loading...")
 			return
 		}
 	}
