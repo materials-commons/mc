@@ -25,15 +25,6 @@ type AddEndpointACLRuleResult struct {
 	Message   string `json:"message"`
 }
 
-/*
-{
-    "message": "Access rule '123' deleted successfully",
-    "code": "Deleted",
-    "resource": "/endpoint/user#ep1/access/123",
-    "DATA_TYPE": "result",
-    "request_id": "ABCdef789"
-}
-*/
 type DeleteEndpointACLRuleResult struct {
 	Code      string `json:"code"`
 	DataType  string `json:"DATA_TYPE"`
