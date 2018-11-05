@@ -2,11 +2,11 @@ package file
 
 import (
 	"context"
-	"log"
 	"os"
 	"sync"
 	"time"
 
+	"github.com/apex/log"
 	"github.com/materials-commons/mc/internal/store/model"
 	"github.com/materials-commons/mc/pkg/mc"
 
@@ -44,7 +44,7 @@ func (l *BackgroundLoader) processLoadFileRequests(c context.Context) {
 	// There may have been jobs in process when the server was stopped. Mark those jobs
 	// at not currently being processed, this will cause them to be re-processed.
 	if err := fileloadsStore.MarkAllNotLoading(); err != nil && errors.Cause(err) != mc.ErrNotFound {
-		log.Printf("Unable to mark current jobs as not loading: %s\n", err)
+		log.Infof("Unable to mark current jobs as not loading: %s\n", err)
 	}
 
 	// Loop through all file load requests and look for any that are not currently being processed.
@@ -52,7 +52,7 @@ func (l *BackgroundLoader) processLoadFileRequests(c context.Context) {
 		requests, err := fileloadsStore.GetAllFileLoads()
 		//fmt.Printf("processing file loads %#v: %s\n", requests, err)
 		if err != nil && errors.Cause(err) != mc.ErrNotFound {
-			log.Println("Error retrieving requests:", err)
+			log.Infof("Error retrieving requests: %s", err)
 		}
 
 		for _, req := range requests {
@@ -69,14 +69,14 @@ func (l *BackgroundLoader) processLoadFileRequests(c context.Context) {
 				continue
 			}
 
-			log.Printf("processing request %#v\n", req)
+			log.Infof("processing request %#v\n", req)
 
 			// If we are here then the current request is not being processed
 			// and it is for a project that is *not* currently being processed.
 
 			// Mark job as loading so we won't attempt to load this request a second time
 			if err := fileloadsStore.UpdateLoading(req.ID, true); err != nil {
-				log.Printf("Unable to update file load request %s: %s", req.ID, err)
+				log.Infof("Unable to update file load request %s: %s", req.ID, err)
 
 				// If the job cannot be marked as loading then skip processing it
 				continue

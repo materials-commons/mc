@@ -21,7 +21,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/labstack/gommon/log"
+	"github.com/apex/log"
+
 	"github.com/materials-commons/mc/pkg/globus"
 
 	"github.com/materials-commons/mc/internal/store/model"

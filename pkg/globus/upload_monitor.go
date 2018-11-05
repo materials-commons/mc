@@ -2,7 +2,10 @@ package globus
 
 import (
 	"context"
+	"strings"
 	"time"
+
+	"github.com/apex/log"
 )
 
 type UploadMonitor struct {
@@ -57,7 +60,24 @@ func (m *UploadMonitor) retrieveAndProcessUploads() {
 }
 
 func (m *UploadMonitor) processTransfers(transfers *TransferItems) {
-	//transferItem := transfers.Transfers[0]
+	transferItem := transfers.Transfers[0]
+
+	// Destination path will have the following format:
+	// /__globus_uploads/<id of upload request>/...
+	// So the second entry in the array is the id in the globus_uploads table we want to look up.
+	pieces := strings.Split(transferItem.DestinationPath, "/")[1]
+	if len(pieces) < 3 {
+		// sanity check, because the destination path should at least be /__globus_uploads/<id>/....
+		// thus should at least have 3 entries in it
+		log.Infof("Invalid globus DestinationPath: %s", transferItem.DestinationPath)
+		return
+	}
+
+	/*
+
+		internal/controllers/api/users_controller.go
+	*/
+
 	// 1. Determine upload id from dir path
 
 	// 2. Lookup the upload id
