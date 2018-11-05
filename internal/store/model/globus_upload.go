@@ -29,7 +29,7 @@ type AddGlobusUploadModel struct {
 
 func (m AddGlobusUploadModel) Validate() error {
 	err := validation.ValidateStruct(&m,
-		validation.Field(&m.ID, validation.Required, is.UUIDv4),
+		validation.Field(&m.ID, validation.Required),
 		validation.Field(&m.Owner, validation.Required, validation.By(IsEmail)),
 		validation.Field(&m.Path, validation.Required),
 		validation.Field(&m.ProjectID, validation.Required, is.UUIDv4),
