@@ -44,9 +44,9 @@ func (m *UploadMonitor) monitorAndProcessUploads(c context.Context) {
 }
 
 func (m *UploadMonitor) retrieveAndProcessUploads(c context.Context) {
-	yesterday := ""
+	lastWeek := getLastWeek()
 	tasks, err := m.client.GetEndpointTaskList(m.endpointID, map[string]string{
-		"filter_completion_time": yesterday,
+		"filter_completion_time": lastWeek,
 		"filter_status":          "SUCCEEDED",
 	})
 
@@ -75,6 +75,12 @@ func (m *UploadMonitor) retrieveAndProcessUploads(c context.Context) {
 	}
 }
 
+func getLastWeek() string {
+	now := time.Now()
+	now.AddDate(0, 0, -7)
+	return now.Format("2006-01-02")
+}
+
 func (m *UploadMonitor) processTransfers(transfers *TransferItems) {
 	transferItem := transfers.Transfers[0]
 
@@ -95,6 +101,12 @@ func (m *UploadMonitor) processTransfers(transfers *TransferItems) {
 		// Upload is already being processed
 		return
 	}
+
+	// At this point we have a globus upload. What we are going to do is remove the ACL on the directory
+	// so no more files can be uploaded to it. Then we are going to add that directory to the list of
+	// directories to upload. Then the file loader will eventually get around to loading these files. In
+	// the meantime since we've now created a file load from this globus upload we can delete the entry
+	// from the globus_uploads table.
 
 	if _, err := m.client.DeleteEndpointACLRule(m.endpointID, globusUpload.GlobusAclID); err != nil {
 		log.Infof("Unable to delete ACL: %s", err)
