@@ -73,5 +73,4 @@ func (e *GlobusUploadsRethinkdb) GetAllGlobusUploadsForUser(user string) ([]mode
 
 	err = res.All(uploads)
 	return uploads, err
-
 }
