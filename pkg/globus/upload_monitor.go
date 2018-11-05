@@ -2,9 +2,10 @@ package globus
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"time"
+
+	"github.com/materials-commons/mc/internal/store/model"
 
 	"github.com/materials-commons/mc/internal/store"
 
@@ -33,7 +34,7 @@ func (m *UploadMonitor) Start(c context.Context) {
 
 func (m *UploadMonitor) monitorAndProcessUploads(c context.Context) {
 	for {
-		m.retrieveAndProcessUploads()
+		m.retrieveAndProcessUploads(c)
 		select {
 		case <-c.Done():
 			return
@@ -42,7 +43,7 @@ func (m *UploadMonitor) monitorAndProcessUploads(c context.Context) {
 	}
 }
 
-func (m *UploadMonitor) retrieveAndProcessUploads() {
+func (m *UploadMonitor) retrieveAndProcessUploads(c context.Context) {
 	yesterday := ""
 	tasks, err := m.client.GetEndpointTaskList(m.endpointID, map[string]string{
 		"filter_completion_time": yesterday,
@@ -66,6 +67,11 @@ func (m *UploadMonitor) retrieveAndProcessUploads() {
 			// Files were transferred for this request
 			m.processTransfers(&transfers)
 		}
+
+		// Check if we should stop processing requests
+		select {
+		case <-c.Done():
+		}
 	}
 }
 
@@ -86,40 +92,26 @@ func (m *UploadMonitor) processTransfers(transfers *TransferItems) {
 	id := pieces[1]
 	globusUpload, err := m.globusUploads.GetGlobusUpload(id)
 	if err != nil {
-		log.Infof("Unable to find globus upload request (%s): %s", id, err)
+		// Upload is already being processed
+		return
 	}
 
-	fmt.Println(globusUpload)
+	if _, err := m.client.DeleteEndpointACLRule(m.endpointID, globusUpload.GlobusAclID); err != nil {
+		log.Infof("Unable to delete ACL: %s", err)
+	}
 
-	// 1. Determine upload id from dir path
+	flAdd := model.AddFileLoadModel{
+		ProjectID: globusUpload.ProjectID,
+		Owner:     globusUpload.Owner,
+		Path:      globusUpload.Path,
+	}
 
-	// 2. Lookup the upload id
-	// 2.a if upload id is already being processed then skip it
-	// 2.b other mark it as being processed and delete ACL (acl id in the upload record)
+	if _, err := m.fileLoads.AddFileLoad(flAdd); err != nil {
+		log.Infof("Unable to add upload request: %s", err)
+		return
+	}
 
-	// 4. Load the files
-	// 5. Remove the top level directory
-
-	// Some general thoughts -
-	// Most of this logic is already in place in the background loader, so could just
-	// add the item into the file uploads table and let the background loader take
-	// care of loading the files.
-	//
-	// If so, then logic is really simple:
-	//     Look in globus table for request
-	//     if no found then just ignore
-	//     else {
-	//        Delete ACL
-	//        Add into file uploads table
-	//        Delete globus request in table
-	//     }
-	//
-	// With this logic all cancellation, restarts, etc... will be handled in the file loading logic
-	// which already exists.
-
-	// GlobusResponse({
-	//    'DATA_TYPE': 'successful_transfer',
-	//    'destination_path': '/__upload_staging/transfer-5ac039c9-6254-4b39-90db-32b89ba6b5a9/hello.titan.txt',
-	//    'source_path': None
-	// })
+	// Delete the globus upload request as we have not turned it into a file loading request
+	// and won't have to process this request again.
+	m.globusUploads.DeleteGlobusUpload(id)
 }
