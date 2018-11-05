@@ -152,7 +152,8 @@ func (g *GlobusController) createAndSetupUploadReq(projectID string, user model.
 		return resp, err
 	}
 
-	gUploadModel.GlobusIdentityID, gUploadModel.GlobusAclID, err = g.globusSetup(gUploadModel.ID, gUploadModel.Path, user.GlobusUser)
+	globusPath := fmt.Sprintf("/__globus_uploads/%s/", gUploadModel.ID)
+	gUploadModel.GlobusIdentityID, gUploadModel.GlobusAclID, err = g.globusSetup(gUploadModel.ID, globusPath, user.GlobusUser)
 	if err != nil {
 		return resp, err
 	}
