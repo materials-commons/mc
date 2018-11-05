@@ -17,8 +17,8 @@ func testUsersStoreEngineAddUser(t *testing.T, e storengine.UsersStoreEngine) {
 		shouldFail bool
 		name       string
 	}{
-		{user: model.UserSchema{ModelSimple: model.ModelSimple{ID: "tusernew@test.com"}}, shouldFail: false, name: "New user"},
-		{user: model.UserSchema{ModelSimple: model.ModelSimple{ID: "tuser@test.com"}}, shouldFail: true, name: "Existing user"},
+		{user: model.UserSchema{ID: "tusernew@test.com"}, shouldFail: false, name: "New user"},
+		{user: model.UserSchema{ID: "tuser@test.com"}, shouldFail: true, name: "Existing user"},
 	}
 
 	storengine.AddDefaultUsersToStoreEngine(t, e)
