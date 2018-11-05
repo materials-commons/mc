@@ -15,7 +15,6 @@ type GlobusUploadSchema struct {
 	GlobusAclID      string `db:"globus_acl_id" json:"globus_acl_id" r:"globus_acl_id"`
 	GlobusEndpointID string `db:"globus_endpoint_id" json:"globus_endpoint_id" r:"globus_endpoint_id"`
 	GlobusIdentityID string `db:"globus_identity_id" json:"globus_identity_id" r:"globus_identity_id"`
-	InProcess        bool   `db:"in_process" json:"in_process" r:"in_process"`
 }
 
 type AddGlobusUploadModel struct {
