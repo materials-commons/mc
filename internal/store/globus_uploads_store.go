@@ -1,6 +1,7 @@
 package store
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/materials-commons/mc/internal/store/model"
@@ -16,18 +17,19 @@ func NewGlobusUploadsStore(e storengine.GlobusUploadsStoreEngine) *GlobusUploads
 }
 
 func (s *GlobusUploadsStore) AddGlobusUpload(upload model.AddGlobusUploadModel) (model.GlobusUploadSchema, error) {
+	fmt.Println("AddGlobusUpload")
 	if err := upload.Validate(); err != nil {
 		return model.GlobusUploadSchema{}, err
 	}
 
 	now := time.Now()
 	gupload := model.GlobusUploadSchema{
-		ModelSimple: model.ModelSimple{
-			ID:        upload.ID,
+		ModelSimpleNoID: model.ModelSimpleNoID{
 			Birthtime: now,
 			MTime:     now,
 			OType:     "globus_upload",
 		},
+		ID:               upload.ID,
 		Owner:            upload.Owner,
 		Path:             upload.Path,
 		ProjectID:        upload.ProjectID,
@@ -36,6 +38,7 @@ func (s *GlobusUploadsStore) AddGlobusUpload(upload model.AddGlobusUploadModel) 
 		GlobusIdentityID: upload.GlobusIdentityID,
 	}
 
+	fmt.Printf("Adding globus upload: %#v\n", gupload)
 	return s.guStoreEngine.AddGlobusUpload(gupload)
 }
 

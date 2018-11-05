@@ -17,3 +17,9 @@ type ModelSimple struct {
 	MTime     time.Time `db:"mtime" json:"mtime" r:"mtime"`
 	OType     string    `db:"otype" json:"otype" r:"otype"`
 }
+
+type ModelSimpleNoID struct {
+	Birthtime time.Time `db:"birthtime" json:"birthtime" r:"birthtime"`
+	MTime     time.Time `db:"mtime" json:"mtime" r:"mtime"`
+	OType     string    `db:"otype" json:"otype" r:"otype"`
+}

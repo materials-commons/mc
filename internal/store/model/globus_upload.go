@@ -8,7 +8,8 @@ import (
 )
 
 type GlobusUploadSchema struct {
-	ModelSimple
+	ModelSimpleNoID
+	ID               string `db:"id" json:"id" r:"id"`
 	Owner            string `db:"owner" json:"owner" r:"owner"`
 	Path             string `db:"path" json:"path" r:"path"`
 	ProjectID        string `db:"project_id" json:"project_id" r:"project_id"`

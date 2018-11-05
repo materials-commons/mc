@@ -9,7 +9,8 @@ import (
 )
 
 type UserSchema struct {
-	ModelSimple
+	ModelSimpleNoID
+	ID              string    `db:"id" json:"id" r:"id"`
 	Admin           bool      `db:"admin" json:"admin" r:"admin"`
 	APIKey          string    `db:"apikey" json:"apikey" r:"apikey"`
 	BetaUser        bool      `db:"beta_user" json:"beta_user" r:"beta_user"`

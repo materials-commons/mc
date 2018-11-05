@@ -86,12 +86,12 @@ func prepareUser(userModel model.AddUserModel) (model.UserSchema, error) {
 	now := time.Now()
 
 	u := model.UserSchema{
-		ModelSimple: model.ModelSimple{
+		ModelSimpleNoID: model.ModelSimpleNoID{
 			Birthtime: now,
 			MTime:     now,
-			ID:        userModel.Email,
 			OType:     "user",
 		},
+		ID:       userModel.Email,
 		Fullname: userModel.Fullname,
 		Email:    userModel.Email,
 	}
