@@ -38,7 +38,7 @@ type Task struct {
 	VerifyChecksum             bool   `json:"verify_checksum"`
 	DeleteDestinationExtra     bool   `json:"delete_destination_extra"`
 	RecursiveSymlinks          string `json:"recursive_symlinks"`
-	PreserveTimestamp          string `json:"preserve_timestamp"`
+	PreserveTimestamp          bool   `json:"preserve_timestamp"`
 	Command                    string `json:"command"`
 	HistoryDeleted             bool   `json:"history_deleted"`
 	Faults                     int    `json:"faults"`
