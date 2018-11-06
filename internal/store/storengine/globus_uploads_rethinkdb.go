@@ -57,7 +57,7 @@ func (e *GlobusUploadsRethinkdb) GetAllGlobusUploads() ([]model.GlobusUploadSche
 
 	defer res.Close()
 
-	err = res.All(uploads)
+	err = res.All(&uploads)
 	return uploads, err
 }
 
@@ -71,6 +71,6 @@ func (e *GlobusUploadsRethinkdb) GetAllGlobusUploadsForUser(user string) ([]mode
 
 	defer res.Close()
 
-	err = res.All(uploads)
+	err = res.All(&uploads)
 	return uploads, err
 }

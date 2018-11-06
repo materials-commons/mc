@@ -97,7 +97,7 @@ func (l *BackgroundLoader) processLoadFileRequests(c context.Context) {
 		// Sleep for 10 seconds before getting the next set of loading requests. Ten seconds is an
 		// somewhat arbitrary value chosen to balance time to start processing and load on the system.
 		select {
-		case <-time.After(100 * time.Millisecond):
+		case <-time.After(10 * time.Second):
 		case <-c.Done():
 			log.Infof("Shutting down file loading...")
 			return

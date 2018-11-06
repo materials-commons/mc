@@ -57,7 +57,7 @@ func (e *FileLoadsRethinkdb) GetAllFileLoads() ([]model.FileLoadSchema, error) {
 	defer res.Close()
 
 	var uploads []model.FileLoadSchema
-	err = res.All(uploads)
+	err = res.All(&uploads)
 	return uploads, err
 }
 
