@@ -45,7 +45,8 @@ func (m *UploadMonitor) monitorAndProcessUploads(c context.Context) {
 }
 
 func (m *UploadMonitor) retrieveAndProcessUploads(c context.Context) {
-	lastWeek := getLastWeek()
+	// Build a filter to get all successful tasks that completed in the last week
+	lastWeek := time.Now().AddDate(0, 0, -7).Format("2006-01-02")
 	tasks, err := m.client.GetEndpointTaskList(m.endpointID, map[string]string{
 		"filter_completion_time": lastWeek,
 		"filter_status":          "SUCCEEDED",
@@ -80,26 +81,21 @@ func (m *UploadMonitor) retrieveAndProcessUploads(c context.Context) {
 	}
 }
 
-func getLastWeek() string {
-	now := time.Now()
-	now.AddDate(0, 0, -7)
-	return now.Format("2006-01-02")
-}
-
 func (m *UploadMonitor) processTransfers(transfers *TransferItems) {
 	transferItem := transfers.Transfers[0]
 
 	// Destination path will have the following format: /__globus_uploads/<id of upload request>/...rest of path...
-	// So the second entry in the array is the id in the globus_uploads table we want to look up.
+	// Split will return ["", "__globus_uploads", "<id of upload request", ....]
+	// So the 3rd entry in the array is the id in the globus_uploads table we want to look up.
 	pieces := strings.Split(transferItem.DestinationPath, "/")
-	if len(pieces) < 3 {
+	if len(pieces) < 4 {
 		// sanity check, because the destination path should at least be /__globus_uploads/<id>/...rest of path...
-		// thus should at least have 3 entries in it
+		// it should at least have 4 entries in it (See Split return description above)
 		log.Infof("Invalid globus DestinationPath: %s", transferItem.DestinationPath)
 		return
 	}
 
-	id := pieces[1]
+	id := pieces[2] // id is the 3rd entry in the path
 	globusUpload, err := m.globusUploads.GetGlobusUpload(id)
 	if err != nil {
 		// Upload is already being processed
