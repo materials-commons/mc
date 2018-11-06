@@ -102,7 +102,7 @@ func (m *UploadMonitor) processTransfers(transfers *TransferItems) {
 		return
 	}
 
-	log.Infof("Process globus upload %s", id)
+	log.Infof("Processing globus upload %s", id)
 
 	// At this point we have a globus upload. What we are going to do is remove the ACL on the directory
 	// so no more files can be uploaded to it. Then we are going to add that directory to the list of
