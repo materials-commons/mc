@@ -98,7 +98,9 @@ func (m *UploadMonitor) processTransfers(transfers *TransferItems) {
 	id := pieces[2] // id is the 3rd entry in the path
 	globusUpload, err := m.globusUploads.GetGlobusUpload(id)
 	if err != nil {
-		// Upload is already being processed
+		// If we find a Globus task, but no corresponding entry in our database that means at some
+		// earlier point in time we processed the task by turning it into a file load request and
+		// deleting globus upload from our database. So this is an old reference we can just ignore.
 		return
 	}
 
@@ -129,7 +131,7 @@ func (m *UploadMonitor) processTransfers(transfers *TransferItems) {
 
 	// Delete the globus upload request as we have now turned it into a file loading request
 	// and won't have to process this request again. If the server stops while loading the
-	// request or their is some other failure, the file loader will take care of picking up
+	// request or there is some other failure, the file loader will take care of picking up
 	// where it left off.
 	m.globusUploads.DeleteGlobusUpload(id)
 }
