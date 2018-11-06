@@ -10,7 +10,7 @@ type FileLoadSchema struct {
 	ModelSimple
 	ProjectID string   `db:"project_id" json:"project_id" r:"project_id"`
 	Path      string   `db:"path" json:"path" r:"path"`
-	Owner     string   `db:"owner" json:"owner" r:"path"`
+	Owner     string   `db:"owner" json:"owner" r:"owner"`
 	Exclude   []string `json:"exclude" r:"exclude"`
 	Loading   bool     `db:"loading" json:"loading" r:"loading"`
 }
