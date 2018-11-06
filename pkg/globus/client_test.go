@@ -1,8 +1,11 @@
 package globus_test
 
 import (
+	"fmt"
 	"os"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/materials-commons/mc/pkg/globus"
 	"github.com/materials-commons/mc/pkg/tutils/assert"
@@ -53,6 +56,28 @@ func TestACLs(t *testing.T) {
 		} else {
 			assert.Errorf(t, err, "Test should have failed")
 		}
+	}
+}
+
+func TestGetTasks(t *testing.T) {
+	client := createClient(t)
+	lastWeek := time.Now().AddDate(0, 0, -10).Format("2006-01-02")
+	fmt.Println("lastWeek", lastWeek)
+	tasks, err := client.GetEndpointTaskList(testEndpointID, map[string]string{
+		"filter_completion_time": lastWeek,
+		"filter_status":          "SUCCEEDED",
+	})
+	fmt.Println("GetEndpointTaskList err", err)
+	fmt.Printf("   tasks: %#v\n", tasks)
+	for _, task := range tasks.Tasks {
+		transfers, err := client.GetTaskSuccessfulTransfers(task.TaskID, 0)
+		fmt.Println("  GetTaskSuccessfulTransfers err", err)
+		fmt.Printf("    transfers: %#v\n", transfers)
+		transferItem := transfers.Transfers[0]
+		pieces := strings.Split(transferItem.DestinationPath, "/")
+		fmt.Println(len(pieces))
+		fmt.Printf("pieces[0] = '%s'\n", pieces[0])
+		fmt.Println("id =", pieces[2])
 	}
 }
 
