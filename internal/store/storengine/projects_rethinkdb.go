@@ -58,7 +58,7 @@ func (e *ProjectsRethinkdb) GetProjectSimple(id string) (model.ProjectSimpleMode
 func projectTopLevelDir(p r.Term) interface{} {
 	return map[string]interface{}{
 		"root_dir": r.Table("datadirs").
-			GetAllByIndex("datadir_project_name", []interface{}{p.Field("id"), p.Field("name")}),
+			GetAllByIndex("datadir_project_name", []interface{}{p.Field("id"), p.Field("name")}).CoerceTo("array"),
 	}
 }
 
