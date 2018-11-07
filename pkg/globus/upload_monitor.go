@@ -77,6 +77,7 @@ func (m *UploadMonitor) retrieveAndProcessUploads(c context.Context) {
 		select {
 		case <-c.Done():
 			break
+		default:
 		}
 	}
 }
@@ -101,6 +102,7 @@ func (m *UploadMonitor) processTransfers(transfers *TransferItems) {
 		// If we find a Globus task, but no corresponding entry in our database that means at some
 		// earlier point in time we processed the task by turning it into a file load request and
 		// deleting globus upload from our database. So this is an old reference we can just ignore.
+		log.Info("Could not find globus upload")
 		return
 	}
 
