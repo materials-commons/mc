@@ -106,13 +106,13 @@ func (m *UploadMonitor) processTransfers(transfers *TransferItems) {
 		return
 	}
 
-	log.Infof("Processing globus upload %s", id)
-
 	// At this point we have a globus upload. What we are going to do is remove the ACL on the directory
 	// so no more files can be uploaded to it. Then we are going to add that directory to the list of
 	// directories to upload. Then the file loader will eventually get around to loading these files. In
 	// the meantime since we've now created a file load from this globus upload we can delete the entry
 	// from the globus_uploads table.
+
+	log.Infof("Processing globus upload %s", id)
 
 	if _, err := m.client.DeleteEndpointACLRule(m.endpointID, globusUpload.GlobusAclID); err != nil {
 		log.Infof("Unable to delete ACL: %s", err)
