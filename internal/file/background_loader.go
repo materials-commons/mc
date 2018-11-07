@@ -42,7 +42,7 @@ func (l *BackgroundLoader) processLoadFileRequests(c context.Context) {
 	fileloadsStore := l.db.FileLoadsStore()
 
 	// There may have been jobs in process when the server was stopped. Mark those jobs
-	// at not currently being processed, this will cause them to be re-processed.
+	// as not currently being processed, this will cause them to be re-processed.
 	if err := fileloadsStore.MarkAllNotLoading(); err != nil && errors.Cause(err) != mc.ErrNotFound {
 		log.Infof("Unable to mark current jobs as not loading: %s\n", err)
 	}
@@ -69,16 +69,15 @@ func (l *BackgroundLoader) processLoadFileRequests(c context.Context) {
 				continue
 			}
 
-			log.Infof("processing request %#v\n", req)
-
 			// If we are here then the current request is not being processed
 			// and it is for a project that is *not* currently being processed.
 
+			log.Infof("processing request %#v\n", req)
+
 			// Mark job as loading so we won't attempt to load this request a second time
 			if err := fileloadsStore.UpdateLoading(req.ID, true); err != nil {
-				log.Infof("Unable to update file load request %s: %s", req.ID, err)
-
 				// If the job cannot be marked as loading then skip processing it
+				log.Infof("Unable to update file load request %s: %s", req.ID, err)
 				continue
 			}
 
