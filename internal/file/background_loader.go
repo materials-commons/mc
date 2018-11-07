@@ -113,9 +113,11 @@ func (l *BackgroundLoader) worker(args interface{}) interface{} {
 	flStore := l.db.FileLoadsStore()
 
 	req := args.(model.FileLoadSchema)
+	log.Infof("worker processing file load request %#v", req)
 
 	proj, err := projStore.GetProjectSimple(req.ProjectID)
 	if err != nil {
+		log.Infof("failed looking up project %s: %s", req.ProjectID, err)
 		return err
 	}
 
@@ -130,6 +132,7 @@ func (l *BackgroundLoader) worker(args interface{}) interface{} {
 		//
 		// Ignore errors as we are already in an error situation, either the updates
 		// to the database will work or they won't in which case nothing else will work.
+		log.Infof("LoadFilesWithCancel failed: %s", err)
 		flStore.UpdateLoading(req.ID, false)
 		l.activeProjects.Delete(req.ProjectID)
 		return err
