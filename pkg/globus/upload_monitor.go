@@ -47,10 +47,11 @@ func (m *UploadMonitor) monitorAndProcessUploads(c context.Context) {
 func (m *UploadMonitor) retrieveAndProcessUploads(c context.Context) {
 	// Build a filter to get all successful tasks that completed in the last week
 	lastWeek := time.Now().AddDate(0, 0, -7).Format("2006-01-02")
-	tasks, err := m.client.GetEndpointTaskList(m.endpointID, map[string]string{
+	taskFilter := map[string]string{
 		"filter_completion_time": lastWeek,
 		"filter_status":          "SUCCEEDED",
-	})
+	}
+	tasks, err := m.client.GetEndpointTaskList(m.endpointID, taskFilter)
 
 	if err != nil {
 		log.Infof("globus.GetEndpointTaskList returned the following error: %s - %#v", err, m.client.GetGlobusErrorResponse())
