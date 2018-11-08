@@ -125,8 +125,10 @@ func (g *GlobusController) CreateGlobusUploadRequest(c echo.Context) error {
 }
 
 type globusResp struct {
-	GlobusURL string `json:"globus_url"`
-	ID        string `json:"id"`
+	GlobusURL          string `json:"globus_url"`
+	GlobusEndpointID   string `json:"globus_endpoint_id"`
+	GlobusEndpointPath string `json:"globus_endpoint_path"`
+	ID                 string `json:"id"`
 }
 
 func (g *GlobusController) createAndSetupUploadReq(projectID string, user model.UserSchema) (globusResp, error) {
@@ -164,6 +166,8 @@ func (g *GlobusController) createAndSetupUploadReq(projectID string, user model.
 
 	resp.ID = gUploadModel.ID
 	resp.GlobusURL = g.createEndpointURL(gUploadModel.ID)
+	resp.GlobusEndpointPath = endpointPath(gUploadModel.ID)
+	resp.GlobusEndpointID = g.globusEndpointID
 
 	return resp, nil
 }
@@ -199,4 +203,9 @@ func (g *GlobusController) globusSetup(uploadID, path string, globusUser string)
 func (g *GlobusController) createEndpointURL(uploadID string) string {
 	path := fmt.Sprintf("/__globus_uploads/%s", uploadID)
 	return fmt.Sprintf("%s?destination_id=%s&destination_path=%s", globusBaseURL, g.globusEndpointID, path)
+}
+
+// endpointPath creates the path in the endpoint to give to globus
+func endpointPath(uploadID string) string {
+	return fmt.Sprintf("/__globus_uploads/%s/", uploadID)
 }
