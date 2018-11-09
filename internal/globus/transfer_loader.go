@@ -2,6 +2,8 @@ package globus
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/materials-commons/mc/pkg/globusapi"
 )
@@ -27,5 +29,12 @@ func (l *TransferLoader) LoadFiles(transferItems globusapi.TransferItems, c cont
 // 'source_path': None})
 
 func (l *TransferLoader) processTransferItem(transfer globusapi.Transfer) error {
+	mcdir := ""
+	fmt.Println(mcdir)
+	pathItems := strings.Split(transfer.DestinationPath, "/")
+	for _, pathItem := range pathItems {
+		fmt.Println(pathItem)
+	}
+
 	return nil
 }
