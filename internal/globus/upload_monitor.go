@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/materials-commons/mc/internal/store/model"
+	"github.com/materials-commons/mc/pkg/globusapi"
 
 	"github.com/materials-commons/mc/internal/store"
 
@@ -13,13 +14,13 @@ import (
 )
 
 type UploadMonitor struct {
-	client        *Client
+	client        *globusapi.Client
 	globusUploads *store.GlobusUploadsStore
 	fileLoads     *store.FileLoadsStore
 	endpointID    string
 }
 
-func NewUploadMonitor(client *Client, endpointID string, db store.DB) *UploadMonitor {
+func NewUploadMonitor(client *globusapi.Client, endpointID string, db store.DB) *UploadMonitor {
 	return &UploadMonitor{
 		client:        client,
 		endpointID:    endpointID,
@@ -83,7 +84,7 @@ func (m *UploadMonitor) retrieveAndProcessUploads(c context.Context) {
 	}
 }
 
-func (m *UploadMonitor) processTransfers(transfers *TransferItems) {
+func (m *UploadMonitor) processTransfers(transfers *globusapi.TransferItems) {
 	transferItem := transfers.Transfers[0]
 
 	// Destination path will have the following format: /__globus_uploads/<id of upload request>/...rest of path...
