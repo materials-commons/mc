@@ -1,4 +1,4 @@
-package globus
+package globusapi
 
 type endpointACLRequest struct {
 	DataType      string `json:"DATA_TYPE"`

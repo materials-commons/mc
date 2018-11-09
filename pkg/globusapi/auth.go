@@ -1,4 +1,4 @@
-package globus
+package globusapi
 
 type Identities struct {
 	Identities []Identity `json:"identities"`

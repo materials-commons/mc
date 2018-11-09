@@ -1,4 +1,4 @@
-package globus
+package globusapi
 
 type APIClient interface {
 	Authenticate() error

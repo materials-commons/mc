@@ -12,6 +12,9 @@ import (
 )
 
 func TestGlobusUploadsStore_AddGlobusUpload(t *testing.T) {
+	if true {
+		t.Skip()
+	}
 	session, _ := r.Connect(r.ConnectOpts{Database: "mctest", Address: "localhost:30815"})
 	r.SetTags("r")
 	storeEngine := storengine.NewGlobusUploadsRethinkdb(session)

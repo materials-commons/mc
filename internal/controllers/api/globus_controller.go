@@ -13,20 +13,20 @@ import (
 	"github.com/labstack/echo"
 	"github.com/materials-commons/mc/internal/store"
 	"github.com/materials-commons/mc/internal/store/model"
-	"github.com/materials-commons/mc/pkg/globus"
+	"github.com/materials-commons/mc/pkg/globusapi"
 	"github.com/pkg/errors"
 )
 
 const globusBaseURL = "https://www.globus.org/app/transfer"
 
 type GlobusController struct {
-	client             *globus.Client
+	client             *globusapi.Client
 	globusUploadsStore *store.GlobusUploadsStore
 	basePath           string
 	globusEndpointID   string
 }
 
-func NewGlobusController(db store.DB, client *globus.Client, basePath, globusEndpointID string) *GlobusController {
+func NewGlobusController(db store.DB, client *globusapi.Client, basePath, globusEndpointID string) *GlobusController {
 	return &GlobusController{
 		client:             client,
 		globusUploadsStore: db.GlobusUploadsStore(),
@@ -182,7 +182,7 @@ func (g *GlobusController) globusSetup(uploadID, path string, globusUser string)
 
 	globusIdentityID = identities.Identities[0].ID
 
-	rule := globus.EndpointACLRule{
+	rule := globusapi.EndpointACLRule{
 		EndpointID:  g.globusEndpointID,
 		Path:        path,
 		IdentityID:  globusIdentityID,

@@ -23,9 +23,11 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/materials-commons/mc/internal/globus"
+
 	"github.com/apex/log"
 
-	"github.com/materials-commons/mc/pkg/globus"
+	"github.com/materials-commons/mc/pkg/globusapi"
 
 	"github.com/materials-commons/mc/internal/store/model"
 
@@ -100,7 +102,7 @@ func cliCmdRoot(cmd *cobra.Command, args []string) {
 
 	mcdirFirstEntry := strings.Split(mcdir, ":")[0]
 
-	globusClient, err := globus.CreateConfidentialClient(globusCCUser, globusCCToken)
+	globusClient, err := globusapi.CreateConfidentialClient(globusCCUser, globusCCToken)
 	if err != nil {
 		log.Fatalf("Unable to create globus client: %s", err)
 	}
@@ -178,7 +180,7 @@ func setupInternalAPIRoutes(e *echo.Echo, db store.DB) {
 	g.POST("/getServerStatus", statusController.GetServerStatus).Name = "getServerStatus"
 }
 
-func setupAPIRoutes(e *echo.Echo, db store.DB, mcdir string, client *globus.Client) {
+func setupAPIRoutes(e *echo.Echo, db store.DB, mcdir string, client *globusapi.Client) {
 	apikey := createAPIKeyMiddleware(db)
 
 	g := e.Group("/api")

@@ -1,4 +1,4 @@
-package globus
+package globusapi
 
 type TaskExtras struct {
 	SourceEndpoint                     string `json:"source_endpoint"`

@@ -1,4 +1,4 @@
-package globus
+package globusapi
 
 type MockClient struct {
 	err error

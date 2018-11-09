@@ -1,4 +1,4 @@
-package globus
+package globusapi
 
 import (
 	"crypto/tls"
