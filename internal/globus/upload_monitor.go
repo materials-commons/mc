@@ -14,18 +14,20 @@ import (
 )
 
 type UploadMonitor struct {
-	client        *globusapi.Client
-	globusUploads *store.GlobusUploadsStore
-	fileLoads     *store.FileLoadsStore
-	endpointID    string
+	client              *globusapi.Client
+	globusUploads       *store.GlobusUploadsStore
+	fileLoads           *store.FileLoadsStore
+	endpointID          string
+	finishedGlobusTasks map[string]bool
 }
 
 func NewUploadMonitor(client *globusapi.Client, endpointID string, db store.DB) *UploadMonitor {
 	return &UploadMonitor{
-		client:        client,
-		endpointID:    endpointID,
-		globusUploads: db.GlobusUploadsStore(),
-		fileLoads:     db.FileLoadsStore(),
+		client:              client,
+		endpointID:          endpointID,
+		globusUploads:       db.GlobusUploadsStore(),
+		fileLoads:           db.FileLoadsStore(),
+		finishedGlobusTasks: make(map[string]bool),
 	}
 }
 
@@ -99,12 +101,17 @@ func (m *UploadMonitor) processTransfers(transfers *globusapi.TransferItems) {
 	}
 
 	id := pieces[2] // id is the 3rd entry in the path
+	if _, ok := m.finishedGlobusTasks[id]; ok {
+		// We've seen this globus task before and already processed it
+		return
+	}
 	globusUpload, err := m.globusUploads.GetGlobusUpload(id)
 	if err != nil {
 		// If we find a Globus task, but no corresponding entry in our database that means at some
 		// earlier point in time we processed the task by turning it into a file load request and
 		// deleting globus upload from our database. So this is an old reference we can just ignore.
-		log.Info("Could not find globus upload")
+		// Add the entry to our hash table of completed requests.
+		m.finishedGlobusTasks[id] = true
 		return
 	}
 
