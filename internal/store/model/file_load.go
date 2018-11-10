@@ -12,6 +12,7 @@ type FileLoadSchema struct {
 	Path      string   `db:"path" json:"path" r:"path"`
 	Owner     string   `db:"owner" json:"owner" r:"owner"`
 	Exclude   []string `json:"exclude" r:"exclude"`
+	LimitTo   []string `json:"limit_to" r:"limit_to"` // Only load the files in this list
 	Loading   bool     `db:"loading" json:"loading" r:"loading"`
 }
 
