@@ -62,7 +62,7 @@ func (m *UploadMonitor) retrieveAndProcessUploads(c context.Context) {
 	}
 
 	for _, task := range tasks.Tasks {
-		log.Infof("Getting successful transfers for Globus Task %s", task.TaskID)
+		//log.Infof("Getting successful transfers for Globus Task %s", task.TaskID)
 		transfers, err := m.client.GetTaskSuccessfulTransfers(task.TaskID, 0)
 
 		switch {
