@@ -152,10 +152,33 @@ func (l *MCFileLoader) loadFile(path string, finfo os.FileInfo) error {
 	case err != nil:
 		return err
 	default:
-		// if the files share the same checksum, then there is nothing to do as there
-		// is already a version of the file in the directory with the same checksum.
-		// So delete the uploaded file and return nil for success
+		// if the files share the same checksum then make sure the file
+		// was correctly copied over. If it wasn't then complete the copy.
+		// If the file was completed then there is nothing to do, just delete
+		// it.
+		dirPath := MCFileDir(l.mcdir, df.ID)
+		filePathInMCDir := filepath.Join(dirPath, df.ID)
 		if checksum == df.Checksum {
+			// We only need to check if things were correctly copied over if this
+			// file doesn't point to a different file (ie, UsesID == ""). Otherwise
+			// a file matching this was already successfully copied at some point in the past
+			// and we are just pointing at that other file.
+			if df.UsesID == "" {
+				finfo2, err := os.Stat(filePathInMCDir)
+				switch {
+				case err != nil:
+					// File doesn't exist so copy it over
+					if err := l.moveFile(path, df); err != nil {
+						return err
+					}
+				case finfo2.Size() != df.Size:
+					// For some reason the file copy wasn't completed
+					if err := l.moveFile(path, df); err != nil {
+						return err
+					}
+				}
+			}
+
 			os.Remove(path)
 			return nil
 		}

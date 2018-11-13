@@ -58,7 +58,7 @@ func (e *ProjectsRethinkdb) GetProjectSimple(id string) (model.ProjectSimpleMode
 func projectTopLevelDir(p r.Term) interface{} {
 	return map[string]interface{}{
 		"root_dir": r.Table("datadirs").
-			GetAllByIndex("datadir_project_name", []interface{}{p.Field("id"), p.Field("name")}),
+			GetAllByIndex("datadir_project_name", []interface{}{p.Field("id"), p.Field("name")}).CoerceTo("array"),
 	}
 }
 
@@ -82,21 +82,27 @@ func (e *ProjectsRethinkdb) GetAllProjectsForUser(user string) ([]model.ProjectE
 		projectsMemberOf []model.ProjectExtendedModel
 	)
 
-	res, err := r.Table("projects").GetAllByIndex("owner", user).Merge(projectDetails).Run(e.Session)
-	if err := checkRethinkdbQueryError(res, err, fmt.Sprintf("Can't retrieve projects for user %s", user)); err != nil {
-		return userProjects, err
-	} else if err := res.All(userProjects); err != nil {
-		res.Close()
+	res1, err := r.Table("projects").GetAllByIndex("owner", user).Merge(projectDetails).Run(e.Session)
+	if err := checkRethinkdbQueryError(res1, err, fmt.Sprintf("Can't retrieve projects for user %s", user)); err != nil {
 		return userProjects, err
 	}
 
-	res, err = r.Table("access").GetAllByIndex("user_id", user).
+	defer res1.Close()
+
+	if err := res1.All(userProjects); err != nil {
+		return userProjects, err
+	}
+
+	res2, err := r.Table("access").GetAllByIndex("user_id", user).
 		EqJoin("project_id", r.Table("projects")).Zip().Filter(r.Row.Field("owner").Ne(user)).
 		Merge(projectDetails).Run(e.Session)
-	if err := checkRethinkdbQueryError(res, err, fmt.Sprintf("Can't retrieve projects user (%s) is member of", user)); err != nil {
+	if err := checkRethinkdbQueryError(res2, err, fmt.Sprintf("Can't retrieve projects user (%s) is member of", user)); err != nil {
 		return userProjects, err
-	} else if err := res.All(projectsMemberOf); err != nil {
-		res.Close()
+	}
+
+	defer res2.Close()
+
+	if err := res2.All(projectsMemberOf); err != nil {
 		return userProjects, err
 	}
 

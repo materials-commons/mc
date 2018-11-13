@@ -53,7 +53,7 @@ func (e *AccessRethinkdb) GetProjectAccessEntries(projectID string) ([]model.Acc
 	}
 	defer res.Close()
 
-	err = res.All(entries)
+	err = res.All(&entries)
 	return entries, err
 }
 
@@ -66,6 +66,6 @@ func (e *AccessRethinkdb) GetUserAccessEntries(userID string) ([]model.AccessSch
 	}
 	defer res.Close()
 
-	err = res.All(entries)
+	err = res.All(&entries)
 	return entries, err
 }
