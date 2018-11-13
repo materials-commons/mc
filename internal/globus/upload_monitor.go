@@ -36,6 +36,7 @@ func (m *UploadMonitor) Start(c context.Context) {
 }
 
 func (m *UploadMonitor) monitorAndProcessUploads(c context.Context) {
+	log.Infof("Starting globus monitoring...")
 	for {
 		m.retrieveAndProcessUploads(c)
 		select {

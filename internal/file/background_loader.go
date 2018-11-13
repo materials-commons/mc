@@ -37,6 +37,7 @@ func (l *BackgroundLoader) Start(c context.Context) {
 }
 
 func (l *BackgroundLoader) processLoadFileRequests(c context.Context) {
+	log.Infof("Starting file loader...")
 	l.c = c
 	pool := tunny.NewFunc(l.numberOfWorkers, l.worker)
 	fileloadsStore := l.db.FileLoadsStore()

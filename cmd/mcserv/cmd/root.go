@@ -94,6 +94,7 @@ func init() {
 }
 
 func cliCmdRoot(cmd *cobra.Command, args []string) {
+	log.Infof("Starting mcserv...")
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
