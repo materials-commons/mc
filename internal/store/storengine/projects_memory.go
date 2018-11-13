@@ -61,11 +61,11 @@ func (e *ProjectsMemory) GetProjectSimple(id string) (model.ProjectSimpleModel, 
 	return p, nil
 }
 
-func (e *ProjectsMemory) GetAllProjectsForUser(user string) ([]model.ProjectExtendedModel, error) {
-	var userProjects []model.ProjectExtendedModel
+func (e *ProjectsMemory) GetAllProjectsForUser(user string) ([]model.ProjectCountModel, error) {
+	var userProjects []model.ProjectCountModel
 	for _, proj := range e.DB {
 		if proj.Owner == user {
-			p := model.ProjectExtendedModel{
+			p := model.ProjectCountModel{
 				ProjectSchema: proj,
 			}
 			userProjects = append(userProjects, p)

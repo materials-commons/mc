@@ -8,22 +8,36 @@ import (
 
 type ProjectSchema struct {
 	Model
-	Description string `db:"description" json:"description"`
+	Description string `db:"description" json:"description" r:"description"`
+}
+
+type ProjectCountModel struct {
+	ProjectSchema
+	OwnerDetails     OwnerDetails `json:"owner_details" r:"owner_details"`
+	FilesCount       int          `json:"files_count" r:"files_count"`
+	UsersCount       int          `json:"users_count" r:"users_count"`
+	SamplesCount     int          `json:"samples_count" r:"samples_count"`
+	ProcessesCount   int          `json:"processes_count" r:"processes_count"`
+	ExperimentsCount int          `json:"experiments_count" r:"experiments_count"`
+}
+
+type OwnerDetails struct {
+	Fullname string `json:"fullname" r:"fullname"`
 }
 
 type ProjectExtendedModel struct {
 	ProjectSchema
-	FilesCount    int                  `json:"files_count"`
-	Users         []ProjectUserModel   `json:"users"`
-	Samples       []SampleSchema       `json:"samples"`
-	Processes     []ProcessSchema      `json:"processes"`
-	Experiments   []ExperimentSchema   `json:"experiments"`
-	Relationships ProjectRelationships `json:"relationships"`
+	FilesCount    int                  `json:"files_count" r:"files_count"`
+	Users         []ProjectUserModel   `json:"users" r:"users"`
+	Samples       []SampleSchema       `json:"samples" r:"samples"`
+	Processes     []ProcessSchema      `json:"processes" r:"processes"`
+	Experiments   []ExperimentSchema   `json:"experiments" r:"experiments"`
+	Relationships ProjectRelationships `json:"relationships" r:"relationships"`
 }
 
 type ProjectRelationships struct {
-	Process2Sample    []Process2Sample    `json:"process2sample"`
-	Experiment2Sample []Experiment2Sample `json:"experiment2sample"`
+	Process2Sample    []Process2Sample    `json:"process2sample" r:"process2sample"`
+	Experiment2Sample []Experiment2Sample `json:"experiment2sample" r:"experiment2sample"`
 }
 
 type ProjectUserModel struct {

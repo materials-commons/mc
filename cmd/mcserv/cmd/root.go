@@ -23,7 +23,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/materials-commons/mc/internal/globus"
+	"github.com/materials-commons/mc/internal/controllers/uiapi"
 
 	"github.com/apex/log"
 
@@ -113,8 +113,8 @@ func cliCmdRoot(cmd *cobra.Command, args []string) {
 	backgroundLoader := file.NewBackgroundLoader(mcdirFirstEntry, numberOfWorkers, db)
 	backgroundLoader.Start(ctx)
 
-	globusMonitor := globus.NewUploadMonitor(globusClient, globusEndpointID, db)
-	globusMonitor.Start(ctx)
+	//globusMonitor := globus.NewUploadMonitor(globusClient, globusEndpointID, db)
+	//globusMonitor.Start(ctx)
 
 	go func() {
 		if err := e.Start(fmt.Sprintf(":%d", port)); err != nil {
@@ -190,6 +190,15 @@ func setupAPIRoutes(e *echo.Echo, db store.DB, mcdir string, client *globusapi.C
 	g.POST("/createGlobusUploadRequest", globusController.CreateGlobusUploadRequest).Name = "createGlobusUploadRequest"
 	g.POST("/getGlobusUploadRequest", globusController.GetGlobusUploadRequest).Name = "getGlobusUploadRequest"
 	g.POST("/listGlobusUploadRequests", globusController.ListGlobusUploadRequests).Name = "listGlobusUploadRequests"
+
+	setupUIAPIRoutes(g, db)
+}
+
+func setupUIAPIRoutes(parent *echo.Group, db store.DB) {
+	g := parent.Group("/ui")
+
+	projectsController := uiapi.NewProjectsController(db)
+	g.POST("/getProjectsForUser", projectsController.GetProjectsForUser).Name = "getProjectsForUser"
 }
 
 func createAPIKeyMiddleware(db store.DB) echo.MiddlewareFunc {
