@@ -1,14 +1,14 @@
 package model
 
-import "time"
-
 type ExperimentSchema struct {
-	ID          string    `db:"id" json:"id"`
-	CreatedAt   time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt   time.Time `db:"updated_at" json:"updated_at"`
-	Name        string    `db:"name" json:"name"`
-	Description string    `db:"description" json:"description"`
-	Owner       string    `db:"owner" json:"owner"`
-	OType       string    `db:"otype" json:"otype"`
-	Status      string    `db:"status" json:"status"`
+	Model
+	Description string `db:"description" json:"description"`
+	Status      string `db:"status" json:"status"`
+}
+
+type ExperimentOverviewModel struct {
+	ExperimentSchema
+	FilesCount   int `db:"files_count" json:"files_count" r:"files_count"`
+	SamplesCount int `db:"samples_count" json:"samples_count" r:"samples_count"`
+	ProcessCount int `db:"process_count" json:"process_count" r:"process_count"`
 }

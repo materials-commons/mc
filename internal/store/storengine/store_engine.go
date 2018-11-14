@@ -82,3 +82,7 @@ type GlobusUploadsStoreEngine interface {
 	GetAllGlobusUploads() ([]model.GlobusUploadSchema, error)
 	GetAllGlobusUploadsForUser(user string) ([]model.GlobusUploadSchema, error)
 }
+
+type ExperimentsStoreEngine interface {
+	GetExperimentOverviewsForProject(projectID string) ([]model.ExperimentOverviewModel, error)
+}
