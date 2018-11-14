@@ -115,8 +115,8 @@ func cliCmdRoot(cmd *cobra.Command, args []string) {
 	backgroundLoader := file.NewBackgroundLoader(mcdirFirstEntry, numberOfWorkers, db)
 	backgroundLoader.Start(ctx)
 
-	// globusMonitor := globus.NewUploadMonitor(globusClient, globusEndpointID, db)
-	// globusMonitor.Start(ctx)
+	globusMonitor := globus.NewUploadMonitor(globusClient, globusEndpointID, db)
+	globusMonitor.Start(ctx)
 
 	go func() {
 		if err := e.Start(fmt.Sprintf(":%d", port)); err != nil {
