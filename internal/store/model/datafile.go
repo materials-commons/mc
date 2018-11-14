@@ -2,7 +2,6 @@ package model
 
 import (
 	"github.com/go-ozzo/ozzo-validation"
-	"github.com/go-ozzo/ozzo-validation/is"
 	"github.com/materials-commons/mc/pkg/mc"
 	"github.com/pkg/errors"
 )
@@ -40,7 +39,7 @@ type AddDatafileModel struct {
 func (d AddDatafileModel) Validate() error {
 	err := validation.ValidateStruct(&d,
 		validation.Field(&d.Name, validation.Required, validation.Length(1, 50)),
-		validation.Field(&d.Owner, validation.Required, is.Email),
+		validation.Field(&d.Owner, validation.Required, validation.By(IsEmail)),
 		validation.Field(&d.Description, validation.Length(0, 300)),
 		validation.Field(&d.Size, validation.Required, validation.Min(1)))
 

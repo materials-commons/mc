@@ -10,7 +10,7 @@ import (
 
 func AddDefaultUsersToStoreEngine(t *testing.T, e UsersStoreEngine) {
 	users := []model.UserSchema{
-		{ModelSimple: model.ModelSimple{ID: "tuser@test.com"}, APIKey: "tuser@test.com apikey", Fullname: "tuser", Password: "tuser-password"},
+		{ID: "tuser@test.com", APIKey: "tuser@test.com apikey", Fullname: "tuser", Password: "tuser-password"},
 	}
 
 	for _, user := range users {

@@ -10,16 +10,17 @@ type UsersStoreEngine interface {
 	AddUser(user model.UserSchema) (model.UserSchema, error)
 	GetUserByID(id string) (model.UserSchema, error)
 	GetUserByAPIKey(apikey string) (model.UserSchema, error)
-	ModifyUserFullname(id, fullname string, updatedAt time.Time) (model.UserSchema, error)
-	ModifyUserPassword(id, password string, updatedAt time.Time) (model.UserSchema, error)
-	ModifyUserAPIKey(id, apikey string, updatedAt time.Time) (model.UserSchema, error)
+	UpdateUserFullname(id, fullname string, updatedAt time.Time) (model.UserSchema, error)
+	UpdateUserPassword(id, password string, updatedAt time.Time) (model.UserSchema, error)
+	UpdateUserAPIKey(id, apikey string, updatedAt time.Time) (model.UserSchema, error)
+	UpdateUserGlobusUser(id string, globusUser string) error
 }
 
 type ProjectsStoreEngine interface {
 	AddProject(project model.ProjectSchema) (model.ProjectSchema, error)
 	GetProject(id string) (model.ProjectExtendedModel, error)
 	GetProjectSimple(id string) (model.ProjectSimpleModel, error)
-	GetAllProjectsForUser(user string) ([]model.ProjectExtendedModel, error)
+	GetAllProjectsForUser(user string) ([]model.ProjectCountModel, error)
 	DeleteProject(id string) error
 	UpdateProjectName(id string, name string, updatedAt time.Time) error
 	UpdateProjectDescription(id string, description string, updatedAt time.Time) error
@@ -72,4 +73,12 @@ type FileLoadsStoreEngine interface {
 	GetAllFileLoads() ([]model.FileLoadSchema, error)
 	MarkAllNotLoading() error
 	UpdateLoading(id string, loading bool) error
+}
+
+type GlobusUploadsStoreEngine interface {
+	AddGlobusUpload(upload model.GlobusUploadSchema) (model.GlobusUploadSchema, error)
+	DeleteGlobusUpload(id string) error
+	GetGlobusUpload(id string) (model.GlobusUploadSchema, error)
+	GetAllGlobusUploads() ([]model.GlobusUploadSchema, error)
+	GetAllGlobusUploadsForUser(user string) ([]model.GlobusUploadSchema, error)
 }

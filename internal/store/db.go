@@ -12,6 +12,7 @@ type DB interface {
 	DatafilesStore() *DatafilesStore
 	DatadirsStore() *DatadirsStore
 	FileLoadsStore() *FileLoadsStore
+	GlobusUploadsStore() *GlobusUploadsStore
 }
 
 type DBRethinkdb struct {
@@ -42,21 +43,27 @@ func (db *DBRethinkdb) FileLoadsStore() *FileLoadsStore {
 	return NewFileLoadsStore(storengine.NewFileLoadsRethinkdb(db.Session))
 }
 
+func (db *DBRethinkdb) GlobusUploadsStore() *GlobusUploadsStore {
+	return NewGlobusUploadsStore(storengine.NewGlobusUploadsRethinkdb(db.Session))
+}
+
 type DBMemory struct {
-	DBProj      map[string]model.ProjectSchema
-	DBUsers     map[string]model.UserSchema
-	DBDatadirs  map[string]model.DatadirSchema
-	DBDatafiles map[string]storengine.DatafileSchemaInMemory
-	DBFileLoads map[string]model.FileLoadSchema
+	DBProj          map[string]model.ProjectSchema
+	DBUsers         map[string]model.UserSchema
+	DBDatadirs      map[string]model.DatadirSchema
+	DBDatafiles     map[string]storengine.DatafileSchemaInMemory
+	DBFileLoads     map[string]model.FileLoadSchema
+	DBGlobusUploads map[string]model.GlobusUploadSchema
 }
 
 func NewDBMemory() *DBMemory {
 	return &DBMemory{
-		DBProj:      make(map[string]model.ProjectSchema),
-		DBUsers:     make(map[string]model.UserSchema),
-		DBDatadirs:  make(map[string]model.DatadirSchema),
-		DBDatafiles: make(map[string]storengine.DatafileSchemaInMemory),
-		DBFileLoads: make(map[string]model.FileLoadSchema),
+		DBProj:          make(map[string]model.ProjectSchema),
+		DBUsers:         make(map[string]model.UserSchema),
+		DBDatadirs:      make(map[string]model.DatadirSchema),
+		DBDatafiles:     make(map[string]storengine.DatafileSchemaInMemory),
+		DBFileLoads:     make(map[string]model.FileLoadSchema),
+		DBGlobusUploads: make(map[string]model.GlobusUploadSchema),
 	}
 }
 
@@ -98,6 +105,14 @@ func (db *DBMemory) FileLoadsStore() *FileLoadsStore {
 	}
 
 	return NewFileLoadsStore(storengine.NewFileLoadsMemoryWithDB(db.DBFileLoads))
+}
+
+func (db *DBMemory) GlobusUploadsStore() *GlobusUploadsStore {
+	if db.DBGlobusUploads == nil {
+		return NewGlobusUploadsStore(storengine.NewGlobusUploadsMemory())
+	}
+
+	return NewGlobusUploadsStore(storengine.NewGlobusUploadsMemoryWithDB(db.DBGlobusUploads))
 }
 
 var InMemory = NewDBMemory() // Global for testing purposes, allows a single db to be shared across test instances

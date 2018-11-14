@@ -2,11 +2,11 @@ package file
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"sync"
 	"time"
 
+	"github.com/apex/log"
 	"github.com/materials-commons/mc/internal/store/model"
 	"github.com/materials-commons/mc/pkg/mc"
 
@@ -37,14 +37,15 @@ func (l *BackgroundLoader) Start(c context.Context) {
 }
 
 func (l *BackgroundLoader) processLoadFileRequests(c context.Context) {
+	log.Infof("Starting file loader...")
 	l.c = c
 	pool := tunny.NewFunc(l.numberOfWorkers, l.worker)
 	fileloadsStore := l.db.FileLoadsStore()
 
 	// There may have been jobs in process when the server was stopped. Mark those jobs
-	// at not currently being processed, this will cause them to be re-processed.
-	if err := fileloadsStore.MarkAllNotLoading(); err != nil {
-		panic(fmt.Sprintf("Unable to mark current jobs as not loading: %s", err))
+	// as not currently being processed, this will cause them to be re-processed.
+	if err := fileloadsStore.MarkAllNotLoading(); err != nil && errors.Cause(err) != mc.ErrNotFound {
+		log.Infof("Unable to mark current jobs as not loading: %s\n", err)
 	}
 
 	// Loop through all file load requests and look for any that are not currently being processed.
@@ -52,11 +53,11 @@ func (l *BackgroundLoader) processLoadFileRequests(c context.Context) {
 		requests, err := fileloadsStore.GetAllFileLoads()
 		//fmt.Printf("processing file loads %#v: %s\n", requests, err)
 		if err != nil && errors.Cause(err) != mc.ErrNotFound {
-			fmt.Println("Error retrieving requests:", err)
+			log.Infof("Error retrieving requests: %s", err)
 		}
 
 		for _, req := range requests {
-			fmt.Printf("processing request %#v\n", req)
+
 			if req.Loading {
 				// This request is already being processed so ignore it
 				continue
@@ -70,13 +71,14 @@ func (l *BackgroundLoader) processLoadFileRequests(c context.Context) {
 			}
 
 			// If we are here then the current request is not being processed
-			// and it is not for a project that is currently being processed.
+			// and it is for a project that is *not* currently being processed.
+
+			log.Infof("processing request %#v\n", req)
 
 			// Mark job as loading so we won't attempt to load this request a second time
 			if err := fileloadsStore.UpdateLoading(req.ID, true); err != nil {
-				fmt.Printf("Unable to update file load request %s: %s", req.ID, err)
-
 				// If the job cannot be marked as loading then skip processing it
+				log.Infof("Unable to update file load request %s: %s", req.ID, err)
 				continue
 			}
 
@@ -95,8 +97,9 @@ func (l *BackgroundLoader) processLoadFileRequests(c context.Context) {
 		// Sleep for 10 seconds before getting the next set of loading requests. Ten seconds is an
 		// somewhat arbitrary value chosen to balance time to start processing and load on the system.
 		select {
-		case <-time.After(100 * time.Millisecond):
+		case <-time.After(10 * time.Second):
 		case <-c.Done():
+			log.Infof("Shutting down file loading...")
 			return
 		}
 	}
@@ -111,9 +114,11 @@ func (l *BackgroundLoader) worker(args interface{}) interface{} {
 	flStore := l.db.FileLoadsStore()
 
 	req := args.(model.FileLoadSchema)
+	log.Infof("worker processing file load request %#v", req)
 
 	proj, err := projStore.GetProjectSimple(req.ProjectID)
 	if err != nil {
+		log.Infof("failed looking up project %s: %s", req.ProjectID, err)
 		return err
 	}
 
@@ -128,6 +133,7 @@ func (l *BackgroundLoader) worker(args interface{}) interface{} {
 		//
 		// Ignore errors as we are already in an error situation, either the updates
 		// to the database will work or they won't in which case nothing else will work.
+		log.Infof("LoadFilesWithCancel failed: %s", err)
 		flStore.UpdateLoading(req.ID, false)
 		l.activeProjects.Delete(req.ProjectID)
 		return err

@@ -9,6 +9,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/apex/log"
+
 	"github.com/pkg/errors"
 )
 
@@ -70,6 +72,7 @@ func (l *Loader) LoadFilesWithCancel(path string, c context.Context) error {
 	err := filepath.Walk(path, func(fpath string, finfo os.FileInfo, err error) error {
 		select {
 		case <-c.Done():
+			log.Infof("LoadFilesWithCancel was cancelled")
 			return errors.Errorf("canceled: %s", c.Err())
 		default:
 			return l.processFile(path, fpath, finfo, err)
@@ -80,6 +83,7 @@ func (l *Loader) LoadFilesWithCancel(path string, c context.Context) error {
 }
 
 func (l *Loader) processFile(root, fpath string, finfo os.FileInfo, err error) error {
+	log.Infof("processFile %s, %s: %s", root, fpath, err)
 	switch {
 	case err != nil && os.IsPermission(err):
 		// Permission errors are ignored. Just continue walking the tree
