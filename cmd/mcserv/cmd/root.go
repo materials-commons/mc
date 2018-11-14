@@ -27,7 +27,7 @@ import (
 
 	"github.com/apex/log"
 
-	// "github.com/materials-commons/mc/internal/globus"
+	"github.com/materials-commons/mc/internal/globus"
 	"github.com/materials-commons/mc/pkg/globusapi"
 
 	"github.com/materials-commons/mc/internal/store/model"
