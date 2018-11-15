@@ -24,3 +24,7 @@ func (p *ProjectsController) GetProjectsForUser(c echo.Context) error {
 		return c.JSON(http.StatusOK, projects)
 	}
 }
+
+func (p *ProjectsController) GetExperimentsForProject(c echo.Context) error {
+	return nil
+}
