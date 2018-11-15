@@ -41,6 +41,20 @@ func (e *ProjectsRethinkdb) AddProject(project model.ProjectSchema) (model.Proje
 	return proj, err
 }
 
+func (e *ProjectsRethinkdb) GetProjectOverview(projectID, userID string) (model.ProjectOverviewModel, error) {
+	var project model.ProjectOverviewModel
+	errMsg := fmt.Sprintf("No such project %s for user %s", projectID, userID)
+	res, err := r.Table("access").GetAllByIndex("user_project", []interface{}{userID, projectID}).
+		EqJoin("project_id", r.Table("projects")).Zip().Merge(projectDetailCounts).Merge(projectExperiments).
+		Run(e.Session)
+	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
+		return project, err
+	}
+	defer res.Close()
+	err = res.One(&project)
+	return project, err
+}
+
 func (e *ProjectsRethinkdb) GetProjectSimple(id string) (model.ProjectSimpleModel, error) {
 	var project model.ProjectSimpleModel
 	errMsg := fmt.Sprintf("No such project %s", id)
@@ -112,6 +126,9 @@ func (e *ProjectsRethinkdb) GetAllProjectsForUser(user string) ([]model.ProjectC
 
 func projectDetails(p r.Term) interface{} {
 	return map[string]interface{}{
+		"shortcuts": r.Table("datadirs").
+			GetAllByIndex("datadir_project_shortcut", []interface{}{p.Field("project_id"), true}).
+			Pluck("name", "id").CoerceTo("array"),
 		"owner_details": r.Table("users").Get(p.Field("owner")).Pluck("fullname"),
 		"users": r.Table("access").GetAllByIndex("project_id", p.Field("id")).
 			EqJoin("user_id", r.Table("users")).Zip().CoerceTo("array"),
@@ -133,8 +150,18 @@ func projectDetails(p r.Term) interface{} {
 	}
 }
 
+func projectExperiments(p r.Term) interface{} {
+	return map[string]interface{}{
+		"experiments": r.Table("project2experiment").GetAllByIndex("project_id", p.Field("project_id")).
+			EqJoin("experiment_id", r.Table("experiments")).Zip().Merge(experimentOverview).CoerceTo("array"),
+	}
+}
+
 func projectDetailCounts(p r.Term) interface{} {
 	return map[string]interface{}{
+		"shortcuts": r.Table("datadirs").
+			GetAllByIndex("datadir_project_shortcut", []interface{}{p.Field("id"), true}).
+			Pluck("name", "id").CoerceTo("array"),
 		"owner_details":     r.Table("users").Get(p.Field("owner")).Pluck("fullname"),
 		"users_count":       r.Table("access").GetAllByIndex("project_id", p.Field("id")).Count(),
 		"samples_count":     r.Table("project2sample").GetAllByIndex("project_id", p.Field("id")).Count(),

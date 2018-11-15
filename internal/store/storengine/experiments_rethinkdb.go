@@ -32,6 +32,7 @@ func (e *ExperimentsRethinkdb) GetExperimentOverviewsForProject(projectID string
 
 func experimentOverview(e r.Term) interface{} {
 	return map[string]interface{}{
+		"owner_details": r.Table("users").Get(e.Field("owner")).Pluck("fullname"),
 		"files_count":   r.Table("experiment2datafile").GetAllByIndex("experiment_id", e.Field("id")).Count(),
 		"samples_count": r.Table("experiment2sample").GetAllByIndex("experiment_id", e.Field("id")).Count(),
 	}

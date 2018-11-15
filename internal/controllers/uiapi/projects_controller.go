@@ -25,6 +25,19 @@ func (p *ProjectsController) GetProjectsForUser(c echo.Context) error {
 	}
 }
 
-func (p *ProjectsController) GetExperimentsForProject(c echo.Context) error {
-	return nil
+func (p *ProjectsController) GetProjectOverview(c echo.Context) error {
+	var req struct {
+		ProjectID string `json:"project_id"`
+	}
+
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
+
+	user := c.Get("User").(model.UserSchema)
+	if project, err := p.projectsStore.GetProjectOverview(req.ProjectID, user.ID); err != nil {
+		return err
+	} else {
+		return c.JSON(http.StatusOK, project)
+	}
 }

@@ -2,8 +2,9 @@ package model
 
 type ExperimentSchema struct {
 	Model
-	Description string `db:"description" json:"description"`
-	Status      string `db:"status" json:"status"`
+	Description  string       `db:"description" json:"description"`
+	Status       string       `db:"status" json:"status"`
+	OwnerDetails OwnerDetails `json:"owner_details" r:"owner_details"`
 }
 
 type ExperimentOverviewModel struct {

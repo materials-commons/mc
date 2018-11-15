@@ -48,6 +48,23 @@ type ProjectUserModel struct {
 	UserID    string `db:"user_id" json:"user_id" r:"user_id"`
 }
 
+type ProjectOverviewModel struct {
+	ProjectSchema
+	Shortcuts      []ProjectShortcut         `json:"shortcuts" r:"shortcuts"`
+	RootDir        []DatadirSchema           `json:"root_dir" r:"root_dir"`
+	OwnerDetails   OwnerDetails              `json:"owner_details" r:"owner_details"`
+	FilesCount     int                       `json:"files_count" r:"files_count"`
+	UsersCount     int                       `json:"users_count" r:"users_count"`
+	SamplesCount   int                       `json:"samples_count" r:"samples_count"`
+	ProcessesCount int                       `json:"processes_count" r:"processes_count"`
+	Experiments    []ExperimentOverviewModel `json:"experiments" r:"experiments"`
+}
+
+type ProjectShortcut struct {
+	Name string `json:"name" r:"name"`
+	ID   string `json:"id" r:"id"`
+}
+
 type ProjectSimpleModel struct {
 	ProjectSchema
 	RootDir []DatadirSchema `json:"root_dir" r:"root_dir"`

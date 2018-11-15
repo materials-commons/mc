@@ -48,6 +48,10 @@ func (e *ProjectsMemory) GetProject(id string) (model.ProjectExtendedModel, erro
 	return p, nil
 }
 
+func (e *ProjectsMemory) GetProjectOverview(projectID, userID string) (model.ProjectOverviewModel, error) {
+	return model.ProjectOverviewModel{}, mc.ErrNotFound
+}
+
 func (e *ProjectsMemory) GetProjectSimple(id string) (model.ProjectSimpleModel, error) {
 	proj, ok := e.DB[id]
 	if !ok {
