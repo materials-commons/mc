@@ -41,6 +41,29 @@ func (e *ProjectsRethinkdb) AddProject(project model.ProjectSchema) (model.Proje
 	return proj, err
 }
 
+func (e *ProjectsRethinkdb) AddAccessToProject(projectID, userID string) (model.ProjectAccessEntry, error) {
+	errMsg := fmt.Sprintf("Unable to add user %s to project %s", userID, projectID)
+	entry := model.ProjectAccessEntry{
+		UserID:    userID,
+		ProjectID: projectID,
+		Birthtime: time.Now(),
+	}
+	var created model.ProjectAccessEntry
+	resp, err := r.Table("access").Insert(entry, r.InsertOpts{ReturnChanges: true}).RunWrite(e.Session)
+	if err := checkRethinkdbInsertError(resp, err, errMsg); err != nil {
+		return created, err
+	}
+
+	err = encoding.Decode(&created, resp.Changes[0].NewValue)
+	return created, err
+}
+
+func (e *ProjectsRethinkdb) DeleteAccessEntry(id string) error {
+	errMsg := fmt.Sprintf("Unable to delete access entry %s", id)
+	resp, err := r.Table("access").Get(id).Delete().RunWrite(e.Session)
+	return checkRethinkdbDeleteError(resp, err, errMsg)
+}
+
 func (e *ProjectsRethinkdb) GetProjectOverview(projectID, userID string) (model.ProjectOverviewModel, error) {
 	var project model.ProjectOverviewModel
 	errMsg := fmt.Sprintf("No such project %s for user %s", projectID, userID)

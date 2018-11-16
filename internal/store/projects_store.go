@@ -52,3 +52,11 @@ func (s *ProjectsStore) GetProjectOverview(projectID, userID string) (model.Proj
 func (s *ProjectsStore) GetProjectAccessEntries(projectID string) ([]model.ProjectUserAccessEntry, error) {
 	return s.pStoreEngine.GetProjectAccessEntries(projectID)
 }
+
+func (s *ProjectsStore) AddUserToProject(projectID, userID string) (model.ProjectAccessEntry, error) {
+	return s.pStoreEngine.AddAccessToProject(projectID, userID)
+}
+
+func (s *ProjectsStore) DeleteAccessEntry(id string) error {
+	return s.pStoreEngine.DeleteAccessEntry(id)
+}

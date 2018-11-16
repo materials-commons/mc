@@ -26,6 +26,8 @@ type ProjectsStoreEngine interface {
 	DeleteProject(id string) error
 	UpdateProjectName(id string, name string, updatedAt time.Time) error
 	UpdateProjectDescription(id string, description string, updatedAt time.Time) error
+	AddAccessToProject(projectID, userID string) (model.ProjectAccessEntry, error)
+	DeleteAccessEntry(id string) error
 }
 
 type AccessStoreEngine interface {
