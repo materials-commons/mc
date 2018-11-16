@@ -52,7 +52,7 @@ func (e *ProjectsMemory) GetProjectOverview(projectID, userID string) (model.Pro
 	return model.ProjectOverviewModel{}, mc.ErrNotFound
 }
 
-func (e *ProjectsMemory) GetProjectAccessEntries(id string) ([]model.ProjectAccessEntry, error) {
+func (e *ProjectsMemory) GetProjectAccessEntries(id string) ([]model.ProjectUserAccessEntry, error) {
 	return nil, mc.ErrNotFound
 }
 

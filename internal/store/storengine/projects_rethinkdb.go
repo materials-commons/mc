@@ -76,8 +76,8 @@ func projectTopLevelDir(p r.Term) interface{} {
 	}
 }
 
-func (e *ProjectsRethinkdb) GetProjectAccessEntries(id string) ([]model.ProjectAccessEntry, error) {
-	var users []model.ProjectAccessEntry
+func (e *ProjectsRethinkdb) GetProjectAccessEntries(id string) ([]model.ProjectUserAccessEntry, error) {
+	var users []model.ProjectUserAccessEntry
 	errMsg := fmt.Sprintf("No such project %s", id)
 	res, err := r.Table("access").GetAllByIndex("project_id", id).
 		EqJoin("user_id", r.Table("users")).
