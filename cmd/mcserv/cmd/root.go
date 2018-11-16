@@ -202,7 +202,7 @@ func setupUIAPIRoutes(parent *echo.Group, db store.DB) {
 	projectsController := uiapi.NewProjectsController(db)
 	g.POST("/getProjectsForUser", projectsController.GetProjectsForUser).Name = "getProjectsForUser"
 	g.POST("/getProjectOverview", projectsController.GetProjectOverview).Name = "getProjectOverview"
-	g.POST("/getProjectUsers", projectsController.GetProjectUsers).Name = "getProjectUsers"
+	g.POST("/getProjectAccessEntries", projectsController.GetProjectAccessEntries).Name = "getProjectAccessEntries"
 }
 
 func createAPIKeyMiddleware(db store.DB) echo.MiddlewareFunc {

@@ -49,6 +49,6 @@ func (s *ProjectsStore) GetProjectOverview(projectID, userID string) (model.Proj
 	return s.pStoreEngine.GetProjectOverview(projectID, userID)
 }
 
-func (s *ProjectsStore) GetProjectUsers(projectID string) ([]model.ProjectUser, error) {
-	return s.pStoreEngine.GetProjectUsers(projectID)
+func (s *ProjectsStore) GetProjectAccessEntries(projectID string) ([]model.ProjectAccessEntry, error) {
+	return s.pStoreEngine.GetProjectAccessEntries(projectID)
 }
