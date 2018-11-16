@@ -76,6 +76,20 @@ func projectTopLevelDir(p r.Term) interface{} {
 	}
 }
 
+func (e *ProjectsRethinkdb) GetProjectUsers(id string) ([]model.ProjectUser, error) {
+	var users []model.ProjectUser
+	errMsg := fmt.Sprintf("No such project %s", id)
+	res, err := r.Table("access").GetAllByIndex("project_id", id).
+		EqJoin("user_id", r.Table("users")).Zip().Run(e.Session)
+	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
+		return users, err
+	}
+	defer res.Close()
+
+	err = res.All(&users)
+	return users, err
+}
+
 func (e *ProjectsRethinkdb) GetProject(id string) (model.ProjectExtendedModel, error) {
 	var project model.ProjectExtendedModel
 	errMsg := fmt.Sprintf("No such project %s", id)

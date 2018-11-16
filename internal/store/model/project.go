@@ -60,6 +60,11 @@ type ProjectOverviewModel struct {
 	Experiments    []ExperimentOverviewModel `json:"experiments" r:"experiments"`
 }
 
+type ProjectUser struct {
+	ID       string `json:"id" r:"id"`
+	Fullname string `json:"fullname" r:"fullname"`
+}
+
 type ProjectShortcut struct {
 	Name string `json:"name" r:"name"`
 	ID   string `json:"id" r:"id"`

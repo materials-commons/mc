@@ -12,7 +12,7 @@ type UserSchema struct {
 	ModelSimpleNoID
 	ID              string    `db:"id" json:"id" r:"id"`
 	Admin           bool      `db:"admin" json:"admin" r:"admin"`
-	APIKey          string    `db:"apikey" json:"apikey" r:"apikey"`
+	APIKey          string    `db:"apikey" json:"-" r:"apikey"`
 	BetaUser        bool      `db:"beta_user" json:"beta_user" r:"beta_user"`
 	DemoInstalled   bool      `db:"demo_installed" json:"demo_installed" r:"demo_installed"`
 	Email           string    `db:"email" json:"email" r:"email"`

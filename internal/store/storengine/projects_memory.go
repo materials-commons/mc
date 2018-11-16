@@ -52,6 +52,10 @@ func (e *ProjectsMemory) GetProjectOverview(projectID, userID string) (model.Pro
 	return model.ProjectOverviewModel{}, mc.ErrNotFound
 }
 
+func (e *ProjectsMemory) GetProjectUsers(id string) ([]model.ProjectUser, error) {
+	return nil, mc.ErrNotFound
+}
+
 func (e *ProjectsMemory) GetProjectSimple(id string) (model.ProjectSimpleModel, error) {
 	proj, ok := e.DB[id]
 	if !ok {

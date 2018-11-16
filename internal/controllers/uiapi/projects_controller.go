@@ -25,10 +25,12 @@ func (p *ProjectsController) GetProjectsForUser(c echo.Context) error {
 	}
 }
 
+type projectReq struct {
+	ProjectID string `json:"project_id"`
+}
+
 func (p *ProjectsController) GetProjectOverview(c echo.Context) error {
-	var req struct {
-		ProjectID string `json:"project_id"`
-	}
+	var req projectReq
 
 	if err := c.Bind(&req); err != nil {
 		return err
@@ -39,5 +41,19 @@ func (p *ProjectsController) GetProjectOverview(c echo.Context) error {
 		return err
 	} else {
 		return c.JSON(http.StatusOK, project)
+	}
+}
+
+func (p *ProjectsController) GetProjectUsers(c echo.Context) error {
+	var req projectReq
+
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
+
+	if users, err := p.projectsStore.GetProjectUsers(req.ProjectID); err != nil {
+		return err
+	} else {
+		return c.JSON(http.StatusOK, users)
 	}
 }

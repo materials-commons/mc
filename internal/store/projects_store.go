@@ -48,3 +48,7 @@ func (s *ProjectsStore) GetProjectsForUser(userID string) ([]model.ProjectCountM
 func (s *ProjectsStore) GetProjectOverview(projectID, userID string) (model.ProjectOverviewModel, error) {
 	return s.pStoreEngine.GetProjectOverview(projectID, userID)
 }
+
+func (s *ProjectsStore) GetProjectUsers(projectID string) ([]model.ProjectUser, error) {
+	return s.pStoreEngine.GetProjectUsers(projectID)
+}
