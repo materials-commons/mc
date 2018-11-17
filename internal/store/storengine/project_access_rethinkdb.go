@@ -43,6 +43,28 @@ func (e *ProjectAccessRethinkdb) DeleteAllAccessForProject(projectID string) err
 	return checkRethinkdbDeleteError(resp, err, errMsg)
 }
 
+func (e *ProjectAccessRethinkdb) GetProjectAccess(projectID string) (model.ProjectAccessModel, error) {
+	var projectAccessModel model.ProjectAccessModel
+	errMsg := fmt.Sprintf("Couldn't retrieve project access for project %s", projectID)
+
+	res, err := r.Table("projects").Get(projectID).Pluck("id", "owner").
+		Merge(accessEntries).Run(e.Session)
+	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
+		return projectAccessModel, err
+	}
+
+	defer res.Close()
+
+	err = res.One(&projectAccessModel)
+	return projectAccessModel, err
+}
+
+func accessEntries(p r.Term) interface{} {
+	return map[string]interface{}{
+		"access_entries": r.Table("access").GetAllByIndex("project_id", p.Field("id")).CoerceTo("array"),
+	}
+}
+
 func (e *ProjectAccessRethinkdb) GetProjectAccessEntries(projectID string) ([]model.ProjectAccessSchema, error) {
 	var entries []model.ProjectAccessSchema
 	errMsg := fmt.Sprintf("Can't retrieve entries for project %s", projectID)

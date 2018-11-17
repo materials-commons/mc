@@ -13,3 +13,9 @@ type ProjectUserAccessModel struct {
 	ProjectAccessSchema
 	Fullname string `json:"fullname" r:"fullname"`
 }
+
+type ProjectAccessModel struct {
+	ID            string                `json:"id" r:"id"`
+	Owner         string                `json:"owner" r:"owner"`
+	AccessEntries []ProjectAccessSchema `json:"access_entries" r:"access_entries"`
+}
