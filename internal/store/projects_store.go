@@ -53,7 +53,7 @@ func (s *ProjectsStore) GetProjectAccessEntries(projectID string) ([]model.Proje
 	return s.pStoreEngine.GetProjectAccessEntries(projectID)
 }
 
-func (s *ProjectsStore) AddUserToProject(projectID, userID string) (model.ProjectAccessEntry, error) {
+func (s *ProjectsStore) AddUserToProject(projectID, userID string) (model.ProjectAccessSchema, error) {
 	return s.pStoreEngine.AddAccessToProject(projectID, userID)
 }
 

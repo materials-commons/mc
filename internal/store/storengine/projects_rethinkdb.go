@@ -41,14 +41,14 @@ func (e *ProjectsRethinkdb) AddProject(project model.ProjectSchema) (model.Proje
 	return proj, err
 }
 
-func (e *ProjectsRethinkdb) AddAccessToProject(projectID, userID string) (model.ProjectAccessEntry, error) {
+func (e *ProjectsRethinkdb) AddAccessToProject(projectID, userID string) (model.ProjectAccessSchema, error) {
 	errMsg := fmt.Sprintf("Unable to add user %s to project %s", userID, projectID)
-	entry := model.ProjectAccessEntry{
+	entry := model.ProjectAccessSchema{
 		UserID:    userID,
 		ProjectID: projectID,
 		Birthtime: time.Now(),
 	}
-	var created model.ProjectAccessEntry
+	var created model.ProjectAccessSchema
 	resp, err := r.Table("access").Insert(entry, r.InsertOpts{ReturnChanges: true}).RunWrite(e.Session)
 	if err := checkRethinkdbInsertError(resp, err, errMsg); err != nil {
 		return created, err

@@ -17,7 +17,7 @@ func NewProjectAccessRethinkdb(session *r.Session) *ProjectAccessRethinkdb {
 	return &ProjectAccessRethinkdb{Session: session}
 }
 
-func (e *ProjectAccessRethinkdb) AddAccessEntry(entry model.ProjectAccessEntry) (model.ProjectAccessEntry, error) {
+func (e *ProjectAccessRethinkdb) AddAccessEntry(entry model.ProjectAccessSchema) (model.ProjectAccessSchema, error) {
 	errMsg := fmt.Sprintf("Unable to insert access entry %+v", entry)
 
 	resp, err := r.Table("access").Insert(entry, r.InsertOpts{ReturnChanges: true}).RunWrite(e.Session)
@@ -25,7 +25,7 @@ func (e *ProjectAccessRethinkdb) AddAccessEntry(entry model.ProjectAccessEntry) 
 		return entry, err
 	}
 
-	var accessEntry model.ProjectAccessEntry
+	var accessEntry model.ProjectAccessSchema
 	err = encoding.Decode(&accessEntry, resp.Changes[0].NewValue)
 	return accessEntry, err
 }
@@ -43,8 +43,8 @@ func (e *ProjectAccessRethinkdb) DeleteAllAccessForProject(projectID string) err
 	return checkRethinkdbDeleteError(resp, err, errMsg)
 }
 
-func (e *ProjectAccessRethinkdb) GetProjectAccessEntries(projectID string) ([]model.ProjectAccessEntry, error) {
-	var entries []model.ProjectAccessEntry
+func (e *ProjectAccessRethinkdb) GetProjectAccessEntries(projectID string) ([]model.ProjectAccessSchema, error) {
+	var entries []model.ProjectAccessSchema
 	errMsg := fmt.Sprintf("Can't retrieve entries for project %s", projectID)
 
 	res, err := r.Table("access").GetAllByIndex("project_id", projectID).Run(e.Session)
@@ -57,8 +57,8 @@ func (e *ProjectAccessRethinkdb) GetProjectAccessEntries(projectID string) ([]mo
 	return entries, err
 }
 
-func (e *ProjectAccessRethinkdb) GetUserAccessEntries(userID string) ([]model.ProjectAccessEntry, error) {
-	var entries []model.ProjectAccessEntry
+func (e *ProjectAccessRethinkdb) GetUserAccessEntries(userID string) ([]model.ProjectAccessSchema, error) {
+	var entries []model.ProjectAccessSchema
 	errMsg := fmt.Sprintf("Can't retrieve access entries for user %s", userID)
 	res, err := r.Table("access").GetAllByIndex("user_id", userID).Run(e.Session)
 	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {

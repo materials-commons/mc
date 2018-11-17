@@ -56,8 +56,8 @@ func (e *ProjectsMemory) GetProjectAccessEntries(id string) ([]model.ProjectUser
 	return nil, mc.ErrNotFound
 }
 
-func (e *ProjectsMemory) AddAccessToProject(projectID, userID string) (model.ProjectAccessEntry, error) {
-	return model.ProjectAccessEntry{}, nil
+func (e *ProjectsMemory) AddAccessToProject(projectID, userID string) (model.ProjectAccessSchema, error) {
+	return model.ProjectAccessSchema{}, nil
 }
 
 func (e *ProjectsMemory) DeleteAccessEntry(id string) error {
