@@ -1,8 +1,6 @@
 package model
 
 import (
-	"time"
-
 	"github.com/go-ozzo/ozzo-validation"
 	"github.com/materials-commons/mc/pkg/mc"
 	"github.com/pkg/errors"
@@ -60,19 +58,6 @@ type ProjectOverviewModel struct {
 	SamplesCount   int                       `json:"samples_count" r:"samples_count"`
 	ProcessesCount int                       `json:"processes_count" r:"processes_count"`
 	Experiments    []ExperimentOverviewModel `json:"experiments" r:"experiments"`
-}
-
-type ProjectUserAccessEntry struct {
-	ID       string `json:"id" r:"id"`
-	UserID   string `json:"user_id" r:"user_id"`
-	Fullname string `json:"fullname" r:"fullname"`
-}
-
-type ProjectAccessEntry struct {
-	ID        string    `json:"id" r:"id"`
-	UserID    string    `json:"user_id" r:"user_id"`
-	Birthtime time.Time `json:"birthtime" r:"birthtime"`
-	ProjectID string    `json:"project_id" r:"project_id"`
 }
 
 type ProjectShortcut struct {

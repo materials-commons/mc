@@ -20,7 +20,7 @@ type ProjectsStoreEngine interface {
 	AddProject(project model.ProjectSchema) (model.ProjectSchema, error)
 	GetProject(id string) (model.ProjectExtendedModel, error)
 	GetProjectOverview(projectID, userID string) (model.ProjectOverviewModel, error)
-	GetProjectAccessEntries(projectID string) ([]model.ProjectUserAccessEntry, error)
+	GetProjectAccessEntries(projectID string) ([]model.ProjectUserAccessModel, error)
 	GetProjectSimple(id string) (model.ProjectSimpleModel, error)
 	GetAllProjectsForUser(user string) ([]model.ProjectCountModel, error)
 	DeleteProject(id string) error
@@ -31,11 +31,11 @@ type ProjectsStoreEngine interface {
 }
 
 type AccessStoreEngine interface {
-	AddAccessEntry(entry model.AccessSchema) (model.AccessSchema, error)
+	AddAccessEntry(entry model.ProjectAccessEntry) (model.ProjectAccessEntry, error)
 	DeleteAccess(projectID, userID string) error
 	DeleteAllAccessForProject(projectID string) error
-	GetProjectAccessEntries(projectID string) ([]model.AccessSchema, error)
-	GetUserAccessEntries(userID string) ([]model.AccessSchema, error)
+	GetProjectAccessEntries(projectID string) ([]model.ProjectAccessEntry, error)
+	GetUserAccessEntries(userID string) ([]model.ProjectAccessEntry, error)
 }
 
 type DatafilesStoreEngine interface {

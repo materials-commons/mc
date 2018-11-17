@@ -17,7 +17,7 @@ func NewAccessRethinkdb(session *r.Session) *AccessRethinkdb {
 	return &AccessRethinkdb{Session: session}
 }
 
-func (e *AccessRethinkdb) AddAccessEntry(entry model.AccessSchema) (model.AccessSchema, error) {
+func (e *AccessRethinkdb) AddAccessEntry(entry model.ProjectAccessEntry) (model.ProjectAccessEntry, error) {
 	errMsg := fmt.Sprintf("Unable to insert access entry %+v", entry)
 
 	resp, err := r.Table("access").Insert(entry, r.InsertOpts{ReturnChanges: true}).RunWrite(e.Session)
@@ -25,7 +25,7 @@ func (e *AccessRethinkdb) AddAccessEntry(entry model.AccessSchema) (model.Access
 		return entry, err
 	}
 
-	var accessEntry model.AccessSchema
+	var accessEntry model.ProjectAccessEntry
 	err = encoding.Decode(&accessEntry, resp.Changes[0].NewValue)
 	return accessEntry, err
 }
@@ -43,8 +43,8 @@ func (e *AccessRethinkdb) DeleteAllAccessForProject(projectID string) error {
 	return checkRethinkdbDeleteError(resp, err, errMsg)
 }
 
-func (e *AccessRethinkdb) GetProjectAccessEntries(projectID string) ([]model.AccessSchema, error) {
-	var entries []model.AccessSchema
+func (e *AccessRethinkdb) GetProjectAccessEntries(projectID string) ([]model.ProjectAccessEntry, error) {
+	var entries []model.ProjectAccessEntry
 	errMsg := fmt.Sprintf("Can't retrieve entries for project %s", projectID)
 
 	res, err := r.Table("access").GetAllByIndex("project_id", projectID).Run(e.Session)
@@ -57,8 +57,8 @@ func (e *AccessRethinkdb) GetProjectAccessEntries(projectID string) ([]model.Acc
 	return entries, err
 }
 
-func (e *AccessRethinkdb) GetUserAccessEntries(userID string) ([]model.AccessSchema, error) {
-	var entries []model.AccessSchema
+func (e *AccessRethinkdb) GetUserAccessEntries(userID string) ([]model.ProjectAccessEntry, error) {
+	var entries []model.ProjectAccessEntry
 	errMsg := fmt.Sprintf("Can't retrieve access entries for user %s", userID)
 	res, err := r.Table("access").GetAllByIndex("user_id", userID).Run(e.Session)
 	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
