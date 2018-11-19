@@ -48,6 +48,15 @@ type ProjectUserModel struct {
 	UserID    string `db:"user_id" json:"user_id" r:"user_id"`
 }
 
+type ProjectNote struct {
+}
+
+type ProjectTodo struct {
+	Title string `json:"title" r:"title"`
+	Edit  bool   `json:"edit" r:"edit"`
+	Done  bool   `json:"done" r:"done"`
+}
+
 type ProjectOverviewModel struct {
 	ProjectSchema
 	Shortcuts      []ProjectShortcut         `json:"shortcuts" r:"shortcuts"`
@@ -58,6 +67,7 @@ type ProjectOverviewModel struct {
 	SamplesCount   int                       `json:"samples_count" r:"samples_count"`
 	ProcessesCount int                       `json:"processes_count" r:"processes_count"`
 	Experiments    []ExperimentOverviewModel `json:"experiments" r:"experiments"`
+	Todos          []ProjectTodo             `json:"todos" r:"todos"`
 }
 
 type ProjectShortcut struct {

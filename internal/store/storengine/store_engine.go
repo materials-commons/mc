@@ -18,16 +18,12 @@ type UsersStoreEngine interface {
 
 type ProjectsStoreEngine interface {
 	AddProject(project model.ProjectSchema) (model.ProjectSchema, error)
-	GetProject(id string) (model.ProjectExtendedModel, error)
 	GetProjectOverview(projectID, userID string) (model.ProjectOverviewModel, error)
-	GetProjectAccessEntries(projectID string) ([]model.ProjectUserAccessModel, error)
 	GetProjectSimple(id string) (model.ProjectSimpleModel, error)
 	GetAllProjectsForUser(user string) ([]model.ProjectCountModel, error)
 	DeleteProject(id string) error
 	UpdateProjectName(id string, name string, updatedAt time.Time) error
 	UpdateProjectDescription(id string, description string, updatedAt time.Time) error
-	AddAccessToProject(projectID, userID string) (model.ProjectAccessSchema, error)
-	DeleteAccessEntry(id string) error
 }
 
 type AccessStoreEngine interface {

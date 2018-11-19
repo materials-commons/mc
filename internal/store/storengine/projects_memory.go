@@ -36,32 +36,8 @@ func (e *ProjectsMemory) AddProject(project model.ProjectSchema) (model.ProjectS
 	return project, nil
 }
 
-func (e *ProjectsMemory) GetProject(id string) (model.ProjectExtendedModel, error) {
-	proj, ok := e.DB[id]
-	if !ok {
-		return model.ProjectExtendedModel{}, mc.ErrNotFound
-	}
-
-	p := model.ProjectExtendedModel{
-		ProjectSchema: proj,
-	}
-	return p, nil
-}
-
 func (e *ProjectsMemory) GetProjectOverview(projectID, userID string) (model.ProjectOverviewModel, error) {
 	return model.ProjectOverviewModel{}, mc.ErrNotFound
-}
-
-func (e *ProjectsMemory) GetProjectAccessEntries(id string) ([]model.ProjectUserAccessModel, error) {
-	return nil, mc.ErrNotFound
-}
-
-func (e *ProjectsMemory) AddAccessToProject(projectID, userID string) (model.ProjectAccessSchema, error) {
-	return model.ProjectAccessSchema{}, nil
-}
-
-func (e *ProjectsMemory) DeleteAccessEntry(id string) error {
-	return nil
 }
 
 func (e *ProjectsMemory) GetProjectSimple(id string) (model.ProjectSimpleModel, error) {

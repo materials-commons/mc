@@ -41,29 +41,6 @@ func (e *ProjectsRethinkdb) AddProject(project model.ProjectSchema) (model.Proje
 	return proj, err
 }
 
-func (e *ProjectsRethinkdb) AddAccessToProject(projectID, userID string) (model.ProjectAccessSchema, error) {
-	errMsg := fmt.Sprintf("Unable to add user %s to project %s", userID, projectID)
-	entry := model.ProjectAccessSchema{
-		UserID:    userID,
-		ProjectID: projectID,
-		Birthtime: time.Now(),
-	}
-	var created model.ProjectAccessSchema
-	resp, err := r.Table("access").Insert(entry, r.InsertOpts{ReturnChanges: true}).RunWrite(e.Session)
-	if err := checkRethinkdbInsertError(resp, err, errMsg); err != nil {
-		return created, err
-	}
-
-	err = encoding.Decode(&created, resp.Changes[0].NewValue)
-	return created, err
-}
-
-func (e *ProjectsRethinkdb) DeleteAccessEntry(id string) error {
-	errMsg := fmt.Sprintf("Unable to delete access entry %s", id)
-	resp, err := r.Table("access").Get(id).Delete().RunWrite(e.Session)
-	return checkRethinkdbDeleteError(resp, err, errMsg)
-}
-
 func (e *ProjectsRethinkdb) GetProjectOverview(projectID, userID string) (model.ProjectOverviewModel, error) {
 	var project model.ProjectOverviewModel
 	errMsg := fmt.Sprintf("No such project %s for user %s", projectID, userID)
@@ -97,35 +74,6 @@ func projectTopLevelDir(p r.Term) interface{} {
 		"root_dir": r.Table("datadirs").
 			GetAllByIndex("datadir_project_name", []interface{}{p.Field("id"), p.Field("name")}).CoerceTo("array"),
 	}
-}
-
-func (e *ProjectsRethinkdb) GetProjectAccessEntries(id string) ([]model.ProjectUserAccessModel, error) {
-	var users []model.ProjectUserAccessModel
-	errMsg := fmt.Sprintf("No such project %s", id)
-	res, err := r.Table("access").GetAllByIndex("project_id", id).
-		EqJoin("user_id", r.Table("users")).
-		Without(map[string]interface{}{"right": map[string]interface{}{"id": true}}).Zip().Run(e.Session)
-	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
-		return users, err
-	}
-	defer res.Close()
-
-	err = res.All(&users)
-	return users, err
-}
-
-func (e *ProjectsRethinkdb) GetProject(id string) (model.ProjectExtendedModel, error) {
-	var project model.ProjectExtendedModel
-	errMsg := fmt.Sprintf("No such project %s", id)
-	res, err := r.Table("projects").Get(id).Merge(projectDetails).Run(e.Session)
-
-	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
-		return project, err
-	}
-	defer res.Close()
-
-	err = res.One(&project)
-	return project, err
 }
 
 func (e *ProjectsRethinkdb) GetAllProjectsForUser(user string) ([]model.ProjectCountModel, error) {
