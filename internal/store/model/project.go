@@ -49,6 +49,10 @@ type ProjectUserModel struct {
 }
 
 type ProjectNote struct {
+	ModelSimple
+	Note  string `json:"note" r:"note"`
+	Owner string `json:"owner" r:"owner"`
+	Title string `json:"title" r:"title"`
 }
 
 type ProjectTodo struct {

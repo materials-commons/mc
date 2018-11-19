@@ -41,6 +41,36 @@ func (e *ProjectsRethinkdb) AddProject(project model.ProjectSchema) (model.Proje
 	return proj, err
 }
 
+func (e *ProjectsRethinkdb) GetProjectAccessEntries(id string) ([]model.ProjectUserAccessModel, error) {
+	var users []model.ProjectUserAccessModel
+	errMsg := fmt.Sprintf("No such project %s", id)
+	res, err := r.Table("access").GetAllByIndex("project_id", id).
+		EqJoin("user_id", r.Table("users")).
+		Without(map[string]interface{}{"right": map[string]interface{}{"id": true}}).Zip().Run(e.Session)
+	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
+		return users, err
+	}
+	defer res.Close()
+
+	err = res.All(&users)
+	return users, err
+}
+
+func (e *ProjectsRethinkdb) GetProjectNotes(projectID, userID string) ([]model.ProjectNote, error) {
+	var notes []model.ProjectNote
+	errMsg := fmt.Sprintf("No such project %s for user %s", projectID, userID)
+	res, err := r.Table("access").GetAllByIndex("user_project", []interface{}{userID, projectID}).
+		EqJoin("project_id", r.Table("note2item"), r.EqJoinOpts{Index: "item_id"}).Zip().
+		EqJoin("note_id", r.Table("notes")).Zip().Run(e.Session)
+	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
+		return notes, err
+	}
+	defer res.Close()
+
+	err = res.All(&notes)
+	return notes, err
+}
+
 func (e *ProjectsRethinkdb) GetProjectOverview(projectID, userID string) (model.ProjectOverviewModel, error) {
 	var project model.ProjectOverviewModel
 	errMsg := fmt.Sprintf("No such project %s for user %s", projectID, userID)

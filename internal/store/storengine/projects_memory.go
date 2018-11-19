@@ -36,6 +36,10 @@ func (e *ProjectsMemory) AddProject(project model.ProjectSchema) (model.ProjectS
 	return project, nil
 }
 
+func (e *ProjectsMemory) GetProjectAccessEntries(id string) ([]model.ProjectUserAccessModel, error) {
+	return nil, mc.ErrNotFound
+}
+
 func (e *ProjectsMemory) GetProjectOverview(projectID, userID string) (model.ProjectOverviewModel, error) {
 	return model.ProjectOverviewModel{}, mc.ErrNotFound
 }
@@ -51,6 +55,10 @@ func (e *ProjectsMemory) GetProjectSimple(id string) (model.ProjectSimpleModel, 
 	}
 
 	return p, nil
+}
+
+func (e *ProjectsMemory) GetProjectNotes(projectID, userID string) ([]model.ProjectNote, error) {
+	return nil, mc.ErrNotFound
 }
 
 func (e *ProjectsMemory) GetAllProjectsForUser(user string) ([]model.ProjectCountModel, error) {

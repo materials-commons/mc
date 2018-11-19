@@ -1,7 +1,6 @@
 package uiapi
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo"
@@ -45,7 +44,7 @@ func (p *ProjectsController) GetProjectOverview(c echo.Context) error {
 	}
 }
 
-func (p *ProjectsController) GetProjectNotesAndTodos(c echo.Context) error {
+func (p *ProjectsController) GetProjectNotes(c echo.Context) error {
 	var req projectReq
 
 	if err := c.Bind(&req); err != nil {
@@ -54,7 +53,23 @@ func (p *ProjectsController) GetProjectNotesAndTodos(c echo.Context) error {
 
 	user := c.Get("User").(model.UserSchema)
 
-	fmt.Print(user)
+	if notes, err := p.projectsStore.GetProjectNotes(req.ProjectID, user.ID); err != nil {
+		return err
+	} else {
+		return c.JSON(http.StatusOK, notes)
+	}
+}
 
-	return nil
+func (p *ProjectsController) GetProjectAccessEntries(c echo.Context) error {
+	var req projectReq
+
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
+
+	if users, err := p.projectsStore.GetProjectAccessEntries(req.ProjectID); err != nil {
+		return err
+	} else {
+		return c.JSON(http.StatusOK, users)
+	}
 }
