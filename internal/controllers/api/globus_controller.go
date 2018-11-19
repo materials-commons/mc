@@ -17,7 +17,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-const globusBaseURL = "https://www.globus.org/app/transfer"
+//const globusBaseURL = "https://www.globus.org/app/transfer"
+const globusBaseURL = "https://app.globus.org/file-manager"
 
 type GlobusController struct {
 	client             *globusapi.Client

@@ -90,6 +90,11 @@ func (m *UploadMonitor) retrieveAndProcessUploads(c context.Context) {
 func (m *UploadMonitor) processTransfers(transfers *globusapi.TransferItems) {
 	transferItem := transfers.Transfers[0]
 
+	// Transfer items with a blank DestinationPath are downloads not uploads.
+	if transferItem.DestinationPath == "" {
+		return
+	}
+
 	// Destination path will have the following format: /__globus_uploads/<id of upload request>/...rest of path...
 	// Split will return ["", "__globus_uploads", "<id of upload request", ....]
 	// So the 3rd entry in the array is the id in the globus_uploads table we want to look up.
