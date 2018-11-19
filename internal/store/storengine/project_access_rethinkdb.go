@@ -61,7 +61,9 @@ func (e *ProjectAccessRethinkdb) GetProjectAccess(projectID string) (model.Proje
 
 func accessEntries(p r.Term) interface{} {
 	return map[string]interface{}{
-		"access_entries": r.Table("access").GetAllByIndex("project_id", p.Field("id")).CoerceTo("array"),
+		"access_entries": r.Table("access").GetAllByIndex("project_id", p.Field("id")).
+			EqJoin("user_id", r.Table("users")).
+			Without(map[string]interface{}{"right": map[string]interface{}{"id": true}}).Zip().CoerceTo("array"),
 	}
 }
 
