@@ -13,6 +13,11 @@ type DatadirSchema struct {
 	Shortcut bool   `db:"shortcut" json:"shortcut" r:"shortcut"`
 }
 
+type DatadirSimpleModel struct {
+	ID   string `db:"id" json:"id" r:"id"`
+	Name string `db:"name" json:"name" r:"name"`
+}
+
 type AddDatadirModel struct {
 	Name      string `json:"name"`
 	Owner     string `json:"owner"`
