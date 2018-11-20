@@ -206,7 +206,7 @@ func setupUIAPIRoutes(parent *echo.Group, db store.DB) {
 	g.POST("/getProjectAccessEntries", projectsController.GetProjectAccessEntries).Name = "getProjectAccessEntries"
 
 	datadirsController := uiapi.NewDatadirsController(db)
-	g.POST("/getDirectoriesForProject", datadirsController.GetDirectoriesForProject).Name = "getDirectoriesForProject"
+	g.POST("/getDirectoryForProject", datadirsController.GetDirectoryForProject).Name = "getDirectoryForProject"
 	g.POST("/getFilesForDirectory", datadirsController.GetFilesForDirectory).Name = "getFilesForDirectory"
 }
 

@@ -32,8 +32,8 @@ func (e *DatadirsMemory) AddDir(dir model.DatadirSchema) (model.DatadirSchema, e
 	return dir, nil
 }
 
-func (e *DatadirsMemory) GetDatadirsForProject(projectID, userID string) ([]model.DatadirSimpleModel, error) {
-	return nil, mc.ErrNotFound
+func (e *DatadirsMemory) GetDatadirForProject(projectID, userID, dirID string) (model.DatadirEntryModel, error) {
+	return model.DatadirEntryModel{}, mc.ErrNotFound
 }
 
 func (e *DatadirsMemory) GetFilesForDatadir(projectID, userID, dirID string) ([]model.DatafileSimpleModel, error) {

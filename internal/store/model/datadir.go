@@ -13,6 +13,12 @@ type DatadirSchema struct {
 	Shortcut bool   `db:"shortcut" json:"shortcut" r:"shortcut"`
 }
 
+type DatadirEntryModel struct {
+	DatadirSimpleModel
+	Directories []DatadirSimpleModel  `json:"directories" r:"directories"`
+	Files       []DatafileSimpleModel `json:"files" r:"files"`
+}
+
 type DatadirSimpleModel struct {
 	ID   string `db:"id" json:"id" r:"id"`
 	Name string `db:"name" json:"name" r:"name"`

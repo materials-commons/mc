@@ -16,9 +16,10 @@ func NewDatadirsController(db store.DB) *DatadirsController {
 	return &DatadirsController{datadirsStore: db.DatadirsStore()}
 }
 
-func (d *DatadirsController) GetDirectoriesForProject(c echo.Context) error {
+func (d *DatadirsController) GetDirectoryForProject(c echo.Context) error {
 	var req struct {
-		ProjectID string `json:"project_id"`
+		ProjectID   string `json:"project_id"`
+		DirectoryID string `json:"directory_id"`
 	}
 
 	if err := c.Bind(&req); err != nil {
@@ -27,7 +28,7 @@ func (d *DatadirsController) GetDirectoriesForProject(c echo.Context) error {
 
 	user := c.Get("User").(model.UserSchema)
 
-	if dirs, err := d.datadirsStore.GetDatadirsForProject(req.ProjectID, user.ID); err != nil {
+	if dirs, err := d.datadirsStore.GetDatadirForProject(req.ProjectID, user.ID, req.DirectoryID); err != nil {
 		return err
 	} else {
 		return c.JSON(http.StatusOK, dirs)

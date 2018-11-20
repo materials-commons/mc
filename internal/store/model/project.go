@@ -64,7 +64,7 @@ type ProjectTodo struct {
 type ProjectOverviewModel struct {
 	ProjectSchema
 	Shortcuts      []ProjectShortcut         `json:"shortcuts" r:"shortcuts"`
-	RootDir        []DatadirSchema           `json:"root_dir" r:"root_dir"`
+	RootDir        []DatadirSimpleModel      `json:"root_dir" r:"root_dir"`
 	OwnerDetails   OwnerDetails              `json:"owner_details" r:"owner_details"`
 	FilesCount     int                       `json:"files_count" r:"files_count"`
 	UsersCount     int                       `json:"users_count" r:"users_count"`

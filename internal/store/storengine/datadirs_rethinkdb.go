@@ -64,21 +64,6 @@ func ToDatadirSchema(ddModel model.AddDatadirModel) model.DatadirSchema {
 	return dd
 }
 
-func (e *DatadirsRethinkdb) GetDatadirsForProject(projectID, userID string) ([]model.DatadirSimpleModel, error) {
-	var dirs []model.DatadirSimpleModel
-	errMsg := fmt.Sprintf("No directories for project %s, user %s", projectID, userID)
-	res, err := r.Table("access").GetAllByIndex("user_project", []interface{}{userID, projectID}).
-		EqJoin("project_id", r.Table("project2datadir"), r.EqJoinOpts{Index: "project_id"}).Zip().
-		EqJoin("datadir_id", r.Table("datadirs")).Zip().Run(e.Session)
-	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
-		return dirs, err
-	}
-	defer res.Close()
-
-	err = res.All(&dirs)
-	return dirs, err
-}
-
 func (e *DatadirsRethinkdb) GetFilesForDatadir(projectID, userID, dirID string) ([]model.DatafileSimpleModel, error) {
 	var files []model.DatafileSimpleModel
 	errMsg := fmt.Sprintf("No files for directory %s in project %s for user %s", dirID, projectID, userID)
@@ -93,15 +78,6 @@ func (e *DatadirsRethinkdb) GetFilesForDatadir(projectID, userID, dirID string) 
 
 	err = res.All(&files)
 	return files, err
-
-	//  "8dd92584-50a5-4372-bfa6-0e26b068df2f"
-	/*
-			r.db('materialscommons').table("access")
-		  .getAll(["gtarcea@umich.edu", "b2e65225-bd32-4122-83ea-c64902906f4a"], {index:"user_project"})
-		  .eqJoin([r.row("project_id"),  "8dd92584-50a5-4372-bfa6-0e26b068df2f"], r.db("materialscommons").table("project2datadir"), {index: "project_datadir"}).zip()
-		  .eqJoin("datadir_id", r.db("materialscommons").table("datadir2datafile"), {index:"datadir_id"}).zip()
-		  .eqJoin("datafile_id", r.db("materialscommons").table("datafiles")).zip()
-	*/
 }
 
 func (e *DatadirsRethinkdb) GetDatadirByPathInProject(path, projectID string) (model.DatadirSchema, error) {
@@ -116,6 +92,29 @@ func (e *DatadirsRethinkdb) GetDatadirByPathInProject(path, projectID string) (m
 
 	err = res.One(&dir)
 	return dir, err
+}
+
+func (e *DatadirsRethinkdb) GetDatadirForProject(projectID, userID, dirID string) (model.DatadirEntryModel, error) {
+	var dir model.DatadirEntryModel
+	errMsg := fmt.Sprintf("No such directory %s in project %s for user %s", dirID, projectID, userID)
+	res, err := r.Table("access").GetAllByIndex("user_project", []interface{}{userID, projectID}).
+		EqJoin([]interface{}{r.Row.Field("project_id"), dirID}, r.Table("project2datadir"), r.EqJoinOpts{Index: "project_datadir"}).Zip().
+		EqJoin("datadir_id", r.Table("datadirs")).Zip().Merge(directoryEntries).Run(e.Session)
+	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
+		return dir, err
+	}
+	defer res.Close()
+
+	err = res.One(&dir)
+	return dir, err
+}
+
+func directoryEntries(p r.Term) interface{} {
+	return map[string]interface{}{
+		"directories": r.Table("datadirs").GetAllByIndex("parent", p.Field("datadir_id")).CoerceTo("array"),
+		"files": r.Table("datadir2datafile").GetAllByIndex("datadir_id", p.Field("datadir_id")).
+			EqJoin("datafile_id", r.Table("datafiles")).Zip().CoerceTo("array"),
+	}
 }
 
 func (e *DatadirsRethinkdb) GetDatadir(id string) (model.DatadirSchema, error) {
