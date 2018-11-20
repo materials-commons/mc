@@ -8,6 +8,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/apex/log"
 
@@ -109,7 +110,33 @@ func (l *Loader) processFile(root, fpath string, finfo os.FileInfo, err error) e
 		// will be processed, but the /tmp/dir starting dir will be skipped.
 		return nil
 
+	case l.invalidFile(finfo):
+		os.RemoveAll(fpath)
+		return nil
+
 	default:
 		return l.DirectoryLoader.LoadFileOrDir(fpath, finfo)
 	}
+}
+
+func (l *Loader) invalidFile(finfo os.FileInfo) bool {
+	switch {
+	case !finfo.IsDir() && finfo.Size() == 0:
+		return true
+	default:
+		return l.isDotOrTempFile(finfo)
+	}
+}
+
+func (l *Loader) isDotOrTempFile(fileInfo os.FileInfo) bool {
+	name := fileInfo.Name()
+	if strings.HasPrefix(name, ".") {
+		return true
+	}
+
+	if strings.Contains(name, "~") {
+		return true
+	}
+
+	return false
 }
