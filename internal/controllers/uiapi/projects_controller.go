@@ -44,6 +44,22 @@ func (p *ProjectsController) GetProjectOverview(c echo.Context) error {
 	}
 }
 
+func (p *ProjectsController) GetProjectNotes(c echo.Context) error {
+	var req projectReq
+
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
+
+	user := c.Get("User").(model.UserSchema)
+
+	if notes, err := p.projectsStore.GetProjectNotes(req.ProjectID, user.ID); err != nil {
+		return err
+	} else {
+		return c.JSON(http.StatusOK, notes)
+	}
+}
+
 func (p *ProjectsController) GetProjectAccessEntries(c echo.Context) error {
 	var req projectReq
 
@@ -56,47 +72,4 @@ func (p *ProjectsController) GetProjectAccessEntries(c echo.Context) error {
 	} else {
 		return c.JSON(http.StatusOK, users)
 	}
-}
-
-func (p *ProjectsController) AddUserToProject(c echo.Context) error {
-	var req struct {
-		ProjectID string `json:"project_id"`
-		UserID    string `json:"user_id"`
-	}
-
-	if err := c.Bind(&req); err != nil {
-		return err
-	}
-
-	user := c.Get("User").(model.UserSchema)
-
-	proj, err := p.projectsStore.GetProjectSimple(req.ProjectID)
-	if err != nil {
-		return err
-	}
-
-	if proj.Owner != user.ID {
-		return echo.ErrUnauthorized
-	}
-
-	users, err := p.projectsStore.GetProjectAccessEntries(req.ProjectID)
-	if err != nil {
-		return err
-	}
-
-	for _, user := range users {
-		if user.UserID == req.UserID {
-			return echo.ErrForbidden
-		}
-	}
-
-	if entry, err := p.projectsStore.AddUserToProject(req.ProjectID, req.UserID); err != nil {
-		return err
-	} else {
-		return c.JSON(http.StatusCreated, entry)
-	}
-}
-
-func (p *ProjectsController) DeleteUserFromProject(c echo.Context) error {
-	return nil
 }
