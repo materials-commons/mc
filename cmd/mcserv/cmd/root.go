@@ -190,7 +190,6 @@ func setupAPIRoutes(e *echo.Echo, db store.DB, mcdir string, client *globusapi.C
 
 	globusController := api.NewGlobusController(db, client, mcdir, globusEndpointID)
 	g.POST("/createGlobusUploadRequest", globusController.CreateGlobusUploadRequest).Name = "createGlobusUploadRequest"
-	g.POST("/getGlobusUploadStatus", globusController.GetGlobusUploadStatus).Name = "getGlobusUploadStatus"
 	g.POST("/getGlobusUploadRequest", globusController.GetGlobusUploadRequest).Name = "getGlobusUploadRequest"
 	g.POST("/listGlobusUploadRequests", globusController.ListGlobusUploadRequests).Name = "listGlobusUploadRequests"
 

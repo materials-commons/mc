@@ -63,23 +63,6 @@ func (g *GlobusController) GetGlobusUploadRequest(c echo.Context) error {
 	}
 }
 
-func (g *GlobusController) GetGlobusUploadStatus(c echo.Context) error {
-	var reg struct {
-		ProjectID           string `json:"project_id"`
-		BackgroundProcessID string `json:"background_process_id"`
-	}
-
-	if err := c.Bind(&reg); err != nil {
-		return err
-	}
-
-	user := c.Get("User").(model.UserSchema)
-
-	globusUploadStatus, err := g.globusStatusStore.GetGlobusStatus(reg.ProjectID, user.ID, reg.BackgroundProcessID)
-
-	return c.JSON(http.StatusOK, globusUploadStatus)
-}
-
 // ListGlobusUploadRequests will retrieve all the upload requests for a specific user. Admin
 // users can set user to "all" to retrieve all the known upload requests. Users can only retrieve
 // their own upload requests unless they are an admin. Admins can retrieve other users requests.
