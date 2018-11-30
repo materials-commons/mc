@@ -17,8 +17,7 @@ func TestBackgroundStore_AddBackgroundProcess(t *testing.T) {
 	se := storengine.NewBackgroundProcessRethinkdb(session)
 	bgp := store.NewBackgroundProcessStore(se)
 
-	bgpAdd := model.AddBackgroundProcessModel{
-	}
+	bgpAdd := model.AddBackgroundProcessModel{}
 
 	load, err := bgp.AddBackgroundProcess(bgpAdd)
 	fmt.Println(err)

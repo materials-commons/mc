@@ -84,5 +84,5 @@ type GlobusUploadsStoreEngine interface {
 }
 
 type BackgroundProcessStoreEngine interface {
-    AddBackgroundProcess(upload model.BackgroundProcessSchema)(model.BackgroundProcessSchema, error)
+	AddBackgroundProcess(upload model.BackgroundProcessSchema) (model.BackgroundProcessSchema, error)
 }

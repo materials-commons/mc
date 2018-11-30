@@ -26,12 +26,12 @@ func (s *BackgroundProcessStore) AddBackgroundProcess(bgpModel model.AddBackgrou
 		},
 		ProjectID:             bgpModel.ProjectID,
 		UserID:                bgpModel.UserID,
-    	BackgroundProcessID:   bgpModel.BackgroundProcessID,
-    	BackgroundProcessType: bgpModel.BackgroundProcessType,
-	    Status:                bgpModel.Status,
-	    Message:               bgpModel.Message,
-	    IsFinished:            false,
-	    IsOk:                  false,
+		BackgroundProcessID:   bgpModel.BackgroundProcessID,
+		BackgroundProcessType: bgpModel.BackgroundProcessType,
+		Status:                bgpModel.Status,
+		Message:               bgpModel.Message,
+		IsFinished:            false,
+		IsOk:                  false,
 	}
 
 	return s.bgpStoreEngine.AddBackgroundProcess(bgp)

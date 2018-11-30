@@ -22,10 +22,10 @@ type AddBackgroundProcessModel struct {
 }
 
 type UpdateBackgroundProcessModel struct {
-	Status                string `db:"status" json:"status" r:"status"`
-	Message               string `db:"message" json:"message" r:"message"`
+	Status  string `db:"status" json:"status" r:"status"`
+	Message string `db:"message" json:"message" r:"message"`
 }
 
 type MarkOKBackgroundProcessModel struct {
-	IsOk                  bool   `db:"is_ok" json:"is_ok" r:"is_ok"`
+	IsOk bool `db:"is_ok" json:"is_ok" r:"is_ok"`
 }
