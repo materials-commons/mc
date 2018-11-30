@@ -79,6 +79,9 @@ func RethinkDB(database, address string) error {
 
 		// globus_uploads table
 		r.TableCreate("globus_uploads"),
+
+		// background_process_table
+		r.TableCreate("background_process"),
 	}
 
 	var errOnExec error

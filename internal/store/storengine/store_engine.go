@@ -82,3 +82,7 @@ type GlobusUploadsStoreEngine interface {
 	GetAllGlobusUploads() ([]model.GlobusUploadSchema, error)
 	GetAllGlobusUploadsForUser(user string) ([]model.GlobusUploadSchema, error)
 }
+
+type BackgroundProcessStoreEngine interface {
+    AddBackgroundProcess(upload model.BackgroundProcessSchema)(model.BackgroundProcessSchema, error)
+}
