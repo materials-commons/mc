@@ -21,6 +21,12 @@ type AddBackgroundProcessModel struct {
 	Message               string `db:"message" json:"message" r:"message"`
 }
 
+type GetListBackgroundProcessModel struct {
+	UserID                string `db:"user_id" json:"user_id" r:"user_id"`
+	ProjectID             string `db:"project_id" json:"project_id" r:"project_id"`
+	BackgroundProcessID   string `db:"background_process_id" json:"background_process_id" r:"background_process_id"`
+}
+
 type UpdateBackgroundProcessModel struct {
 	Status  string `db:"status" json:"status" r:"status"`
 	Message string `db:"message" json:"message" r:"message"`

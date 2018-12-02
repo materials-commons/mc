@@ -33,3 +33,7 @@ func (e *BackgroundProcessRethinkdb) AddBackgroundProcess(bgp model.BackgroundPr
 
 	return ret, nil
 }
+
+func (e *BackgroundProcessRethinkdb) GetListBackgroundProcess(glbpg model.GetListBackgroundProcessModel) ([]model.BackgroundProcessSchema, error) {
+    return nil, nil
+}
