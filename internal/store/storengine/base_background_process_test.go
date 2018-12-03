@@ -91,6 +91,34 @@ func testBackgroundProcessStoreEngine_SetFinishedBackgroundProcess(t *testing.T,
 	cleanupBackgroundProcessEngine(e)
 }
 
+func testBackgroundProcessStoreEngine_SetOKBackgroundProcess(t *testing.T, e storengine.BackgroundProcessStoreEngine) {
+
+	bgpSchema := model.BackgroundProcessSchema{
+		UserID:                "bogues.user@mc.org",
+		ProjectID:             "ProjectId",
+		BackgroundProcessID:   "BGProcessId",
+		BackgroundProcessType: "bgp-type",
+		Status:                "status",
+		Message:               "message",
+	}
+
+	bgp, err := e.AddBackgroundProcess(bgpSchema)
+	assert.Okf(t, err, "Unable to add abgpModel: %s", err)
+	assert.Truef(t, !bgp.IsOk, "Initial background_process record incorrectly marked ok")
+
+	id := bgp.ID
+
+	err = e.SetOkBackgroundProcess(id, true)
+	assert.Okf(t, err, "Unable to set ok flag on background_process record, %s: %s", id, err)
+
+	bgp, err = e.GetBackgroundProcess(id)
+	assert.Okf(t, err, "Unable to get background process, %s: %s", id, err)
+
+	assert.Truef(t, bgp.IsOk, "Updated background_process record incorrectly marked not ok")
+
+	cleanupBackgroundProcessEngine(e)
+}
+
 func testBackgroundProcessStoreEngine_GetListBackgroundProcess(t *testing.T, e storengine.BackgroundProcessStoreEngine) {
 
 	bgpSchema := model.BackgroundProcessSchema{

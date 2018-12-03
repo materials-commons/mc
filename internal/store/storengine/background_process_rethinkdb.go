@@ -87,6 +87,15 @@ func (e *BackgroundProcessRethinkdb) SetFinishedBackgroundProcess(id string, don
 	return checkRethinkdbUpdateError(resp, err, errMsg)
 }
 
+func (e *BackgroundProcessRethinkdb) SetOkBackgroundProcess(id string, success bool) error {
+	errMsg := fmt.Sprintf("failed update on %s: IsOk = %t", id, success)
+
+	resp, err := r.Table("background_process").Get(id).
+		Update(map[string]interface{}{"is_ok": success}, r.UpdateOpts{ReturnChanges: true}).RunWrite(e.Session)
+
+	return checkRethinkdbUpdateError(resp, err, errMsg)
+}
+
 func (e *BackgroundProcessRethinkdb) UpdateStatusBackgroundProcess(id string, status string, message string) error {
 	errMsg := fmt.Sprintf("failed update on %s: status = %s, message = %s", id, status, message)
 
