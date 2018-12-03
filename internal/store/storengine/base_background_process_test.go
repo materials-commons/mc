@@ -78,7 +78,25 @@ func testBackgroundProcessStoreEngine_GetListBackgroundProcess(t *testing.T, e s
 	cleanupBackgroundProcessEngine(e)
 }
 
+func testBackgroundProcessStoreEngine_DeleteBackgroundProcess(t *testing.T, e storengine.BackgroundProcessStoreEngine) {
+	bgpSchema := model.BackgroundProcessSchema{
+		UserID:                "bogues.user@mc.org",
+		ProjectID:             "ProjectId",
+		BackgroundProcessID:   "BGProcessId",
+		BackgroundProcessType: "bgp-type",
+		Status:                "status",
+		Message:               "message",
+	}
+	bgp, err := e.AddBackgroundProcess(bgpSchema)
+	assert.Okf(t, err, "Unable to add bgpSchema: %s", err)
+	assert.Truef(t, bgpSchema.UserID == bgp.UserID, "IDs don't match %s/%s", bgp.UserID, bgpSchema.UserID)
 
+    id := bgp.ID
+
+    err = e.DeleteBackgroundProcess(id)
+	assert.Okf(t, err, "Unable to delete bgpSchema: %s", err)
+
+}
 
 func addDefaultBackgroundProcessToStoreEngine(t *testing.T, e storengine.BackgroundProcessStoreEngine) {
 	background_process_records := []model.BackgroundProcessSchema{

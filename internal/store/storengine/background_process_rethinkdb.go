@@ -53,3 +53,9 @@ func (e *BackgroundProcessRethinkdb) GetListBackgroundProcess(glbgp model.GetLis
 
 	return returnList, err
 }
+
+func (e *BackgroundProcessRethinkdb) DeleteBackgroundProcess(id string) error {
+	errMsg := fmt.Sprintf("failed deleting background_process record %s", id)
+	resp, err := r.Table("background_process").Get(id).Delete().RunWrite(e.Session)
+	return checkRethinkdbDeleteError(resp, err, errMsg)
+}
