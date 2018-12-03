@@ -31,6 +31,8 @@ func TestBackgroundProcessStore_AddBackgroundProcess(t *testing.T) {
 	bgp, err := bgps.AddBackgroundProcess(abgpModel)
 	assert.Okf(t, err, "Unable to add abgpModel: %s", err)
 	assert.Truef(t, abgpModel.UserID == bgp.UserID, "User IDs don't match %s/%s", bgp.UserID, abgpModel.UserID)
+
+	cleanupBackgroundProcessEngine(storeEngine)
 }
 
 func TestBackgroundProcessStore_GetBackgroundProcess(t *testing.T) {
@@ -91,6 +93,39 @@ func TestBackgroundProcessStore_SetFinishedBackgroundProcess(t *testing.T) {
 	assert.Okf(t, err, "Unable to get background process, %s: %s", id, err)
 
 	assert.Truef(t, bgp.IsFinished, "Updated background_process record incorrectly marked not finished")
+	cleanupBackgroundProcessEngine(storeEngine)
+}
+
+func TestBackgroundProcessStore_SetOKBackgroundProcess(t *testing.T) {
+	session, _ := r.Connect(r.ConnectOpts{Database: "mctest", Address: "localhost:30815"})
+	r.SetTags("r")
+	storeEngine := storengine.NewBackgroundProcessRethinkdb(session)
+	bgps := store.NewBackgroundProcessStore(storeEngine)
+
+	cleanupBackgroundProcessEngine(storeEngine)
+	abgpModel := model.AddBackgroundProcessModel{
+		UserID:                "bogues.user@mc.org",
+		ProjectID:             "ProjectId",
+		BackgroundProcessID:   "BGProcessId",
+		BackgroundProcessType: "bgp-type",
+		Status:                "status",
+		Message:               "message",
+	}
+
+	bgp, err := bgps.AddBackgroundProcess(abgpModel)
+	assert.Okf(t, err, "Unable to add abgpModel: %s", err)
+	assert.Truef(t, !bgp.IsOk, "Initial background_process record incorrectly marked ok")
+
+	id := bgp.ID
+
+	err = bgps.SetOkBackgroundProcess(id, true)
+	assert.Okf(t, err, "Unable to set ok flag on background_process record, %s: %s", id, err)
+
+	bgp, err = bgps.GetBackgroundProcess(id)
+	assert.Okf(t, err, "Unable to get background process, %s: %s", id, err)
+
+	assert.Truef(t, bgp.IsOk, "Updated background_process record incorrectly marked not ok")
+	cleanupBackgroundProcessEngine(storeEngine)
 }
 
 func TestBackgroundProcessStore_GetListBackgroundProcess(t *testing.T) {
