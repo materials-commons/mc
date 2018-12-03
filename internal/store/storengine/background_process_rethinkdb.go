@@ -59,3 +59,9 @@ func (e *BackgroundProcessRethinkdb) DeleteBackgroundProcess(id string) error {
 	resp, err := r.Table("background_process").Get(id).Delete().RunWrite(e.Session)
 	return checkRethinkdbDeleteError(resp, err, errMsg)
 }
+
+func (e *BackgroundProcessRethinkdb) UpdateStatusBackgroundProcess(id string, status string, message string) error {
+	errMsg := fmt.Sprintf("failed deleting background_process record %s", id)
+	resp, err := r.Table("background_process").Get(id).Delete().RunWrite(e.Session)
+	return checkRethinkdbDeleteError(resp, err, errMsg)
+}
