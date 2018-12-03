@@ -95,12 +95,12 @@ func TestBackgroundProcessStore_DeleteBackgroundProcess(t *testing.T) {
 	assert.Okf(t, err, "Unable to add abgpModel: %s", err)
 	assert.Truef(t, abgpModel.UserID == bgp.UserID, "IDs don't match %s/%s", bgp.UserID, abgpModel.UserID)
 
-	//    id := bgp.ID
+    id := bgp.ID
 
-	//    err = bgps.DeleteBackgroundProcess(id)
-	//    assert.Okf(t, err, "Unable to delete background_process record %s: %s", id, err)
+    err = bgps.DeleteBackgroundProcess(id)
+    assert.Okf(t, err, "Unable to delete background_process record %s: %s", id, err)
 
-	//    assert.Truef(t, false, "Stop.")
+    assert.Truef(t, false, "Stop.")
 }
 
 func cleanupBackgroundProcessEngine(e storengine.BackgroundProcessStoreEngine) {

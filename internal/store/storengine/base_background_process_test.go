@@ -91,11 +91,10 @@ func testBackgroundProcessStoreEngine_DeleteBackgroundProcess(t *testing.T, e st
 	assert.Okf(t, err, "Unable to add bgpSchema: %s", err)
 	assert.Truef(t, bgpSchema.UserID == bgp.UserID, "IDs don't match %s/%s", bgp.UserID, bgpSchema.UserID)
 
-    id := bgp.ID
+	id := bgp.ID
 
-    err = e.DeleteBackgroundProcess(id)
+	err = e.DeleteBackgroundProcess(id)
 	assert.Okf(t, err, "Unable to delete bgpSchema: %s", err)
-
 }
 
 func addDefaultBackgroundProcessToStoreEngine(t *testing.T, e storengine.BackgroundProcessStoreEngine) {
