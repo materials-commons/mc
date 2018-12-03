@@ -123,7 +123,6 @@ func TestBackgroundProcessStore_DeleteBackgroundProcess(t *testing.T) {
 		"Unexpected length in returned list of background_process records, %v", len(bgpList))
 
 	cleanupBackgroundProcessEngine(storeEngine)
-
 }
 
 func cleanupBackgroundProcessEngine(e storengine.BackgroundProcessStoreEngine) {

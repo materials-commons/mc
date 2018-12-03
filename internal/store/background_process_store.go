@@ -42,5 +42,5 @@ func (s *BackgroundProcessStore) GetListBackgroundProcess(bpGetListModel model.G
 }
 
 func (s *BackgroundProcessStore) DeleteBackgroundProcess(id string) error {
-    return s.bgpStoreEngine.DeleteBackgroundProcess(id)
+	return s.bgpStoreEngine.DeleteBackgroundProcess(id)
 }
