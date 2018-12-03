@@ -91,7 +91,6 @@ func testBackgroundProcessStoreEngine_SetFinishedBackgroundProcess(t *testing.T,
 	cleanupBackgroundProcessEngine(e)
 }
 
-
 func testBackgroundProcessStoreEngine_GetListBackgroundProcess(t *testing.T, e storengine.BackgroundProcessStoreEngine) {
 
 	bgpSchema := model.BackgroundProcessSchema{
