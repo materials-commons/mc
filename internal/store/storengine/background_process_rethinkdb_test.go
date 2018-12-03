@@ -26,6 +26,12 @@ func TestBackgroundProcessStoreEngineRethinkdb_DeleteBackgroundProcess(t *testin
 	e.Session.Close()
 }
 
+func TestBackgroundProcessStoreEngineRethinkdb_UpdateStatusBackgroundProcess(t *testing.T) {
+	e := createRethinkdbBackgroundProcessStoreEngine()
+	testBackgroundProcessStoreEngine_UpdateStatusBackgroundProcess(t, e)
+	e.Session.Close()
+}
+
 func createRethinkdbBackgroundProcessStoreEngine() *storengine.BackgroundProcessRethinkdb {
 	session, _ := r.Connect(r.ConnectOpts{Database: "mctest", Address: "localhost:30815"})
 	r.SetTags("r")

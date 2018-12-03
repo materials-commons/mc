@@ -170,13 +170,22 @@ func TestBackgroundProcessStore_UpdateStatusBackgroundProcess(t *testing.T) {
 		assert.Truef(t, getListModel.UserID == record.UserID, "IDs don't match %s/%s", record.UserID, abgpModel.UserID)
 	}
 
-	//	id := bgp.ID
+	id := bgp.ID
 
-	//	newStatus := "new status"
-	//	newMessage := "new message"
-	//	err = bgps.UpdateStatusBackgroundProcess(id, newStatus, newMessage)
-	//	assert.Okf(t, err, "Unable to update background_process record, %s: %s", id, err)
+	newStatus := "new status"
+	newMessage := "new message"
+	err = bgps.UpdateStatusBackgroundProcess(id, newStatus, newMessage)
+	assert.Okf(t, err, "Unable to update background_process record, %s: %s", id, err)
 
+	bgpList, err = bgps.GetListBackgroundProcess(getListModel)
+	assert.Okf(t, err, "Unable to get list of matching background_process records: %s", err)
+
+	assert.Truef(t, len(bgpList) == 1,
+		"Unexpected length in returned list of background_process records, %v", len(bgpList))
+
+    bgp = bgpList[0]
+	assert.Truef(t, newStatus == bgp.Status, "Status Fields don't match %s/%s", bgp.Status, newStatus)
+	cleanupBackgroundProcessEngine(storeEngine)
 }
 
 func cleanupBackgroundProcessEngine(e storengine.BackgroundProcessStoreEngine) {
