@@ -40,3 +40,7 @@ func (s *BackgroundProcessStore) AddBackgroundProcess(bgpAddModel model.AddBackg
 func (s *BackgroundProcessStore) GetListBackgroundProcess(bpGetListModel model.GetListBackgroundProcessModel) ([]model.BackgroundProcessSchema, error) {
 	return s.bgpStoreEngine.GetListBackgroundProcess(bpGetListModel)
 }
+
+func (s *BackgroundProcessStore) DeleteBackgroundProcess(id string) error {
+    return s.bgpStoreEngine.DeleteBackgroundProcess(id)
+}

@@ -73,6 +73,8 @@ func TestBackgroundProcessStore_GetListBackgroundProcess(t *testing.T) {
 	for _, record := range bgpList {
 		assert.Truef(t, getListModel.UserID == record.UserID, "IDs don't match %s/%s", record.UserID, abgpModel.UserID)
 	}
+
+	cleanupBackgroundProcessEngine(storeEngine)
 }
 
 func TestBackgroundProcessStore_DeleteBackgroundProcess(t *testing.T) {
@@ -91,16 +93,37 @@ func TestBackgroundProcessStore_DeleteBackgroundProcess(t *testing.T) {
 		Message:               "message",
 	}
 
+	getListModel := model.GetListBackgroundProcessModel{
+		UserID:              "bogues.user@mc.org",
+		ProjectID:           "ProjectId",
+		BackgroundProcessID: "BGProcessId",
+	}
+
 	bgp, err := bgps.AddBackgroundProcess(abgpModel)
 	assert.Okf(t, err, "Unable to add abgpModel: %s", err)
 	assert.Truef(t, abgpModel.UserID == bgp.UserID, "IDs don't match %s/%s", bgp.UserID, abgpModel.UserID)
 
-    id := bgp.ID
+	bgpList, err := bgps.GetListBackgroundProcess(getListModel)
+	assert.Okf(t, err, "Unable to get list of matching background_process records: %s", err)
 
-    err = bgps.DeleteBackgroundProcess(id)
-    assert.Okf(t, err, "Unable to delete background_process record %s: %s", id, err)
+	assert.Truef(t, len(bgpList) == 1,
+		"Unexpected length in returned list of background_process records, %v", len(bgpList))
 
-    assert.Truef(t, false, "Stop.")
+	for _, record := range bgpList {
+		assert.Truef(t, getListModel.UserID == record.UserID, "IDs don't match %s/%s", record.UserID, abgpModel.UserID)
+	}
+
+	id := bgp.ID
+
+	err = bgps.DeleteBackgroundProcess(id)
+	assert.Okf(t, err, "Unable to delete background_process record %s: %s", id, err)
+
+	bgpList, _ = bgps.GetListBackgroundProcess(getListModel)
+	assert.Truef(t, len(bgpList) == 0,
+		"Unexpected length in returned list of background_process records, %v", len(bgpList))
+
+	cleanupBackgroundProcessEngine(storeEngine)
+
 }
 
 func cleanupBackgroundProcessEngine(e storengine.BackgroundProcessStoreEngine) {
