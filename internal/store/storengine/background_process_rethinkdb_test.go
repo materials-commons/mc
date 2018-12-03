@@ -14,6 +14,18 @@ func TestBackgroundProcessStoreEngineRethinkdb_BackgroundProcess(t *testing.T) {
 	e.Session.Close()
 }
 
+func TestBackgroundProcessStoreEngineRethinkdb_GetBackgroundProcess(t *testing.T) {
+	e := createRethinkdbBackgroundProcessStoreEngine()
+	testBackgroundProcessStoreEngine_GetBackgroundProcess(t, e)
+	e.Session.Close()
+}
+
+func TestBackgroundProcessStoreEngineRethinkdb_SetFinishedBackgroundProcess(t *testing.T) {
+	e := createRethinkdbBackgroundProcessStoreEngine()
+	testBackgroundProcessStoreEngine_SetFinishedBackgroundProcess(t, e)
+	e.Session.Close()
+}
+
 func TestBackgroundProcessStoreEngineRethinkdb_GetListBackgroundProcess(t *testing.T) {
 	e := createRethinkdbBackgroundProcessStoreEngine()
 	testBackgroundProcessStoreEngine_GetListBackgroundProcess(t, e)

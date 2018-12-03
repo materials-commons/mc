@@ -89,4 +89,6 @@ type BackgroundProcessStoreEngine interface {
 	DeleteBackgroundProcess(id string) error
 	GetBackgroundProcess(id string) (model.BackgroundProcessSchema, error)
 	UpdateStatusBackgroundProcess(id string, status string, message string) error
+	SetFinishedBackgroundProcess(id string, done bool) error
+	//  SetOkBackgroundProcess(id string, success bool) error
 }

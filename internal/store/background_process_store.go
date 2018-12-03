@@ -41,6 +41,10 @@ func (s *BackgroundProcessStore) GetBackgroundProcess(id string) (model.Backgrou
 	return s.bgpStoreEngine.GetBackgroundProcess(id)
 }
 
+func (s *BackgroundProcessStore) SetFinishedBackgroundProcess(id string, done bool) error {
+	return s.bgpStoreEngine.SetFinishedBackgroundProcess(id, done)
+}
+
 func (s *BackgroundProcessStore) GetListBackgroundProcess(bpGetListModel model.GetListBackgroundProcessModel) ([]model.BackgroundProcessSchema, error) {
 	return s.bgpStoreEngine.GetListBackgroundProcess(bpGetListModel)
 }

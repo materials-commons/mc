@@ -40,6 +40,58 @@ func testBackgroundProcessStoreEngine_AddBackgroundProcess(t *testing.T, e store
 	cleanupBackgroundProcessEngine(e)
 }
 
+func testBackgroundProcessStoreEngine_GetBackgroundProcess(t *testing.T, e storengine.BackgroundProcessStoreEngine) {
+
+	bgpSchema := model.BackgroundProcessSchema{
+		UserID:                "bogues.user@mc.org",
+		ProjectID:             "ProjectId",
+		BackgroundProcessID:   "BGProcessId",
+		BackgroundProcessType: "bgp-type",
+		Status:                "status",
+		Message:               "message",
+	}
+
+	bgp, err := e.AddBackgroundProcess(bgpSchema)
+	assert.Okf(t, err, "Unable to add bgpSchema: %s", err)
+	assert.Truef(t, bgpSchema.UserID == bgp.UserID, "User IDs don't match %s/%s", bgp.UserID, bgpSchema.UserID)
+
+	id := bgp.ID
+	bgp, err = e.GetBackgroundProcess(id)
+	assert.Okf(t, err, "Unable to get bgpSchema, %s: %s", id, err)
+	assert.Truef(t, bgpSchema.UserID == bgp.UserID, "User IDs don't match %s/%s", bgp.UserID, bgpSchema.UserID)
+
+	cleanupBackgroundProcessEngine(e)
+}
+
+func testBackgroundProcessStoreEngine_SetFinishedBackgroundProcess(t *testing.T, e storengine.BackgroundProcessStoreEngine) {
+
+	bgpSchema := model.BackgroundProcessSchema{
+		UserID:                "bogues.user@mc.org",
+		ProjectID:             "ProjectId",
+		BackgroundProcessID:   "BGProcessId",
+		BackgroundProcessType: "bgp-type",
+		Status:                "status",
+		Message:               "message",
+	}
+
+	bgp, err := e.AddBackgroundProcess(bgpSchema)
+	assert.Okf(t, err, "Unable to add abgpModel: %s", err)
+	assert.Truef(t, !bgp.IsFinished, "Initial background_process record incorrectly marked finished")
+
+	id := bgp.ID
+
+	err = e.SetFinishedBackgroundProcess(id, true)
+	assert.Okf(t, err, "Unable to set finished flag on background_process record, %s: %s", id, err)
+
+	bgp, err = e.GetBackgroundProcess(id)
+	assert.Okf(t, err, "Unable to get background process, %s: %s", id, err)
+
+	assert.Truef(t, bgp.IsFinished, "Updated background_process record incorrectly marked not finished")
+
+	cleanupBackgroundProcessEngine(e)
+}
+
+
 func testBackgroundProcessStoreEngine_GetListBackgroundProcess(t *testing.T, e storengine.BackgroundProcessStoreEngine) {
 
 	bgpSchema := model.BackgroundProcessSchema{
@@ -118,8 +170,8 @@ func testBackgroundProcessStoreEngine_UpdateStatusBackgroundProcess(t *testing.T
 	err = e.UpdateStatusBackgroundProcess(id, newStatus, newMessage)
 	assert.Okf(t, err, "Unable to update background_process record, %s: %s", id, err)
 
-    bgp, err = e.GetBackgroundProcess(id)
-    assert.Truef(t, newStatus == bgp.Status, "Status Fields don't match '%s'/'%s' ", bgp.Status, newStatus)
+	bgp, err = e.GetBackgroundProcess(id)
+	assert.Truef(t, newStatus == bgp.Status, "Status Fields don't match '%s'/'%s' ", bgp.Status, newStatus)
 }
 
 func addDefaultBackgroundProcessToStoreEngine(t *testing.T, e storengine.BackgroundProcessStoreEngine) {
