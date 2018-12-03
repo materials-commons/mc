@@ -87,5 +87,6 @@ type BackgroundProcessStoreEngine interface {
 	AddBackgroundProcess(bgp model.BackgroundProcessSchema) (model.BackgroundProcessSchema, error)
 	GetListBackgroundProcess(glbpg model.GetListBackgroundProcessModel) ([]model.BackgroundProcessSchema, error)
 	DeleteBackgroundProcess(id string) error
+	GetBackgroundProcess(id string) (model.BackgroundProcessSchema, error)
 	UpdateStatusBackgroundProcess(id string, status string, message string) error
 }

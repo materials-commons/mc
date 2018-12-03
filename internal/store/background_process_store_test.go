@@ -12,9 +12,6 @@ import (
 )
 
 func TestBackgroundProcessStore_AddBackgroundProcess(t *testing.T) {
-
-	t.Skip()
-
 	session, _ := r.Connect(r.ConnectOpts{Database: "mctest", Address: "localhost:30815"})
 	r.SetTags("r")
 	storeEngine := storengine.NewBackgroundProcessRethinkdb(session)
@@ -33,13 +30,39 @@ func TestBackgroundProcessStore_AddBackgroundProcess(t *testing.T) {
 
 	bgp, err := bgps.AddBackgroundProcess(abgpModel)
 	assert.Okf(t, err, "Unable to add abgpModel: %s", err)
+	assert.Truef(t, abgpModel.UserID == bgp.UserID, "User IDs don't match %s/%s", bgp.UserID, abgpModel.UserID)
+}
+
+func TestBackgroundProcessStore_GetBackgroundProcess(t *testing.T) {
+	session, _ := r.Connect(r.ConnectOpts{Database: "mctest", Address: "localhost:30815"})
+	r.SetTags("r")
+	storeEngine := storengine.NewBackgroundProcessRethinkdb(session)
+	bgps := store.NewBackgroundProcessStore(storeEngine)
+
+	cleanupBackgroundProcessEngine(storeEngine)
+	abgpModel := model.AddBackgroundProcessModel{
+		UserID:                "bogues.user@mc.org",
+		ProjectID:             "ProjectId",
+		BackgroundProcessID:   "BGProcessId",
+		BackgroundProcessType: "bgp-type",
+		Status:                "status",
+		Message:               "message",
+	}
+
+	bgp, err := bgps.AddBackgroundProcess(abgpModel)
+	assert.Okf(t, err, "Unable to add abgpModel: %s", err)
 	assert.Truef(t, abgpModel.UserID == bgp.UserID, "IDs don't match %s/%s", bgp.UserID, abgpModel.UserID)
+
+	id := bgp.ID
+
+    bgp, err = bgps.GetBackgroundProcess(id)
+	assert.Okf(t, err, "Unable to get background process, %s: %s", id, err)
+	assert.Truef(t, abgpModel.UserID == bgp.UserID, "User IDs don't match %s/%s", bgp.UserID, abgpModel.UserID)
+
+	cleanupBackgroundProcessEngine(storeEngine)
 }
 
 func TestBackgroundProcessStore_GetListBackgroundProcess(t *testing.T) {
-
-	t.Skip()
-
 	session, _ := r.Connect(r.ConnectOpts{Database: "mctest", Address: "localhost:30815"})
 	r.SetTags("r")
 	storeEngine := storengine.NewBackgroundProcessRethinkdb(session)
@@ -84,9 +107,6 @@ func TestBackgroundProcessStore_GetListBackgroundProcess(t *testing.T) {
 }
 
 func TestBackgroundProcessStore_DeleteBackgroundProcess(t *testing.T) {
-
-	t.Skip()
-
 	session, _ := r.Connect(r.ConnectOpts{Database: "mctest", Address: "localhost:30815"})
 	r.SetTags("r")
 	storeEngine := storengine.NewBackgroundProcessRethinkdb(session)
@@ -183,7 +203,7 @@ func TestBackgroundProcessStore_UpdateStatusBackgroundProcess(t *testing.T) {
 	assert.Truef(t, len(bgpList) == 1,
 		"Unexpected length in returned list of background_process records, %v", len(bgpList))
 
-    bgp = bgpList[0]
+	bgp = bgpList[0]
 	assert.Truef(t, newStatus == bgp.Status, "Status Fields don't match %s/%s", bgp.Status, newStatus)
 	cleanupBackgroundProcessEngine(storeEngine)
 }

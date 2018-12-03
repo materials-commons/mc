@@ -43,11 +43,12 @@ func (e *BackgroundProcessRethinkdb) GetListBackgroundProcess(glbgp model.GetLis
 
 	resp, err := r.Table("background_process").
 		GetAllByIndex("user_project_process", queryIndex).Run(e.Session)
+
+	defer resp.Close()
+
 	if err := checkRethinkdbQueryError(resp, err, errMsg); err != nil {
 		return returnList, err
 	}
-
-	defer resp.Close()
 
 	err = resp.All(&returnList)
 
@@ -57,7 +58,24 @@ func (e *BackgroundProcessRethinkdb) GetListBackgroundProcess(glbgp model.GetLis
 func (e *BackgroundProcessRethinkdb) DeleteBackgroundProcess(id string) error {
 	errMsg := fmt.Sprintf("failed deleting background_process record %s", id)
 	resp, err := r.Table("background_process").Get(id).Delete().RunWrite(e.Session)
-	return checkRethinkdbDeleteError(resp, err, errMsg)
+
+    return checkRethinkdbDeleteError(resp, err, errMsg)
+}
+
+func (e *BackgroundProcessRethinkdb) GetBackgroundProcess(id string)  (model.BackgroundProcessSchema, error) {
+    var bgp  model.BackgroundProcessSchema
+	errMsg := fmt.Sprintf("failed to get background_process record %s", id)
+
+	resp, err := r.Table("background_process").Get(id).Run(e.Session)
+	defer resp.Close()
+
+	if err := checkRethinkdbQueryError(resp, err, errMsg); err != nil {
+		return bgp, err
+	}
+
+	err = resp.One(&bgp)
+
+	return bgp, err
 }
 
 func (e *BackgroundProcessRethinkdb) UpdateStatusBackgroundProcess(id string, status string, message string) error {

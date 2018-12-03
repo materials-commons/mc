@@ -110,7 +110,7 @@ func testBackgroundProcessStoreEngine_UpdateStatusBackgroundProcess(t *testing.T
 	}
 	bgp, err := e.AddBackgroundProcess(bgpSchema)
 	assert.Okf(t, err, "Unable to add bgpSchema: %s", err)
-	assert.Truef(t, bgpSchema.Status == bgp.Status, "Status Fields don't match %s/%s", bgp.Status, bgpSchema.Status)
+	assert.Truef(t, bgpSchema.Status == bgp.Status, "Status Fields don't match '%s'/'%s' ", bgp.Status, bgpSchema.Status)
 
 	id := bgp.ID
 	newStatus := "new status"
@@ -118,7 +118,8 @@ func testBackgroundProcessStoreEngine_UpdateStatusBackgroundProcess(t *testing.T
 	err = e.UpdateStatusBackgroundProcess(id, newStatus, newMessage)
 	assert.Okf(t, err, "Unable to update background_process record, %s: %s", id, err)
 
-    // assert.Truef(t, false, "Stop.")
+    bgp, err = e.GetBackgroundProcess(id)
+    assert.Truef(t, newStatus == bgp.Status, "Status Fields don't match '%s'/'%s' ", bgp.Status, newStatus)
 }
 
 func addDefaultBackgroundProcessToStoreEngine(t *testing.T, e storengine.BackgroundProcessStoreEngine) {

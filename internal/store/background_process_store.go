@@ -37,6 +37,10 @@ func (s *BackgroundProcessStore) AddBackgroundProcess(bgpAddModel model.AddBackg
 	return s.bgpStoreEngine.AddBackgroundProcess(schema)
 }
 
+func (s *BackgroundProcessStore) GetBackgroundProcess(id string) (model.BackgroundProcessSchema, error) {
+	return s.bgpStoreEngine.GetBackgroundProcess(id)
+}
+
 func (s *BackgroundProcessStore) GetListBackgroundProcess(bpGetListModel model.GetListBackgroundProcessModel) ([]model.BackgroundProcessSchema, error) {
 	return s.bgpStoreEngine.GetListBackgroundProcess(bpGetListModel)
 }
