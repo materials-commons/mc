@@ -170,12 +170,12 @@ func TestBackgroundProcessStore_UpdateStatusBackgroundProcess(t *testing.T) {
 		assert.Truef(t, getListModel.UserID == record.UserID, "IDs don't match %s/%s", record.UserID, abgpModel.UserID)
 	}
 
-//	id := bgp.ID
+	//	id := bgp.ID
 
-//	newStatus := "new status"
-//	newMessage := "new message"
-//	err = bgps.UpdateStatusBackgroundProcess(id, newStatus, newMessage)
-//	assert.Okf(t, err, "Unable to update background_process record, %s: %s", id, err)
+	//	newStatus := "new status"
+	//	newMessage := "new message"
+	//	err = bgps.UpdateStatusBackgroundProcess(id, newStatus, newMessage)
+	//	assert.Okf(t, err, "Unable to update background_process record, %s: %s", id, err)
 
 }
 

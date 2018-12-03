@@ -97,7 +97,7 @@ func testBackgroundProcessStoreEngine_DeleteBackgroundProcess(t *testing.T, e st
 	assert.Okf(t, err, "Unable to delete bgpSchema: %s", err)
 }
 
-func testBackgroundProcessStoreEngine_UpdateStatusBackgroundProcess(t *testing.T, e storengine.BackgroundProcessStoreEngine){
+func testBackgroundProcessStoreEngine_UpdateStatusBackgroundProcess(t *testing.T, e storengine.BackgroundProcessStoreEngine) {
 	bgpSchema := model.BackgroundProcessSchema{
 		UserID:                "bogues.user@mc.org",
 		ProjectID:             "ProjectId",
@@ -111,8 +111,6 @@ func testBackgroundProcessStoreEngine_UpdateStatusBackgroundProcess(t *testing.T
 	assert.Truef(t, bgpSchema.UserID == bgp.UserID, "IDs don't match %s/%s", bgp.UserID, bgpSchema.UserID)
 
 }
-
-
 
 func addDefaultBackgroundProcessToStoreEngine(t *testing.T, e storengine.BackgroundProcessStoreEngine) {
 	background_process_records := []model.BackgroundProcessSchema{
