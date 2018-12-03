@@ -86,4 +86,5 @@ type GlobusUploadsStoreEngine interface {
 type BackgroundProcessStoreEngine interface {
 	AddBackgroundProcess(bgp model.BackgroundProcessSchema) (model.BackgroundProcessSchema, error)
 	GetListBackgroundProcess(glbpg model.GetListBackgroundProcessModel) ([]model.BackgroundProcessSchema, error)
+//	DeleteBackgroundProcess(id string) error
 }
