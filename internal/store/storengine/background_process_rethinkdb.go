@@ -35,8 +35,8 @@ func (e *BackgroundProcessRethinkdb) AddBackgroundProcess(bgp model.BackgroundPr
 	return ret, nil
 }
 
-func (e *BackgroundProcessRethinkdb) GetListBackgroundProcess(glbgp model.GetListBackgroundProcessModel) (model.BackgroundProcessSchema, error) {
-	var ret model.BackgroundProcessSchema
+func (e *BackgroundProcessRethinkdb) GetListBackgroundProcess(glbgp model.GetListBackgroundProcessModel) ([]model.BackgroundProcessSchema, error) {
+	var returnList []model.BackgroundProcessSchema
 
 	queryIndex := []interface{}{glbgp.UserID, glbgp.ProjectID, glbgp.BackgroundProcessID}
 	errMsg := fmt.Sprintf("Unable to GetAll background_process records: %+v", queryIndex)
@@ -44,12 +44,12 @@ func (e *BackgroundProcessRethinkdb) GetListBackgroundProcess(glbgp model.GetLis
 	resp, err := r.Table("background_process").
 		GetAllByIndex("user_project_process", queryIndex).Run(e.Session)
 	if err := checkRethinkdbQueryError(resp, err, errMsg); err != nil {
-		return ret, err
+		return returnList, err
 	}
 
 	defer resp.Close()
 
-	err = resp.One(&ret)
+	err = resp.All(&returnList)
 
-	return ret, err
+	return returnList, err
 }

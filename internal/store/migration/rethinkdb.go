@@ -82,6 +82,9 @@ func RethinkDB(database, address string) error {
 
 		// background_process_table
 		r.TableCreate("background_process"),
+		r.Table("background_process").IndexCreateFunc("user_project_process",
+			[]interface{}{r.Row.Field("user_id"), r.Row.Field("project_id"),
+				r.Row.Field("background_process_id")}),
 	}
 
 	var errOnExec error
