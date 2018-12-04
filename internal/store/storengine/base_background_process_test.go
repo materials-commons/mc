@@ -3,10 +3,8 @@ package storengine_test
 import (
 	"testing"
 
-	"github.com/materials-commons/mc/internal/store/storengine"
-
 	"github.com/materials-commons/mc/internal/store/model"
-
+	"github.com/materials-commons/mc/internal/store/storengine"
 	"github.com/materials-commons/mc/pkg/tutils/assert"
 
 	r "gopkg.in/gorethink/gorethink.v4"
@@ -37,7 +35,6 @@ func testBackgroundProcessStoreEngine_AddBackgroundProcess(t *testing.T, e store
 			}
 		})
 	}
-	cleanupBackgroundProcessEngine(e)
 }
 
 func testBackgroundProcessStoreEngine_GetBackgroundProcess(t *testing.T, e storengine.BackgroundProcessStoreEngine) {
@@ -52,15 +49,13 @@ func testBackgroundProcessStoreEngine_GetBackgroundProcess(t *testing.T, e store
 	}
 
 	bgp, err := e.AddBackgroundProcess(bgpSchema)
-	assert.Okf(t, err, "Unable to add bgpSchema: %s", err)
-	assert.Truef(t, bgpSchema.UserID == bgp.UserID, "User IDs don't match %s/%s", bgp.UserID, bgpSchema.UserID)
+	assert.Okf(t, err, "Unable to add BackgroundProcess: %s", err)
+	assert.Truef(t, bgpSchema.UserID == bgp.UserID, "Add for Get: User IDs don't match '%s'/'%s'", bgp.UserID, bgpSchema.UserID)
 
 	id := bgp.ID
 	bgp, err = e.GetBackgroundProcess(id)
-	assert.Okf(t, err, "Unable to get bgpSchema, %s: %s", id, err)
-	assert.Truef(t, bgpSchema.UserID == bgp.UserID, "User IDs don't match %s/%s", bgp.UserID, bgpSchema.UserID)
-
-	cleanupBackgroundProcessEngine(e)
+	assert.Okf(t, err, "Unable to get BackgroundProcess, %s: %s", id, err)
+	assert.Truef(t, bgpSchema.UserID == bgp.UserID, "Get: User IDs don't match '%s'/'%s'", bgp.UserID, bgpSchema.UserID)
 }
 
 func testBackgroundProcessStoreEngine_SetFinishedBackgroundProcess(t *testing.T, e storengine.BackgroundProcessStoreEngine) {
@@ -87,11 +82,9 @@ func testBackgroundProcessStoreEngine_SetFinishedBackgroundProcess(t *testing.T,
 	assert.Okf(t, err, "Unable to get background process, %s: %s", id, err)
 
 	assert.Truef(t, bgp.IsFinished, "Updated background_process record incorrectly marked not finished")
-
-	cleanupBackgroundProcessEngine(e)
 }
 
-func testBackgroundProcessStoreEngine_SetOKBackgroundProcess(t *testing.T, e storengine.BackgroundProcessStoreEngine) {
+func testBackgroundProcessStoreEngine_SetOkBackgroundProcess(t *testing.T, e storengine.BackgroundProcessStoreEngine) {
 
 	bgpSchema := model.BackgroundProcessSchema{
 		UserID:                "bogues.user@mc.org",
@@ -115,8 +108,6 @@ func testBackgroundProcessStoreEngine_SetOKBackgroundProcess(t *testing.T, e sto
 	assert.Okf(t, err, "Unable to get background process, %s: %s", id, err)
 
 	assert.Truef(t, bgp.IsOk, "Updated background_process record incorrectly marked not ok")
-
-	cleanupBackgroundProcessEngine(e)
 }
 
 func testBackgroundProcessStoreEngine_GetListBackgroundProcess(t *testing.T, e storengine.BackgroundProcessStoreEngine) {
@@ -153,8 +144,6 @@ func testBackgroundProcessStoreEngine_GetListBackgroundProcess(t *testing.T, e s
 	for _, record := range bgpList {
 		assert.Truef(t, getListModel.UserID == record.UserID, "IDs don't match %s/%s", record.UserID, bgpSchema.UserID)
 	}
-
-	cleanupBackgroundProcessEngine(e)
 }
 
 func testBackgroundProcessStoreEngine_DeleteBackgroundProcess(t *testing.T, e storengine.BackgroundProcessStoreEngine) {
@@ -174,8 +163,6 @@ func testBackgroundProcessStoreEngine_DeleteBackgroundProcess(t *testing.T, e st
 
 	err = e.DeleteBackgroundProcess(id)
 	assert.Okf(t, err, "Unable to delete bgpSchema: %s", err)
-
-	cleanupBackgroundProcessEngine(e)
 }
 
 func testBackgroundProcessStoreEngine_UpdateStatusBackgroundProcess(t *testing.T, e storengine.BackgroundProcessStoreEngine) {
@@ -216,5 +203,8 @@ func cleanupBackgroundProcessEngine(e storengine.BackgroundProcessStoreEngine) {
 	if re, ok := e.(*storengine.BackgroundProcessRethinkdb); ok {
 		session := re.Session
 		_, _ = r.Table("background_process").Delete().RunWrite(session)
+	}
+	if me, ok := e.(*storengine.BackgroundProcessMemory); ok {
+		me.DB = make(map[string]model.BackgroundProcessSchema)
 	}
 }
