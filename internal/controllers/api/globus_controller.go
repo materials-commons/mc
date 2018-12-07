@@ -23,6 +23,7 @@ const globusBaseURL = "https://app.globus.org/file-manager"
 type GlobusController struct {
 	client             *globusapi.Client
 	globusUploadsStore *store.GlobusUploadsStore
+	globusStatusStore  *store.BackgroundProcessStore
 	basePath           string
 	globusEndpointID   string
 }
@@ -31,6 +32,7 @@ func NewGlobusController(db store.DB, client *globusapi.Client, basePath, globus
 	return &GlobusController{
 		client:             client,
 		globusUploadsStore: db.GlobusUploadsStore(),
+		globusStatusStore:  db.
 		basePath:           basePath,
 		globusEndpointID:   globusEndpointID,
 	}
