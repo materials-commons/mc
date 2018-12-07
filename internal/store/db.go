@@ -49,27 +49,27 @@ func (db *DBRethinkdb) GlobusUploadsStore() *GlobusUploadsStore {
 }
 
 func (db *DBRethinkdb) BackgroundProcessStore() *BackgroundProcessStore {
-    return NewBackgroundProcessStore(storengine.NewBackgroundProcessRethinkdb(db.Session))
+	return NewBackgroundProcessStore(storengine.NewBackgroundProcessRethinkdb(db.Session))
 }
 
 type DBMemory struct {
-	DBProj          map[string]model.ProjectSchema
-	DBUsers         map[string]model.UserSchema
-	DBDatadirs      map[string]model.DatadirSchema
-	DBDatafiles     map[string]storengine.DatafileSchemaInMemory
-	DBFileLoads     map[string]model.FileLoadSchema
-	DBGlobusUploads map[string]model.GlobusUploadSchema
+	DBProj              map[string]model.ProjectSchema
+	DBUsers             map[string]model.UserSchema
+	DBDatadirs          map[string]model.DatadirSchema
+	DBDatafiles         map[string]storengine.DatafileSchemaInMemory
+	DBFileLoads         map[string]model.FileLoadSchema
+	DBGlobusUploads     map[string]model.GlobusUploadSchema
 	DBBackgroundProcess map[string]model.BackgroundProcessSchema
 }
 
 func NewDBMemory() *DBMemory {
 	return &DBMemory{
-		DBProj:          make(map[string]model.ProjectSchema),
-		DBUsers:         make(map[string]model.UserSchema),
-		DBDatadirs:      make(map[string]model.DatadirSchema),
-		DBDatafiles:     make(map[string]storengine.DatafileSchemaInMemory),
-		DBFileLoads:     make(map[string]model.FileLoadSchema),
-		DBGlobusUploads: make(map[string]model.GlobusUploadSchema),
+		DBProj:              make(map[string]model.ProjectSchema),
+		DBUsers:             make(map[string]model.UserSchema),
+		DBDatadirs:          make(map[string]model.DatadirSchema),
+		DBDatafiles:         make(map[string]storengine.DatafileSchemaInMemory),
+		DBFileLoads:         make(map[string]model.FileLoadSchema),
+		DBGlobusUploads:     make(map[string]model.GlobusUploadSchema),
 		DBBackgroundProcess: make(map[string]model.BackgroundProcessSchema),
 	}
 }
@@ -123,12 +123,11 @@ func (db *DBMemory) GlobusUploadsStore() *GlobusUploadsStore {
 }
 
 func (db *DBMemory) BackgroundProcessStore() *BackgroundProcessStore {
-    if db.DBBackgroundProcess == nil {
-        return NewBackgroundProcessStore(storengine.NewBackgroundProcessMemory())
+	if db.DBBackgroundProcess == nil {
+		return NewBackgroundProcessStore(storengine.NewBackgroundProcessMemory())
 	}
 
-    return NewBackgroundProcessStore(storengine.NewBackgroundProcessMemoryWithDB(db.BackgroundProcess))
+	return NewBackgroundProcessStore(storengine.NewBackgroundProcessMemoryWithDB(db.BackgroundProcess))
 }
-
 
 var InMemory = NewDBMemory() // Global for testing purposes, allows a single db to be shared across test instances
