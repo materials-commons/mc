@@ -35,7 +35,7 @@ func main() {
 	guStoreEngin := storengine.NewGlobusUploadsRethinkdb(session)
 	globusUploadsStore := store.NewGlobusUploadsStore(guStoreEngin)
 
-	fmt.Printf("Waiting on a globusUpload for user %s in project%s (%s)/n", userID, testProjectName, projectID)
+	fmt.Printf("Waiting on a globusUpload for user %s in project%s (%s)\n", userID, testProjectName, projectID)
 	bgTaskID := ""
 	for {
 		globusUploadsList := getGlobusUploadsList(globusUploadsStore, userID, projectID)

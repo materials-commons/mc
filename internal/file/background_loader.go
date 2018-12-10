@@ -112,6 +112,7 @@ func (l *BackgroundLoader) worker(args interface{}) interface{} {
 	ddStore := l.db.DatadirsStore()
 	projStore := l.db.ProjectsStore()
 	flStore := l.db.FileLoadsStore()
+	globusStatusStore := l.db.BackgroundProcessStore()
 
 	req := args.(model.FileLoadSchema)
 	log.Infof("worker processing file load request %#v", req)
@@ -141,9 +142,22 @@ func (l *BackgroundLoader) worker(args interface{}) interface{} {
 		// if loading files was successful then
 		//    1. remove path since all files were processed and
 		//    2. remove project from activeProjects map so other requests can be processed
-		//    3. delete this file load request
+		//    3. update status for this request
+		//    4. delete this file load request
 		_ = os.RemoveAll(req.Path)
 		l.activeProjects.Delete(req.ProjectID)
+
+		queryIndex := model.GetListBackgroundProcessModel{
+			UserID:           req.Owner,
+			ProjectID:        req.ProjectID,
+			BackgroundTaskID: req.GlobusUploadID,
+		}
+		bpProcessList, _ := globusStatusStore.GetListBackgroundProcess(queryIndex)
+		bgProcess := bpProcessList[0]
+		globusStatusStore.UpdateStatusBackgroundProcess(bgProcess.ID, "done", "All files loaded")
+		globusStatusStore.SetOkBackgroundProcess(bgProcess.ID, true)
+		globusStatusStore.SetFinishedBackgroundProcess(bgProcess.ID, true)
+
 		return flStore.DeleteFileLoad(req.ID)
 	}
 }
