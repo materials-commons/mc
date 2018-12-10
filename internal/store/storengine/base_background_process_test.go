@@ -40,12 +40,12 @@ func testBackgroundProcessStoreEngine_AddBackgroundProcess(t *testing.T, e store
 func testBackgroundProcessStoreEngine_GetBackgroundProcess(t *testing.T, e storengine.BackgroundProcessStoreEngine) {
 
 	bgpSchema := model.BackgroundProcessSchema{
-		UserID:                "bogues.user@mc.org",
-		ProjectID:             "ProjectId",
-		BackgroundProcessID:   "BGProcessId",
-		BackgroundProcessType: "bgp-type",
-		Status:                "status",
-		Message:               "message",
+		UserID:             "bogues.user@mc.org",
+		ProjectID:          "ProjectId",
+		BackgroundTaskID:   "BGProcessId",
+		BackgroundTaskType: "bgp-type",
+		Status:             "status",
+		Message:            "message",
 	}
 
 	bgp, err := e.AddBackgroundProcess(bgpSchema)
@@ -61,12 +61,12 @@ func testBackgroundProcessStoreEngine_GetBackgroundProcess(t *testing.T, e store
 func testBackgroundProcessStoreEngine_SetFinishedBackgroundProcess(t *testing.T, e storengine.BackgroundProcessStoreEngine) {
 
 	bgpSchema := model.BackgroundProcessSchema{
-		UserID:                "bogues.user@mc.org",
-		ProjectID:             "ProjectId",
-		BackgroundProcessID:   "BGProcessId",
-		BackgroundProcessType: "bgp-type",
-		Status:                "status",
-		Message:               "message",
+		UserID:             "bogues.user@mc.org",
+		ProjectID:          "ProjectId",
+		BackgroundTaskID:   "BGProcessId",
+		BackgroundTaskType: "bgp-type",
+		Status:             "status",
+		Message:            "message",
 	}
 
 	bgp, err := e.AddBackgroundProcess(bgpSchema)
@@ -87,12 +87,12 @@ func testBackgroundProcessStoreEngine_SetFinishedBackgroundProcess(t *testing.T,
 func testBackgroundProcessStoreEngine_SetOkBackgroundProcess(t *testing.T, e storengine.BackgroundProcessStoreEngine) {
 
 	bgpSchema := model.BackgroundProcessSchema{
-		UserID:                "bogues.user@mc.org",
-		ProjectID:             "ProjectId",
-		BackgroundProcessID:   "BGProcessId",
-		BackgroundProcessType: "bgp-type",
-		Status:                "status",
-		Message:               "message",
+		UserID:             "bogues.user@mc.org",
+		ProjectID:          "ProjectId",
+		BackgroundTaskID:   "BGProcessId",
+		BackgroundTaskType: "bgp-type",
+		Status:             "status",
+		Message:            "message",
 	}
 
 	bgp, err := e.AddBackgroundProcess(bgpSchema)
@@ -113,18 +113,18 @@ func testBackgroundProcessStoreEngine_SetOkBackgroundProcess(t *testing.T, e sto
 func testBackgroundProcessStoreEngine_GetListBackgroundProcess(t *testing.T, e storengine.BackgroundProcessStoreEngine) {
 
 	bgpSchema := model.BackgroundProcessSchema{
-		UserID:                "bogues.user@mc.org",
-		ProjectID:             "ProjectId",
-		BackgroundProcessID:   "BGProcessId",
-		BackgroundProcessType: "bgp-type",
-		Status:                "status",
-		Message:               "message",
+		UserID:             "bogues.user@mc.org",
+		ProjectID:          "ProjectId",
+		BackgroundTaskID:   "BGProcessId",
+		BackgroundTaskType: "bgp-type",
+		Status:             "status",
+		Message:            "message",
 	}
 
 	getListModel := model.GetListBackgroundProcessModel{
-		UserID:              "bogues.user@mc.org",
-		ProjectID:           "ProjectId",
-		BackgroundProcessID: "BGProcessId",
+		UserID:           "bogues.user@mc.org",
+		ProjectID:        "ProjectId",
+		BackgroundTaskID: "BGProcessId",
 	}
 
 	bgp, err := e.AddBackgroundProcess(bgpSchema)
@@ -148,12 +148,12 @@ func testBackgroundProcessStoreEngine_GetListBackgroundProcess(t *testing.T, e s
 
 func testBackgroundProcessStoreEngine_DeleteBackgroundProcess(t *testing.T, e storengine.BackgroundProcessStoreEngine) {
 	bgpSchema := model.BackgroundProcessSchema{
-		UserID:                "bogues.user@mc.org",
-		ProjectID:             "ProjectId",
-		BackgroundProcessID:   "BGProcessId",
-		BackgroundProcessType: "bgp-type",
-		Status:                "status",
-		Message:               "message",
+		UserID:             "bogues.user@mc.org",
+		ProjectID:          "ProjectId",
+		BackgroundTaskID:   "BGProcessId",
+		BackgroundTaskType: "bgp-type",
+		Status:             "status",
+		Message:            "message",
 	}
 	bgp, err := e.AddBackgroundProcess(bgpSchema)
 	assert.Okf(t, err, "Unable to add bgpSchema: %s", err)
@@ -167,12 +167,12 @@ func testBackgroundProcessStoreEngine_DeleteBackgroundProcess(t *testing.T, e st
 
 func testBackgroundProcessStoreEngine_UpdateStatusBackgroundProcess(t *testing.T, e storengine.BackgroundProcessStoreEngine) {
 	bgpSchema := model.BackgroundProcessSchema{
-		UserID:                "bogues.user@mc.org",
-		ProjectID:             "ProjectId",
-		BackgroundProcessID:   "BGProcessId",
-		BackgroundProcessType: "bgp-type",
-		Status:                "status",
-		Message:               "message",
+		UserID:             "bogues.user@mc.org",
+		ProjectID:          "ProjectId",
+		BackgroundTaskID:   "BGProcessId",
+		BackgroundTaskType: "bgp-type",
+		Status:             "status",
+		Message:            "message",
 	}
 	bgp, err := e.AddBackgroundProcess(bgpSchema)
 	assert.Okf(t, err, "Unable to add bgpSchema: %s", err)

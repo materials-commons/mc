@@ -36,7 +36,7 @@ func main() {
 	globusUploadsStore := store.NewGlobusUploadsStore(guStoreEngin)
 
 	fmt.Printf("Waiting on a globusUpload for user %s in project%s (%s)/n", userID, testProjectName, projectID)
-	bgProcessID := ""
+	bgTaskID := ""
 	for {
 		globusUploadsList := getGlobusUploadsList(globusUploadsStore, userID, projectID)
 		if len(globusUploadsList) > 0 {
@@ -44,21 +44,21 @@ func main() {
 			for _, gul := range globusUploadsList {
 				fmt.Printf("Found GlobusUpload with id = %s\n", gul.ID)
 			}
-			bgProcessID = globusUploadsList[0].ID
+			bgTaskID = globusUploadsList[0].ID
 			break
 		}
 		time.Sleep(100)
 	}
 
-	fmt.Printf("Waiting on success status for %s\n", bgProcessID)
+	fmt.Printf("Waiting on success status for %s\n", bgTaskID)
 
 	bgpStoreEngine := storengine.NewBackgroundProcessRethinkdb(session)
 	bgps := store.NewBackgroundProcessStore(bgpStoreEngine)
 
 	getListModel := model.GetListBackgroundProcessModel{
-		UserID:              userID,
-		ProjectID:           projectID,
-		BackgroundProcessID: bgProcessID,
+		UserID:           userID,
+		ProjectID:        projectID,
+		BackgroundTaskID: bgTaskID,
 	}
 
 	var finished bool
@@ -69,7 +69,7 @@ func main() {
 
 		bgpList, err := bgps.GetListBackgroundProcess(getListModel)
 		if err != nil {
-			fmt.Println("Unexpected error %v\n", err)
+			fmt.Printf("Unexpected error %+v\n", err)
 			break
 		}
 		if len(bgpList) > 0 {

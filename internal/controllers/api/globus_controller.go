@@ -126,12 +126,12 @@ func (g *GlobusController) CreateGlobusUploadRequest(c echo.Context) error {
 	}
 
 	addRequest := model.AddBackgroundProcessModel{
-		UserID:                user.ID,
-		ProjectID:             req.ProjectID,
-		BackgroundProcessID:   globusResp.ID,
-		BackgroundProcessType: "globus-upload",
-		Status:                "uploading",
-		Message:               "Globus is uploading files to Materials Commons site - See Globus UI for details",
+		UserID:             user.ID,
+		ProjectID:          req.ProjectID,
+		BackgroundTaskID:   globusResp.ID,
+		BackgroundTaskType: "globus-upload",
+		Status:             "uploading",
+		Message:            "Globus is uploading files to Materials Commons site - See Globus UI for details",
 	}
 
 	g.globusStatusStore.AddBackgroundProcess(addRequest)

@@ -28,14 +28,14 @@ func (s *BackgroundProcessStore) AddBackgroundProcess(bgpAddModel model.AddBackg
 			MTime:     now,
 			OType:     "background_process",
 		},
-		UserID:                bgpAddModel.UserID,
-		ProjectID:             bgpAddModel.ProjectID,
-		BackgroundProcessID:   bgpAddModel.BackgroundProcessID,
-		BackgroundProcessType: bgpAddModel.BackgroundProcessType,
-		Status:                bgpAddModel.Status,
-		Message:               bgpAddModel.Message,
-		IsFinished:            false,
-		IsOk:                  false,
+		UserID:             bgpAddModel.UserID,
+		ProjectID:          bgpAddModel.ProjectID,
+		BackgroundTaskID:   bgpAddModel.BackgroundTaskID,
+		BackgroundTaskType: bgpAddModel.BackgroundTaskType,
+		Status:             bgpAddModel.Status,
+		Message:            bgpAddModel.Message,
+		IsFinished:         false,
+		IsOk:               false,
 	}
 
 	fmt.Printf("Adding BackgroundProcess: %#v\n", schema)

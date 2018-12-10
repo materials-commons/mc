@@ -150,6 +150,7 @@ func (m *UploadMonitor) processTransfers(transfers *globusapi.TransferItems) {
 	}
 
 	// update relivent background process record.
+	// need another call here - to get background process record by background_process_id
 
 	// Delete the globus upload request as we have now turned it into a file loading request
 	// and won't have to process this request again. If the server stops while loading the

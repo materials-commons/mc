@@ -62,7 +62,7 @@ func (e *BackgroundProcessMemory) DeleteBackgroundProcess(id string) error {
 func (e *BackgroundProcessMemory) getListMatches(candidate model.BackgroundProcessSchema, template model.GetListBackgroundProcessModel) bool {
 	return (candidate.UserID == template.UserID &&
 		candidate.ProjectID == template.ProjectID &&
-		candidate.BackgroundProcessID == template.BackgroundProcessID)
+		candidate.BackgroundTaskID == template.BackgroundTaskID)
 }
 
 func (e *BackgroundProcessMemory) GetListBackgroundProcess(glbpg model.GetListBackgroundProcessModel) ([]model.BackgroundProcessSchema, error) {

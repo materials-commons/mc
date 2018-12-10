@@ -20,12 +20,12 @@ func TestBackgroundProcessStore_AddBackgroundProcess(t *testing.T) {
 	cleanupBackgroundProcessEngine(storeEngine)
 
 	abgpModel := model.AddBackgroundProcessModel{
-		UserID:                "bogues.user@mc.org",
-		ProjectID:             "ProjectId",
-		BackgroundProcessID:   "BGProcessId",
-		BackgroundProcessType: "bgp-type",
-		Status:                "status",
-		Message:               "message",
+		UserID:             "bogues.user@mc.org",
+		ProjectID:          "ProjectId",
+		BackgroundTaskID:   "BGProcessId",
+		BackgroundTaskType: "bgp-type",
+		Status:             "status",
+		Message:            "message",
 	}
 
 	bgp, err := bgps.AddBackgroundProcess(abgpModel)
@@ -43,12 +43,12 @@ func TestBackgroundProcessStore_GetBackgroundProcess(t *testing.T) {
 
 	cleanupBackgroundProcessEngine(storeEngine)
 	abgpModel := model.AddBackgroundProcessModel{
-		UserID:                "bogues.user@mc.org",
-		ProjectID:             "ProjectId",
-		BackgroundProcessID:   "BGProcessId",
-		BackgroundProcessType: "bgp-type",
-		Status:                "status",
-		Message:               "message",
+		UserID:             "bogues.user@mc.org",
+		ProjectID:          "ProjectId",
+		BackgroundTaskID:   "BGProcessId",
+		BackgroundTaskType: "bgp-type",
+		Status:             "status",
+		Message:            "message",
 	}
 
 	bgp, err := bgps.AddBackgroundProcess(abgpModel)
@@ -72,12 +72,12 @@ func TestBackgroundProcessStore_SetFinishedBackgroundProcess(t *testing.T) {
 
 	cleanupBackgroundProcessEngine(storeEngine)
 	abgpModel := model.AddBackgroundProcessModel{
-		UserID:                "bogues.user@mc.org",
-		ProjectID:             "ProjectId",
-		BackgroundProcessID:   "BGProcessId",
-		BackgroundProcessType: "bgp-type",
-		Status:                "status",
-		Message:               "message",
+		UserID:             "bogues.user@mc.org",
+		ProjectID:          "ProjectId",
+		BackgroundTaskID:   "BGProcessId",
+		BackgroundTaskType: "bgp-type",
+		Status:             "status",
+		Message:            "message",
 	}
 
 	bgp, err := bgps.AddBackgroundProcess(abgpModel)
@@ -104,12 +104,12 @@ func TestBackgroundProcessStore_SetOKBackgroundProcess(t *testing.T) {
 
 	cleanupBackgroundProcessEngine(storeEngine)
 	abgpModel := model.AddBackgroundProcessModel{
-		UserID:                "bogues.user@mc.org",
-		ProjectID:             "ProjectId",
-		BackgroundProcessID:   "BGProcessId",
-		BackgroundProcessType: "bgp-type",
-		Status:                "status",
-		Message:               "message",
+		UserID:             "bogues.user@mc.org",
+		ProjectID:          "ProjectId",
+		BackgroundTaskID:   "BGProcessId",
+		BackgroundTaskType: "bgp-type",
+		Status:             "status",
+		Message:            "message",
 	}
 
 	bgp, err := bgps.AddBackgroundProcess(abgpModel)
@@ -137,18 +137,18 @@ func TestBackgroundProcessStore_GetListBackgroundProcess(t *testing.T) {
 	cleanupBackgroundProcessEngine(storeEngine)
 
 	abgpModel := model.AddBackgroundProcessModel{
-		UserID:                "bogues.user@mc.org",
-		ProjectID:             "ProjectId",
-		BackgroundProcessID:   "BGProcessId",
-		BackgroundProcessType: "bgp-type",
-		Status:                "status",
-		Message:               "message",
+		UserID:             "bogues.user@mc.org",
+		ProjectID:          "ProjectId",
+		BackgroundTaskID:   "BGTaskId",
+		BackgroundTaskType: "bgp-type",
+		Status:             "status",
+		Message:            "message",
 	}
 
 	getListModel := model.GetListBackgroundProcessModel{
-		UserID:              "bogues.user@mc.org",
-		ProjectID:           "ProjectId",
-		BackgroundProcessID: "BGProcessId",
+		UserID:           "bogues.user@mc.org",
+		ProjectID:        "ProjectId",
+		BackgroundTaskID: "BGTaskId",
 	}
 
 	bgp, err := bgps.AddBackgroundProcess(abgpModel)
@@ -180,12 +180,12 @@ func TestBackgroundProcessStore_DeleteBackgroundProcess(t *testing.T) {
 
 	cleanupBackgroundProcessEngine(storeEngine)
 	abgpModel := model.AddBackgroundProcessModel{
-		UserID:                "bogues.user@mc.org",
-		ProjectID:             "ProjectId",
-		BackgroundProcessID:   "BGProcessId",
-		BackgroundProcessType: "bgp-type",
-		Status:                "status",
-		Message:               "message",
+		UserID:             "bogues.user@mc.org",
+		ProjectID:          "ProjectId",
+		BackgroundTaskID:   "BGProcessId",
+		BackgroundTaskType: "bgp-type",
+		Status:             "status",
+		Message:            "message",
 	}
 
 	bgp, err := bgps.AddBackgroundProcess(abgpModel)
@@ -214,18 +214,18 @@ func TestBackgroundProcessStore_UpdateStatusBackgroundProcess(t *testing.T) {
 
 	cleanupBackgroundProcessEngine(storeEngine)
 	abgpModel := model.AddBackgroundProcessModel{
-		UserID:                "bogues.user@mc.org",
-		ProjectID:             "ProjectId",
-		BackgroundProcessID:   "BGProcessId",
-		BackgroundProcessType: "bgp-type",
-		Status:                "status",
-		Message:               "message",
+		UserID:             "bogues.user@mc.org",
+		ProjectID:          "ProjectId",
+		BackgroundTaskID:   "BGProcessId",
+		BackgroundTaskType: "bgp-type",
+		Status:             "status",
+		Message:            "message",
 	}
 
 	getListModel := model.GetListBackgroundProcessModel{
-		UserID:              "bogues.user@mc.org",
-		ProjectID:           "ProjectId",
-		BackgroundProcessID: "BGProcessId",
+		UserID:           "bogues.user@mc.org",
+		ProjectID:        "ProjectId",
+		BackgroundTaskID: "BGProcessId",
 	}
 
 	bgp, err := bgps.AddBackgroundProcess(abgpModel)
