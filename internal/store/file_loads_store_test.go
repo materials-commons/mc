@@ -21,9 +21,10 @@ func TestFileLoadsStore_AddFileLoad(t *testing.T) {
 	floads := store.NewFileLoadsStore(se)
 
 	flAdd := model.AddFileLoadModel{
-		ProjectID: "abc123",
-		Path:      "/tmp",
-		Owner:     "test@test.com",
+		ProjectID:      "abc123",
+		Path:           "/tmp",
+		Owner:          "test@test.com",
+		GlobusUploadID: "fakeID",
 	}
 
 	load, err := floads.AddFileLoad(flAdd)

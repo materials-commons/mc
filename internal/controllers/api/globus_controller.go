@@ -107,9 +107,9 @@ func (g *GlobusController) ListGlobusUploadRequests(c echo.Context) error {
 // CreateGlobusUploadRequests creates a new entry in the globus_uploads table that tracks to a directory on
 // the materials commons globus endpoint that a user can upload to. The directory is created on the endpoint
 // and that user has an ACL set on it to permit reading and writing to it. This directory is temporary and
-// only available for the upload.
+// only available for the upload. Finally, this request will create a new background process record for
+// the globus upload process (used by the other, background steps, to record the status/progress of the upload.
 func (g *GlobusController) CreateGlobusUploadRequest(c echo.Context) error {
-	fmt.Println("CreateGlobusUploadRequest")
 	var req struct {
 		ProjectID string `json:"project_id"`
 	}
@@ -124,7 +124,6 @@ func (g *GlobusController) CreateGlobusUploadRequest(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("Return from createAndSetupUploadReq")
 
 	addRequest := model.AddBackgroundProcessModel{
 		UserID:                user.ID,
@@ -135,9 +134,7 @@ func (g *GlobusController) CreateGlobusUploadRequest(c echo.Context) error {
 		Message:               "Globus is uploading files to Materials Commons site - See Globus UI for details",
 	}
 
-	fmt.Printf("In CreateGlobusUploadRequest: Adding BackgroundProcess -  %#v\n", addRequest)
 	g.globusStatusStore.AddBackgroundProcess(addRequest)
-	fmt.Println("Return from AddBackgroundProcess")
 
 	return c.JSON(http.StatusCreated, globusResp)
 }

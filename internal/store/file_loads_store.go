@@ -28,10 +28,11 @@ func (s *FileLoadsStore) AddFileLoad(flModel model.AddFileLoadModel) (model.File
 			MTime:     now,
 			OType:     "file_load",
 		},
-		ProjectID: flModel.ProjectID,
-		Path:      flModel.Path,
-		Owner:     flModel.Owner,
-		Exclude:   flModel.Exclude,
+		ProjectID:      flModel.ProjectID,
+		Path:           flModel.Path,
+		Owner:          flModel.Owner,
+		Exclude:        flModel.Exclude,
+		GlobusUploadID: flModel.GlobusUploadID,
 	}
 
 	return s.flStoreEngine.AddFileLoad(fl)

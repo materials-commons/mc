@@ -125,7 +125,7 @@ func (m *UploadMonitor) processTransfers(transfers *globusapi.TransferItems) {
 	// so no more files can be uploaded to it. Then we are going to add that directory to the list of
 	// directories to upload. Then the file loader will eventually get around to loading these files. In
 	// the meantime since we've now created a file load from this globus upload we can delete the entry
-	// from the globus_uploads table.
+	// from the globus_uploads table. Finally we are going to update the status for this background process.
 
 	log.Infof("Processing globus upload %s", id)
 
@@ -137,6 +137,7 @@ func (m *UploadMonitor) processTransfers(transfers *globusapi.TransferItems) {
 		ProjectID: globusUpload.ProjectID,
 		Owner:     globusUpload.Owner,
 		Path:      globusUpload.Path,
+		GlobusUploadID: globusUpload.ID,
 	}
 
 	if fl, err := m.fileLoads.AddFileLoad(flAdd); err != nil {
