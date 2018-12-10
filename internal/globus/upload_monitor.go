@@ -134,9 +134,9 @@ func (m *UploadMonitor) processTransfers(transfers *globusapi.TransferItems) {
 	}
 
 	flAdd := model.AddFileLoadModel{
-		ProjectID: globusUpload.ProjectID,
-		Owner:     globusUpload.Owner,
-		Path:      globusUpload.Path,
+		ProjectID:      globusUpload.ProjectID,
+		Owner:          globusUpload.Owner,
+		Path:           globusUpload.Path,
 		GlobusUploadID: globusUpload.ID,
 	}
 
