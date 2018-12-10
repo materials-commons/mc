@@ -109,6 +109,7 @@ func (g *GlobusController) ListGlobusUploadRequests(c echo.Context) error {
 // and that user has an ACL set on it to permit reading and writing to it. This directory is temporary and
 // only available for the upload.
 func (g *GlobusController) CreateGlobusUploadRequest(c echo.Context) error {
+	fmt.Println("CreateGlobusUploadRequest")
 	var req struct {
 		ProjectID string `json:"project_id"`
 	}
@@ -123,6 +124,20 @@ func (g *GlobusController) CreateGlobusUploadRequest(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println("Return from createAndSetupUploadReq")
+
+	addRequest := model.AddBackgroundProcessModel{
+		UserID:                user.ID,
+		ProjectID:             req.ProjectID,
+		BackgroundProcessID:   globusResp.ID,
+		BackgroundProcessType: "globus-upload",
+		Status:                "uploading",
+		Message:               "Globus is uploading files to Materials Commons site - See Globus UI for details",
+	}
+
+	fmt.Printf("In CreateGlobusUploadRequest: Adding BackgroundProcess -  %#v\n", addRequest)
+	g.globusStatusStore.AddBackgroundProcess(addRequest)
+	fmt.Println("Return from AddBackgroundProcess")
 
 	return c.JSON(http.StatusCreated, globusResp)
 }
@@ -163,6 +178,7 @@ func (g *GlobusController) createAndSetupUploadReq(projectID string, user model.
 		return resp, err
 	}
 
+	fmt.Printf("In createAndSetupUploadReq: Adding GlobusUpload -  %#v\n", gUploadModel)
 	if _, err := g.globusUploadsStore.AddGlobusUpload(gUploadModel); err != nil {
 		return resp, err
 	}

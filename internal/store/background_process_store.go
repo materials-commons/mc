@@ -3,6 +3,8 @@ package store
 import (
 	"time"
 
+	"fmt"
+
 	"github.com/materials-commons/mc/internal/store/storengine"
 
 	"github.com/materials-commons/mc/internal/store/model"
@@ -17,6 +19,8 @@ func NewBackgroundProcessStore(e storengine.BackgroundProcessStoreEngine) *Backg
 }
 
 func (s *BackgroundProcessStore) AddBackgroundProcess(bgpAddModel model.AddBackgroundProcessModel) (model.BackgroundProcessSchema, error) {
+	fmt.Println("AddBackgroundProcess")
+
 	now := time.Now()
 	schema := model.BackgroundProcessSchema{
 		ModelSimple: model.ModelSimple{
@@ -34,6 +38,7 @@ func (s *BackgroundProcessStore) AddBackgroundProcess(bgpAddModel model.AddBackg
 		IsOk:                  false,
 	}
 
+	fmt.Printf("Adding BackgroundProcess: %#v\n", schema)
 	return s.bgpStoreEngine.AddBackgroundProcess(schema)
 }
 
