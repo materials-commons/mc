@@ -127,7 +127,7 @@ func (db *DBMemory) BackgroundProcessStore() *BackgroundProcessStore {
 		return NewBackgroundProcessStore(storengine.NewBackgroundProcessMemory())
 	}
 
-	return NewBackgroundProcessStore(storengine.NewBackgroundProcessMemoryWithDB(db.BackgroundProcess))
+	return NewBackgroundProcessStore(storengine.NewBackgroundProcessMemoryWithDB(db.DBBackgroundProcess))
 }
 
 var InMemory = NewDBMemory() // Global for testing purposes, allows a single db to be shared across test instances

@@ -32,7 +32,7 @@ func NewGlobusController(db store.DB, client *globusapi.Client, basePath, globus
 	return &GlobusController{
 		client:             client,
 		globusUploadsStore: db.GlobusUploadsStore(),
-		globusStatusStore:  db.
+		globusStatusStore:  db.BackgroundProcessStore(),
 		basePath:           basePath,
 		globusEndpointID:   globusEndpointID,
 	}
