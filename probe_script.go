@@ -17,7 +17,7 @@ func main() {
 	testProjectName := "Test1"
 
 	userID := "test@test.mc"
-	fmt.Println(userID)
+	fmt.Printf("UserId = %s\n", userID)
 
 	session, _ := r.Connect(r.ConnectOpts{Database: "materialscommons", Address: "localhost:30815"})
 	r.SetTags("r")
@@ -35,7 +35,7 @@ func main() {
 	guStoreEngin := storengine.NewGlobusUploadsRethinkdb(session)
 	globusUploadsStore := store.NewGlobusUploadsStore(guStoreEngin)
 
-	fmt.Printf("Waiting on a globusUpload for user %s in project%s (%s)\n", userID, testProjectName, projectID)
+	fmt.Printf("Waiting on a globusUpload for user %s in project = %s (%s)\n", userID, testProjectName, projectID)
 	bgTaskID := ""
 	for {
 		globusUploadsList := getGlobusUploadsList(globusUploadsStore, userID, projectID)
