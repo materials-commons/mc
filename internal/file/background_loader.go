@@ -153,11 +153,16 @@ func (l *BackgroundLoader) worker(args interface{}) interface{} {
 			BackgroundTaskID: req.GlobusUploadID,
 		}
 		bpProcessList, _ := globusStatusStore.GetListBackgroundProcess(queryIndex)
-		bgProcess := bpProcessList[0]
-		globusStatusStore.UpdateStatusBackgroundProcess(bgProcess.ID, "done", "All files loaded")
-		globusStatusStore.SetOkBackgroundProcess(bgProcess.ID, true)
-		globusStatusStore.SetFinishedBackgroundProcess(bgProcess.ID, true)
-
+		if len(bpProcessList) > 0 {
+			bgProcess := bpProcessList[0]
+			globusStatusStore.UpdateStatusBackgroundProcess(bgProcess.ID, "done", "All files loaded")
+			globusStatusStore.SetOkBackgroundProcess(bgProcess.ID, true)
+			globusStatusStore.SetFinishedBackgroundProcess(bgProcess.ID, true)
+		} else {
+			log.Infof("Background process list for Globus Upload is unexpectedly zero length/n"+
+				"For query UserID = %s, ProjectID = %s, BackgroundProcessID =%s",
+				queryIndex.UserID, queryIndex.ProjectID, queryIndex.BackgroundTaskID)
+		}
 		return flStore.DeleteFileLoad(req.ID)
 	}
 }
