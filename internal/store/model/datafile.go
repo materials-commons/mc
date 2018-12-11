@@ -23,6 +23,11 @@ type DatafileMediaType struct {
 	Mime        string `db:"mime" json:"mime" r:"mime"`
 }
 
+type DatafileSimpleModel struct {
+	ID   string `json:"id" r:"id"`
+	Name string `json:"name" r:"name"`
+}
+
 type AddDatafileModel struct {
 	Name        string `json:"name"`
 	Owner       string `json:"owner"`

@@ -17,21 +17,25 @@ type UsersStoreEngine interface {
 }
 
 type ProjectsStoreEngine interface {
-	AddProject(project model.ProjectSchema) (model.ProjectSchema, error)
-	GetProject(id string) (model.ProjectExtendedModel, error)
+	GetProjectOverview(projectID, userID string) (model.ProjectOverviewModel, error)
 	GetProjectSimple(id string) (model.ProjectSimpleModel, error)
 	GetAllProjectsForUser(user string) ([]model.ProjectCountModel, error)
+	GetProjectNotes(projectID, userID string) ([]model.ProjectNote, error)
+	GetProjectAccessEntries(id string) ([]model.ProjectUserAccessModel, error)
+
+	// Not used
+	AddProject(project model.ProjectSchema) (model.ProjectSchema, error)
 	DeleteProject(id string) error
 	UpdateProjectName(id string, name string, updatedAt time.Time) error
 	UpdateProjectDescription(id string, description string, updatedAt time.Time) error
 }
 
 type AccessStoreEngine interface {
-	AddAccessEntry(entry model.AccessSchema) (model.AccessSchema, error)
+	AddAccessEntry(entry model.ProjectAccessSchema) (model.ProjectAccessSchema, error)
 	DeleteAccess(projectID, userID string) error
 	DeleteAllAccessForProject(projectID string) error
-	GetProjectAccessEntries(projectID string) ([]model.AccessSchema, error)
-	GetUserAccessEntries(userID string) ([]model.AccessSchema, error)
+	GetProjectAccessEntries(projectID string) ([]model.ProjectAccessSchema, error)
+	GetUserAccessEntries(userID string) ([]model.ProjectAccessSchema, error)
 }
 
 type DatafilesStoreEngine interface {
@@ -43,6 +47,9 @@ type DatafilesStoreEngine interface {
 }
 
 type DatadirsStoreEngine interface {
+	GetFilesForDatadir(projectID, userID, dirID string) ([]model.DatafileSimpleModel, error)
+	GetDatadirForProject(projectID, userID, dirID string) (model.DatadirEntryModel, error)
+	//
 	AddDir(dir model.DatadirSchema) (model.DatadirSchema, error)
 	GetDatadirByPathInProject(path, projectID string) (model.DatadirSchema, error)
 	GetDatadir(id string) (model.DatadirSchema, error)
@@ -91,4 +98,8 @@ type BackgroundProcessStoreEngine interface {
 	UpdateStatusBackgroundProcess(id string, status string, message string) error
 	SetFinishedBackgroundProcess(id string, done bool) error
 	SetOkBackgroundProcess(id string, success bool) error
+}
+
+type ExperimentsStoreEngine interface {
+	GetExperimentOverviewsForProject(projectID string) ([]model.ExperimentOverviewModel, error)
 }

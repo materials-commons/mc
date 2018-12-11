@@ -14,6 +14,7 @@ type DB interface {
 	FileLoadsStore() *FileLoadsStore
 	GlobusUploadsStore() *GlobusUploadsStore
 	BackgroundProcessStore() *BackgroundProcessStore
+	ExperimentsStore() *ExperimentsStore
 }
 
 type DBRethinkdb struct {
@@ -52,6 +53,10 @@ func (db *DBRethinkdb) BackgroundProcessStore() *BackgroundProcessStore {
 	return NewBackgroundProcessStore(storengine.NewBackgroundProcessRethinkdb(db.Session))
 }
 
+func (db *DBRethinkdb) ExperimentsStore() *ExperimentsStore {
+	return NewExperimentsStore(storengine.NewExperimentsRethinkdb(db.Session))
+}
+
 type DBMemory struct {
 	DBProj              map[string]model.ProjectSchema
 	DBUsers             map[string]model.UserSchema
@@ -60,6 +65,7 @@ type DBMemory struct {
 	DBFileLoads         map[string]model.FileLoadSchema
 	DBGlobusUploads     map[string]model.GlobusUploadSchema
 	DBBackgroundProcess map[string]model.BackgroundProcessSchema
+	DBExperiments       map[string]model.ExperimentSchema
 }
 
 func NewDBMemory() *DBMemory {
@@ -71,6 +77,7 @@ func NewDBMemory() *DBMemory {
 		DBFileLoads:         make(map[string]model.FileLoadSchema),
 		DBGlobusUploads:     make(map[string]model.GlobusUploadSchema),
 		DBBackgroundProcess: make(map[string]model.BackgroundProcessSchema),
+		DBExperiments:       make(map[string]model.ExperimentSchema),
 	}
 }
 
@@ -128,6 +135,14 @@ func (db *DBMemory) BackgroundProcessStore() *BackgroundProcessStore {
 	}
 
 	return NewBackgroundProcessStore(storengine.NewBackgroundProcessMemoryWithDB(db.DBBackgroundProcess))
+}
+
+func (db *DBMemory) ExperimentsStore() *ExperimentsStore {
+	if db.DBExperiments == nil {
+		return NewExperimentsStore(storengine.NewExperimentsMemory())
+	}
+
+	return NewExperimentsStore(storengine.NewExperimentsMemoryWithDB(db.DBExperiments))
 }
 
 var InMemory = NewDBMemory() // Global for testing purposes, allows a single db to be shared across test instances

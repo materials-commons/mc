@@ -24,3 +24,52 @@ func (p *ProjectsController) GetProjectsForUser(c echo.Context) error {
 		return c.JSON(http.StatusOK, projects)
 	}
 }
+
+type projectReq struct {
+	ProjectID string `json:"project_id"`
+}
+
+func (p *ProjectsController) GetProjectOverview(c echo.Context) error {
+	var req projectReq
+
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
+
+	user := c.Get("User").(model.UserSchema)
+	if project, err := p.projectsStore.GetProjectOverview(req.ProjectID, user.ID); err != nil {
+		return err
+	} else {
+		return c.JSON(http.StatusOK, project)
+	}
+}
+
+func (p *ProjectsController) GetProjectNotes(c echo.Context) error {
+	var req projectReq
+
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
+
+	user := c.Get("User").(model.UserSchema)
+
+	if notes, err := p.projectsStore.GetProjectNotes(req.ProjectID, user.ID); err != nil {
+		return err
+	} else {
+		return c.JSON(http.StatusOK, notes)
+	}
+}
+
+func (p *ProjectsController) GetProjectAccessEntries(c echo.Context) error {
+	var req projectReq
+
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
+
+	if users, err := p.projectsStore.GetProjectAccessEntries(req.ProjectID); err != nil {
+		return err
+	} else {
+		return c.JSON(http.StatusOK, users)
+	}
+}
