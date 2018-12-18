@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/materials-commons/mc/pkg/mc"
+	"github.com/pkg/errors"
+
 	"github.com/materials-commons/mc/internal/store/model"
 
 	r "gopkg.in/gorethink/gorethink.v4"
@@ -93,13 +96,11 @@ func projectTopLevelDir(p r.Term) interface{} {
 }
 
 func (e *ProjectsRethinkdb) GetAllProjectsForUser(user string) ([]model.ProjectCountModel, error) {
-	var (
-		userProjects     []model.ProjectCountModel
-		projectsMemberOf []model.ProjectCountModel
-	)
+	userProjects := make([]model.ProjectCountModel, 0)
+	projectsMemberOf := make([]model.ProjectCountModel, 0)
 
 	res1, err := r.Table("projects").GetAllByIndex("owner", user).Merge(projectDetailCounts).Run(e.Session)
-	if err := checkRethinkdbQueryError(res1, err, fmt.Sprintf("Can't retrieve projects for user %s", user)); err != nil {
+	if err := checkRethinkdbQueryError(res1, err, fmt.Sprintf("Can't retrieve projects for user %s", user)); err != nil && errors.Cause(err) != mc.ErrNotFound {
 		return userProjects, err
 	}
 
@@ -112,7 +113,7 @@ func (e *ProjectsRethinkdb) GetAllProjectsForUser(user string) ([]model.ProjectC
 	res2, err := r.Table("access").GetAllByIndex("user_id", user).
 		EqJoin("project_id", r.Table("projects")).Zip().Filter(r.Row.Field("owner").Ne(user)).
 		Merge(projectDetailCounts).Run(e.Session)
-	if err := checkRethinkdbQueryError(res2, err, fmt.Sprintf("Can't retrieve projects user (%s) is member of", user)); err != nil {
+	if err := checkRethinkdbQueryError(res2, err, fmt.Sprintf("Can't retrieve projects user (%s) is member of", user)); err != nil && errors.Cause(err) != mc.ErrNotFound {
 		return userProjects, err
 	}
 
