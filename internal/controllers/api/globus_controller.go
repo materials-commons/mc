@@ -172,9 +172,11 @@ func (g *GlobusController) createAndSetupUploadReq(projectID string, user model.
 		return resp, err
 	}
 
-	log.Infof("uuid.GenerateUUID = ", gUploadModel.ID)
+	log.Infof("uuid.GenerateUUID = %s", gUploadModel.ID)
 
+	log.Infof("making Path %s/__globus_uploads/%s", g.basePath, gUploadModel.ID)
 	gUploadModel.Path = filepath.Join(g.basePath, "__globus_uploads", gUploadModel.ID)
+	log.Infof("gUploadModel.Path = '%s'", gUploadModel.Path)
 	log.Infof("MkdirAll %s", gUploadModel.Path)
 	if err := os.MkdirAll(gUploadModel.Path, 0700); err != nil {
 		log.Infof("MkdirAll failed %s", err)
