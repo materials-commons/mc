@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/apex/log"
+
 	"github.com/materials-commons/mc/pkg/mc"
 
 	"github.com/hashicorp/go-uuid"
@@ -118,10 +120,14 @@ func (g *GlobusController) CreateGlobusUploadRequest(c echo.Context) error {
 		return err
 	}
 
+	log.Infof("CreateGlobusUploadRequest %s", req.ProjectID)
+
 	user := c.Get("User").(model.UserSchema)
 
+	log.Infof("  Calling createAndSetupUploadReq")
 	globusResp, err := g.createAndSetupUploadReq(req.ProjectID, user)
 	if err != nil {
+		log.Infof("    createAndSetupUploadReq failed: %s", err)
 		return err
 	}
 
@@ -134,7 +140,9 @@ func (g *GlobusController) CreateGlobusUploadRequest(c echo.Context) error {
 		Message:            "Globus is uploading files to Materials Commons site - See Globus UI for details",
 	}
 
+	log.Infof("   Adding to AddBackgroundProcess")
 	g.globusStatusStore.AddBackgroundProcess(addRequest)
+	log.Infof("   Past AddBackgroundProcess")
 
 	return c.JSON(http.StatusCreated, globusResp)
 }
