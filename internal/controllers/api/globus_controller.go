@@ -124,7 +124,6 @@ func (g *GlobusController) CreateGlobusUploadRequest(c echo.Context) error {
 
 	user := c.Get("User").(model.UserSchema)
 
-	log.Infof("  Calling createAndSetupUploadReq")
 	globusResp, err := g.createAndSetupUploadReq(req.ProjectID, user)
 	if err != nil {
 		log.Infof("    createAndSetupUploadReq failed: %s", err)
@@ -140,9 +139,7 @@ func (g *GlobusController) CreateGlobusUploadRequest(c echo.Context) error {
 		Message:            "Globus is uploading files to Materials Commons site - See Globus UI for details",
 	}
 
-	log.Infof("   Adding to AddBackgroundProcess")
 	g.globusStatusStore.AddBackgroundProcess(addRequest)
-	log.Infof("   Past AddBackgroundProcess")
 
 	return c.JSON(http.StatusCreated, globusResp)
 }
@@ -172,31 +169,23 @@ func (g *GlobusController) createAndSetupUploadReq(projectID string, user model.
 		return resp, err
 	}
 
-	log.Infof("uuid.GenerateUUID = %s", gUploadModel.ID)
-
-	log.Infof("making Path %s/__globus_uploads/%s", g.basePath, gUploadModel.ID)
 	gUploadModel.Path = filepath.Join(g.basePath, "__globus_uploads", gUploadModel.ID)
-	log.Infof("gUploadModel.Path = '%s'", gUploadModel.Path)
 	log.Infof("MkdirAll %s", gUploadModel.Path)
 	if err := os.MkdirAll(gUploadModel.Path, 0700); err != nil {
 		log.Infof("MkdirAll failed %s", err)
 		return resp, err
 	}
 
-	log.Info("Calling g.globusSetup()")
 	globusPath := fmt.Sprintf("/__globus_uploads/%s/", gUploadModel.ID)
 	gUploadModel.GlobusIdentityID, gUploadModel.GlobusAclID, err = g.globusSetup(gUploadModel.ID, globusPath, user.GlobusUser)
 	if err != nil {
 		return resp, err
 	}
-	log.Infof("Past g.globusSetup()")
 
-	log.Infof("In createAndSetupUploadReq: Adding GlobusUpload -  %#v\n", gUploadModel)
 	if _, err := g.globusUploadsStore.AddGlobusUpload(gUploadModel); err != nil {
 		return resp, err
 	}
 
-	log.Infof("past AddGlobusUpload")
 	resp.ID = gUploadModel.ID
 	resp.GlobusURL = g.createEndpointURL(gUploadModel.ID)
 	resp.GlobusEndpointPath = endpointPath(gUploadModel.ID)
@@ -208,12 +197,10 @@ func (g *GlobusController) createAndSetupUploadReq(projectID string, user model.
 // globusSetup performs a couple of operations related to globus. It takes the users globus login and translates that into
 // and identity id. The identity id is used to set the ACL on the directory in the end point for materials commons.
 func (g *GlobusController) globusSetup(uploadID, path string, globusUser string) (globusIdentityID string, aclID string, err error) {
-	log.Infof("Calling GetIdentities(%s)", globusUser)
 	identities, err := g.client.GetIdentities([]string{globusUser})
 	if err != nil {
 		return globusIdentityID, aclID, errors.WithMessage(err, fmt.Sprintf("Unable to retrieve globus user from globus api %s", globusUser))
 	}
-	log.Infof("Past GetIdentities()")
 
 	globusIdentityID = identities.Identities[0].ID
 
@@ -224,13 +211,11 @@ func (g *GlobusController) globusSetup(uploadID, path string, globusUser string)
 		Permissions: "rw",
 	}
 
-	log.Infof("Calling AddEndpointACLRule %#v", rule)
 	aclRes, err := g.client.AddEndpointACLRule(rule)
 	if err != nil {
 		msg := fmt.Sprintf("Unable to add endpoint rule for endpoint %s, path %s, user %s/%s", g.globusEndpointID, path, globusUser, globusIdentityID)
 		return globusIdentityID, aclID, errors.WithMessage(err, msg)
 	}
-	log.Infof("past AddEndpointACLRule")
 
 	return globusIdentityID, aclRes.AccessID, nil
 }
