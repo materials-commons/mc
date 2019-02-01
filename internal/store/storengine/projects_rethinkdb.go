@@ -60,12 +60,13 @@ func (e *ProjectsRethinkdb) GetProjectAccessEntries(id string) ([]model.ProjectU
 }
 
 func (e *ProjectsRethinkdb) GetProjectNotes(projectID, userID string) ([]model.ProjectNote, error) {
-	var notes []model.ProjectNote
+	notes := make([]model.ProjectNote, 0)
+
 	errMsg := fmt.Sprintf("No such project %s for user %s", projectID, userID)
 	res, err := r.Table("access").GetAllByIndex("user_project", []interface{}{userID, projectID}).
 		EqJoin("project_id", r.Table("note2item"), r.EqJoinOpts{Index: "item_id"}).Zip().
 		EqJoin("note_id", r.Table("notes")).Zip().Run(e.Session)
-	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
+	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil && errors.Cause(err) != mc.ErrNotFound {
 		return notes, err
 	}
 	defer res.Close()
