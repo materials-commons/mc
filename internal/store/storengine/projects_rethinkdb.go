@@ -177,6 +177,7 @@ func projectDetailCounts(p r.Term) interface{} {
 		"samples_count":     r.Table("project2sample").GetAllByIndex("project_id", p.Field("id")).Count(),
 		"processes_count":   r.Table("project2process").GetAllByIndex("project_id", p.Field("id")).Count(),
 		"experiments_count": r.Table("project2experiment").GetAllByIndex("project_id", p.Field("id")).Count(),
+		"datasets_count":    r.Table("project2dataset").GetAllByIndex("project_id", p.Field("id")).Count(),
 		"root_dir": r.Table("datadirs").
 			GetAllByIndex("datadir_project_name", []interface{}{p.Field("id"), p.Field("name")}).CoerceTo("array"),
 		//"files_count":       r.Table("project2datafile").GetAllByIndex("project_id", p.Field("id")).Count(),

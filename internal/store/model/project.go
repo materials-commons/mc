@@ -19,6 +19,7 @@ type ProjectCountModel struct {
 	SamplesCount     int          `json:"samples_count" r:"samples_count"`
 	ProcessesCount   int          `json:"processes_count" r:"processes_count"`
 	ExperimentsCount int          `json:"experiments_count" r:"experiments_count"`
+	DatasetsCount    int          `json:"datasets_count" r:"datasets_count"`
 }
 
 type OwnerDetails struct {
@@ -70,6 +71,7 @@ type ProjectOverviewModel struct {
 	UsersCount     int                       `json:"users_count" r:"users_count"`
 	SamplesCount   int                       `json:"samples_count" r:"samples_count"`
 	ProcessesCount int                       `json:"processes_count" r:"processes_count"`
+	DatasetsCount  int                       `json:"datasets_count" r:"datasets_count"`
 	Experiments    []ExperimentOverviewModel `json:"experiments" r:"experiments"`
 	Todos          []ProjectTodo             `json:"todos" r:"todos"`
 }
