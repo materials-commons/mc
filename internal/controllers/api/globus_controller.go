@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/apex/log"
+
 	"github.com/materials-commons/mc/pkg/mc"
 
 	"github.com/hashicorp/go-uuid"
@@ -118,10 +120,13 @@ func (g *GlobusController) CreateGlobusUploadRequest(c echo.Context) error {
 		return err
 	}
 
+	log.Infof("CreateGlobusUploadRequest %s", req.ProjectID)
+
 	user := c.Get("User").(model.UserSchema)
 
 	globusResp, err := g.createAndSetupUploadReq(req.ProjectID, user)
 	if err != nil {
+		log.Infof("    createAndSetupUploadReq failed: %s", err)
 		return err
 	}
 
@@ -165,7 +170,9 @@ func (g *GlobusController) createAndSetupUploadReq(projectID string, user model.
 	}
 
 	gUploadModel.Path = filepath.Join(g.basePath, "__globus_uploads", gUploadModel.ID)
+	log.Infof("MkdirAll %s", gUploadModel.Path)
 	if err := os.MkdirAll(gUploadModel.Path, 0700); err != nil {
+		log.Infof("MkdirAll failed %s", err)
 		return resp, err
 	}
 
@@ -175,7 +182,6 @@ func (g *GlobusController) createAndSetupUploadReq(projectID string, user model.
 		return resp, err
 	}
 
-	fmt.Printf("In createAndSetupUploadReq: Adding GlobusUpload -  %#v\n", gUploadModel)
 	if _, err := g.globusUploadsStore.AddGlobusUpload(gUploadModel); err != nil {
 		return resp, err
 	}
