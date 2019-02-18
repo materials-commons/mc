@@ -17,17 +17,9 @@ type UsersStoreEngine interface {
 }
 
 type ProjectsStoreEngine interface {
-	GetProjectOverview(projectID, userID string) (model.ProjectOverviewModel, error)
 	GetProjectSimple(id string) (model.ProjectSimpleModel, error)
-	GetAllProjectsForUser(user string) ([]model.ProjectCountModel, error)
-	GetProjectNotes(projectID, userID string) ([]model.ProjectNote, error)
-	GetProjectAccessEntries(id string) ([]model.ProjectUserAccessModel, error)
-
-	// Not used
 	AddProject(project model.ProjectSchema) (model.ProjectSchema, error)
 	DeleteProject(id string) error
-	UpdateProjectName(id string, name string, updatedAt time.Time) error
-	UpdateProjectDescription(id string, description string, updatedAt time.Time) error
 }
 
 type AccessStoreEngine interface {

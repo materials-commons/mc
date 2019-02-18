@@ -199,12 +199,6 @@ func setupAPIRoutes(e *echo.Echo, db store.DB, mcdir string, client *globusapi.C
 func setupUIAPIRoutes(parent *echo.Group, db store.DB) {
 	g := parent.Group("/ui")
 
-	projectsController := uiapi.NewProjectsController(db)
-	g.POST("/getProjectsForUser", projectsController.GetProjectsForUser).Name = "getProjectsForUser"
-	g.POST("/getProjectOverview", projectsController.GetProjectOverview).Name = "getProjectOverview"
-	g.POST("/getProjectNotes", projectsController.GetProjectNotes).Name = "getProjectNotes"
-	g.POST("/getProjectAccessEntries", projectsController.GetProjectAccessEntries).Name = "getProjectAccessEntries"
-
 	datadirsController := uiapi.NewDatadirsController(db)
 	g.POST("/getDirectoryForProject", datadirsController.GetDirectoryForProject).Name = "getDirectoryForProject"
 	g.POST("/getFilesForDirectory", datadirsController.GetFilesForDirectory).Name = "getFilesForDirectory"

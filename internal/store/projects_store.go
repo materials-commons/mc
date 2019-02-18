@@ -40,19 +40,3 @@ func (s *ProjectsStore) AddProject(pModel model.AddProjectModel) (model.ProjectS
 func (s *ProjectsStore) GetProjectSimple(id string) (model.ProjectSimpleModel, error) {
 	return s.pStoreEngine.GetProjectSimple(id)
 }
-
-func (s *ProjectsStore) GetProjectsForUser(userID string) ([]model.ProjectCountModel, error) {
-	return s.pStoreEngine.GetAllProjectsForUser(userID)
-}
-
-func (s *ProjectsStore) GetProjectOverview(projectID, userID string) (model.ProjectOverviewModel, error) {
-	return s.pStoreEngine.GetProjectOverview(projectID, userID)
-}
-
-func (s *ProjectsStore) GetProjectNotes(projectID, userID string) ([]model.ProjectNote, error) {
-	return s.pStoreEngine.GetProjectNotes(projectID, userID)
-}
-
-func (s *ProjectsStore) GetProjectAccessEntries(projectID string) ([]model.ProjectUserAccessModel, error) {
-	return s.pStoreEngine.GetProjectAccessEntries(projectID)
-}
