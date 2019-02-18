@@ -23,8 +23,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/materials-commons/mc/internal/controllers/uiapi"
-
 	"github.com/apex/log"
 
 	"github.com/materials-commons/mc/internal/globus"
@@ -192,16 +190,6 @@ func setupAPIRoutes(e *echo.Echo, db store.DB, mcdir string, client *globusapi.C
 	g.POST("/createGlobusUploadRequest", globusController.CreateGlobusUploadRequest).Name = "createGlobusUploadRequest"
 	g.POST("/getGlobusUploadRequest", globusController.GetGlobusUploadRequest).Name = "getGlobusUploadRequest"
 	g.POST("/listGlobusUploadRequests", globusController.ListGlobusUploadRequests).Name = "listGlobusUploadRequests"
-
-	setupUIAPIRoutes(g, db)
-}
-
-func setupUIAPIRoutes(parent *echo.Group, db store.DB) {
-	g := parent.Group("/ui")
-
-	datadirsController := uiapi.NewDatadirsController(db)
-	g.POST("/getDirectoryForProject", datadirsController.GetDirectoryForProject).Name = "getDirectoryForProject"
-	g.POST("/getFilesForDirectory", datadirsController.GetFilesForDirectory).Name = "getFilesForDirectory"
 }
 
 func createAPIKeyMiddleware(db store.DB) echo.MiddlewareFunc {
