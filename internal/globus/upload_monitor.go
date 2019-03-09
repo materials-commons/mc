@@ -17,7 +17,6 @@ type UploadMonitor struct {
 	client              *globusapi.Client
 	globusUploads       *store.GlobusUploadsStore
 	fileLoads           *store.FileLoadsStore
-	globusStatusStore   *store.BackgroundProcessStore
 	endpointID          string
 	finishedGlobusTasks map[string]bool
 }
@@ -28,7 +27,6 @@ func NewUploadMonitor(client *globusapi.Client, endpointID string, db store.DB) 
 		endpointID:          endpointID,
 		globusUploads:       db.GlobusUploadsStore(),
 		fileLoads:           db.FileLoadsStore(),
-		globusStatusStore:   db.BackgroundProcessStore(),
 		finishedGlobusTasks: make(map[string]bool),
 	}
 }
@@ -148,19 +146,6 @@ func (m *UploadMonitor) processTransfers(transfers *globusapi.TransferItems) {
 	} else {
 		log.Infof("Created file load (id: %s) for globus upload %s", fl.ID, id)
 	}
-
-	// update relevant background process record.
-	queryIndex := model.GetListBackgroundProcessModel{
-		UserID:           globusUpload.Owner,
-		ProjectID:        globusUpload.ProjectID,
-		BackgroundTaskID: globusUpload.ID,
-	}
-	bpProcessList, _ := m.globusStatusStore.GetListBackgroundProcess(queryIndex)
-	bgProcess := bpProcessList[0]
-	m.globusStatusStore.UpdateStatusBackgroundProcess(bgProcess.ID, "mc_load", "Materials Commons is loading your files in to the project")
-	m.globusStatusStore.SetOkBackgroundProcess(bgProcess.ID, true)
-
-	// need another call here - to get background process record by background_process_id
 
 	// Delete the globus upload request as we have now turned it into a file loading request
 	// and won't have to process this request again. If the server stops while loading the
