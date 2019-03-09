@@ -40,6 +40,20 @@ func NewGlobusController(db store.DB, client *globusapi.Client, basePath, globus
 	}
 }
 
+func (g *GlobusController) CreateGlobusProjectDownloadDir(c echo.Context) error {
+	var req struct {
+		ProjectID string `json:"project_id"`
+	}
+
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
+
+	user := c.Get("User").(model.UserSchema)
+
+	return c.JSON(http.StatusOK, user)
+}
+
 // GetGlobusUploadRequest will retrieve the specified request so long as the
 // user is the owner of the request, or the user has the Admin flag set to true
 func (g *GlobusController) GetGlobusUploadRequest(c echo.Context) error {

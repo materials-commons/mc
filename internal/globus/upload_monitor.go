@@ -113,6 +113,7 @@ func (m *UploadMonitor) processTransfers(transfers *globusapi.TransferItems) {
 		// We've seen this globus task before and already processed it
 		return
 	}
+
 	globusUpload, err := m.globusUploads.GetGlobusUpload(id)
 	if err != nil {
 		// If we find a Globus task, but no corresponding entry in our database that means at some
@@ -148,19 +149,6 @@ func (m *UploadMonitor) processTransfers(transfers *globusapi.TransferItems) {
 	} else {
 		log.Infof("Created file load (id: %s) for globus upload %s", fl.ID, id)
 	}
-
-	// update relevant background process record.
-	queryIndex := model.GetListBackgroundProcessModel{
-		UserID:           globusUpload.Owner,
-		ProjectID:        globusUpload.ProjectID,
-		BackgroundTaskID: globusUpload.ID,
-	}
-	bpProcessList, _ := m.globusStatusStore.GetListBackgroundProcess(queryIndex)
-	bgProcess := bpProcessList[0]
-	m.globusStatusStore.UpdateStatusBackgroundProcess(bgProcess.ID, "mc_load", "Materials Commons is loading your files in to the project")
-	m.globusStatusStore.SetOkBackgroundProcess(bgProcess.ID, true)
-
-	// need another call here - to get background process record by background_process_id
 
 	// Delete the globus upload request as we have now turned it into a file loading request
 	// and won't have to process this request again. If the server stops while loading the

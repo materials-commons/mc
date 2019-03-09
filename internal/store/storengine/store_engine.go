@@ -41,6 +41,7 @@ type DatafilesStoreEngine interface {
 type DatadirsStoreEngine interface {
 	GetFilesForDatadir(projectID, userID, dirID string) ([]model.DatafileSimpleModel, error)
 	GetDatadirForProject(projectID, userID, dirID string) (model.DatadirEntryModel, error)
+	GetDatadirsForProject(projectID, userID string) ([]model.DatadirEntryModel, error)
 	//
 	AddDir(dir model.DatadirSchema) (model.DatadirSchema, error)
 	GetDatadirByPathInProject(path, projectID string) (model.DatadirSchema, error)

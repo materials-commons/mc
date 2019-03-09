@@ -53,3 +53,7 @@ func (s *DatadirsStore) GetDatadirForProject(projectID, userID, dirID string) (m
 func (s *DatadirsStore) GetFilesForDatadir(projectID, userID, dirID string) ([]model.DatafileSimpleModel, error) {
 	return s.ddStoreEngine.GetFilesForDatadir(projectID, userID, dirID)
 }
+
+func (s *DatadirsStore) GetDatadirsForProject(projectID, userID string) ([]model.DatadirEntryModel, error) {
+	return s.ddStoreEngine.GetDatadirsForProject(projectID, userID)
+}
