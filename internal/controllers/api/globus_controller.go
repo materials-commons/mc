@@ -25,7 +25,6 @@ const globusBaseURL = "https://app.globus.org/file-manager"
 type GlobusController struct {
 	client             *globusapi.Client
 	globusUploadsStore *store.GlobusUploadsStore
-	globusStatusStore  *store.BackgroundProcessStore
 	basePath           string
 	globusEndpointID   string
 }
@@ -34,7 +33,6 @@ func NewGlobusController(db store.DB, client *globusapi.Client, basePath, globus
 	return &GlobusController{
 		client:             client,
 		globusUploadsStore: db.GlobusUploadsStore(),
-		globusStatusStore:  db.BackgroundProcessStore(),
 		basePath:           basePath,
 		globusEndpointID:   globusEndpointID,
 	}
@@ -143,17 +141,6 @@ func (g *GlobusController) CreateGlobusUploadRequest(c echo.Context) error {
 		log.Infof("    createAndSetupUploadReq failed: %s", err)
 		return err
 	}
-
-	addRequest := model.AddBackgroundProcessModel{
-		UserID:             user.ID,
-		ProjectID:          req.ProjectID,
-		BackgroundTaskID:   globusResp.ID,
-		BackgroundTaskType: "globus-upload",
-		Status:             "uploading",
-		Message:            "Globus is uploading files to Materials Commons site - See Globus UI for details",
-	}
-
-	g.globusStatusStore.AddBackgroundProcess(addRequest)
 
 	return c.JSON(http.StatusCreated, globusResp)
 }

@@ -17,7 +17,6 @@ type UploadMonitor struct {
 	client              *globusapi.Client
 	globusUploads       *store.GlobusUploadsStore
 	fileLoads           *store.FileLoadsStore
-	globusStatusStore   *store.BackgroundProcessStore
 	endpointID          string
 	finishedGlobusTasks map[string]bool
 }
@@ -28,7 +27,6 @@ func NewUploadMonitor(client *globusapi.Client, endpointID string, db store.DB) 
 		endpointID:          endpointID,
 		globusUploads:       db.GlobusUploadsStore(),
 		fileLoads:           db.FileLoadsStore(),
-		globusStatusStore:   db.BackgroundProcessStore(),
 		finishedGlobusTasks: make(map[string]bool),
 	}
 }
