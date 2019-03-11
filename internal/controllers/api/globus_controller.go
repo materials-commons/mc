@@ -288,5 +288,5 @@ func uploadEndpointPath(uploadID string) string {
 // createUploadEndpointURL creates the url that the front end can use to bring up the globus UI webapp and have the destination
 // panel (right side) pointing to the materials commons endpoint and correct directory. This is used for uploads.
 func (g *GlobusController) createDownloadEndpointURL(path string) string {
-	return fmt.Sprintf("%s?destination_id=%s&destination_path=%s", globusBaseURL, g.globusEndpointID, path)
+	return fmt.Sprintf("%s?origin_id=%s&origin_path=%s", globusBaseURL, g.globusEndpointID, path)
 }
