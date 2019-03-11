@@ -113,7 +113,7 @@ func (e *DatadirsRethinkdb) GetDatadirsForProject(projectID, userID string) ([]m
 	var dirs []model.DatadirEntryModel
 	errMsg := fmt.Sprintf("No directories for project %s", projectID)
 	res, err := r.Table("access").GetAllByIndex("user_project", []interface{}{userID, projectID}).
-		EqJoin([]interface{}{r.Row.Field("project_id")}, r.Table("project2datadir"), r.EqJoinOpts{Index: "project_id"}).Zip().
+		EqJoin("project_id", r.Table("project2datadir"), r.EqJoinOpts{Index: "project_id"}).Zip().
 		EqJoin("datadir_id", r.Table("datadirs")).Zip().Run(e.Session)
 	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
 		return dirs, err

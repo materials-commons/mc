@@ -116,6 +116,8 @@ func cliCmdRoot(cmd *cobra.Command, args []string) {
 	globusMonitor := globus.NewUploadMonitor(globusClient, globusEndpointID, db)
 	globusMonitor.Start(ctx)
 
+	log.Infof("Listening on port %d", port)
+
 	go func() {
 		if err := e.Start(fmt.Sprintf(":%d", port)); err != nil {
 			log.Infof("Shutting down mcserv: %s", err)
@@ -190,6 +192,7 @@ func setupAPIRoutes(e *echo.Echo, db store.DB, mcdir string, client *globusapi.C
 	g.POST("/createGlobusUploadRequest", globusController.CreateGlobusUploadRequest).Name = "createGlobusUploadRequest"
 	g.POST("/getGlobusUploadRequest", globusController.GetGlobusUploadRequest).Name = "getGlobusUploadRequest"
 	g.POST("/listGlobusUploadRequests", globusController.ListGlobusUploadRequests).Name = "listGlobusUploadRequests"
+	g.POST("/createGlobusProjectDownload", globusController.CreateGlobusProjectDownload).Name = "createGlobusProjectDownload"
 }
 
 func createAPIKeyMiddleware(db store.DB) echo.MiddlewareFunc {

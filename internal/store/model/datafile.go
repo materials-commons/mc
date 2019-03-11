@@ -1,6 +1,10 @@
 package model
 
 import (
+	"os"
+	"path/filepath"
+	"strings"
+
 	"github.com/go-ozzo/ozzo-validation"
 	"github.com/materials-commons/mc/pkg/mc"
 	"github.com/pkg/errors"
@@ -24,8 +28,20 @@ type DatafileMediaType struct {
 }
 
 type DatafileSimpleModel struct {
-	ID   string `json:"id" r:"id"`
-	Name string `json:"name" r:"name"`
+	ID     string `json:"id" r:"id"`
+	Name   string `json:"name" r:"name"`
+	UsesID string `json:"usesid" r:"usesid"`
+}
+
+func (m DatafileSimpleModel) FirstMCDirPath() string {
+	mcdir := strings.Split(os.Getenv("MCDIR"), ":")[0]
+	id := m.ID
+	if m.UsesID != "" {
+		id = m.UsesID
+	}
+
+	idSegments := strings.Split(id, "-")
+	return filepath.Join(mcdir, idSegments[1][0:2], idSegments[1][2:4], id)
 }
 
 type AddDatafileModel struct {

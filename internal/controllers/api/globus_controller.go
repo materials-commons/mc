@@ -2,9 +2,13 @@ package api
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
+
+	"github.com/materials-commons/mc/internal/file"
 
 	"github.com/apex/log"
 
@@ -25,6 +29,7 @@ const globusBaseURL = "https://app.globus.org/file-manager"
 type GlobusController struct {
 	client             *globusapi.Client
 	globusUploadsStore *store.GlobusUploadsStore
+	ddirsStore         *store.DatadirsStore
 	basePath           string
 	globusEndpointID   string
 }
@@ -35,21 +40,69 @@ func NewGlobusController(db store.DB, client *globusapi.Client, basePath, globus
 		globusUploadsStore: db.GlobusUploadsStore(),
 		basePath:           basePath,
 		globusEndpointID:   globusEndpointID,
+		ddirsStore:         db.DatadirsStore(),
 	}
 }
 
-func (g *GlobusController) CreateGlobusProjectDownloadDir(c echo.Context) error {
+type globusDownloadResp struct {
+	GlobusURL          string `json:"globus_url"`
+	GlobusEndpointID   string `json:"globus_endpoint_id"`
+	GlobusEndpointPath string `json:"globus_endpoint_path"`
+}
+
+// CreateGlobusProjectDownload creates a unique directory, sets up the projects directory structure
+// and sets links to all its files for globus download. Additionally it adds an Globus "r" ACL to the
+// directory so that only the requesting user can read from it (so that user only has read access, no
+// other users have access to the directory.
+func (g *GlobusController) CreateGlobusProjectDownload(c echo.Context) error {
 	var req struct {
 		ProjectID string `json:"project_id"`
 	}
 
 	if err := c.Bind(&req); err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest)
 	}
 
 	user := c.Get("User").(model.UserSchema)
 
-	return c.JSON(http.StatusOK, user)
+	// Construct path to download to. The path needs to be unique as it will be created on every request.
+	// We construct this by using the project id and appending an random string to it.
+	randomPartOfName := req.ProjectID + randomStr(8)
+	globusPath := fmt.Sprintf("/__download_staging/%s/", randomPartOfName)
+
+	baseDir := filepath.Join(g.basePath, "__download_staging", randomPartOfName)
+
+	projectDownload := file.NewProjectDownload(req.ProjectID, user, g.ddirsStore)
+	if err := projectDownload.CreateProjectDownloadDirectory(baseDir); err != nil {
+		log.Infof("Failed creating download directory %s", err)
+		return ToHttpError(err)
+	}
+
+	if _, _, err := g.globusSetup(globusPath, user.GlobusUser, "r"); err != nil {
+		log.Infof("Failed setting up globus download: %s", err)
+		return ToHttpError(err)
+	}
+
+	resp := globusDownloadResp{
+		GlobusURL:          g.createDownloadEndpointURL(globusPath),
+		GlobusEndpointID:   g.globusEndpointID,
+		GlobusEndpointPath: globusPath,
+	}
+
+	return c.JSON(http.StatusOK, resp)
+}
+
+// Code based on https://www.calhoun.io/creating-random-strings-in-go/
+const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+var seededRand = rand.New(rand.NewSource(time.Now().UnixNano()))
+
+func randomStr(length int) string {
+	b := make([]byte, length)
+	for i := range b {
+		b[i] = charset[seededRand.Intn(len(charset))]
+	}
+	return string(b)
 }
 
 // GetGlobusUploadRequest will retrieve the specified request so long as the
@@ -60,7 +113,7 @@ func (g *GlobusController) GetGlobusUploadRequest(c echo.Context) error {
 	}
 
 	if err := c.Bind(&req); err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest)
 	}
 
 	user := c.Get("User").(model.UserSchema)
@@ -92,7 +145,7 @@ func (g *GlobusController) ListGlobusUploadRequests(c echo.Context) error {
 	)
 
 	if err := c.Bind(&req); err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest)
 	}
 
 	user := c.Get("User").(model.UserSchema)
@@ -177,7 +230,7 @@ func (g *GlobusController) createAndSetupUploadReq(projectID string, user model.
 	}
 
 	globusPath := fmt.Sprintf("/__globus_uploads/%s/", gUploadModel.ID)
-	gUploadModel.GlobusIdentityID, gUploadModel.GlobusAclID, err = g.globusSetup(gUploadModel.ID, globusPath, user.GlobusUser)
+	gUploadModel.GlobusIdentityID, gUploadModel.GlobusAclID, err = g.globusSetup(globusPath, user.GlobusUser, "rw")
 	if err != nil {
 		return resp, err
 	}
@@ -187,8 +240,8 @@ func (g *GlobusController) createAndSetupUploadReq(projectID string, user model.
 	}
 
 	resp.ID = gUploadModel.ID
-	resp.GlobusURL = g.createEndpointURL(gUploadModel.ID)
-	resp.GlobusEndpointPath = endpointPath(gUploadModel.ID)
+	resp.GlobusURL = g.createUploadEndpointURL(gUploadModel.ID)
+	resp.GlobusEndpointPath = uploadEndpointPath(gUploadModel.ID)
 	resp.GlobusEndpointID = g.globusEndpointID
 
 	return resp, nil
@@ -196,7 +249,7 @@ func (g *GlobusController) createAndSetupUploadReq(projectID string, user model.
 
 // globusSetup performs a couple of operations related to globus. It takes the users globus login and translates that into
 // and identity id. The identity id is used to set the ACL on the directory in the end point for materials commons.
-func (g *GlobusController) globusSetup(uploadID, path string, globusUser string) (globusIdentityID string, aclID string, err error) {
+func (g *GlobusController) globusSetup(path, globusUser, permissions string) (globusIdentityID string, aclID string, err error) {
 	identities, err := g.client.GetIdentities([]string{globusUser})
 	if err != nil {
 		return globusIdentityID, aclID, errors.WithMessage(err, fmt.Sprintf("Unable to retrieve globus user from globus api %s", globusUser))
@@ -208,7 +261,7 @@ func (g *GlobusController) globusSetup(uploadID, path string, globusUser string)
 		EndpointID:  g.globusEndpointID,
 		Path:        path,
 		IdentityID:  globusIdentityID,
-		Permissions: "rw",
+		Permissions: permissions,
 	}
 
 	aclRes, err := g.client.AddEndpointACLRule(rule)
@@ -220,14 +273,20 @@ func (g *GlobusController) globusSetup(uploadID, path string, globusUser string)
 	return globusIdentityID, aclRes.AccessID, nil
 }
 
-// createEndpointURL creates the url that the front end can use to bring up the globus UI webapp and have the destination
-// panel (right side) pointing to the materials commons endpoint and correct directory.
-func (g *GlobusController) createEndpointURL(uploadID string) string {
+// createUploadEndpointURL creates the url that the front end can use to bring up the globus UI webapp and have the destination
+// panel (right side) pointing to the materials commons endpoint and correct directory. This is used for uploads.
+func (g *GlobusController) createUploadEndpointURL(uploadID string) string {
 	path := fmt.Sprintf("/__globus_uploads/%s", uploadID)
 	return fmt.Sprintf("%s?destination_id=%s&destination_path=%s", globusBaseURL, g.globusEndpointID, path)
 }
 
-// endpointPath creates the path in the endpoint to give to globus
-func endpointPath(uploadID string) string {
+// uploadEndpointPath returns the upload path in the endpoint to give to globus
+func uploadEndpointPath(uploadID string) string {
 	return fmt.Sprintf("/__globus_uploads/%s/", uploadID)
+}
+
+// createUploadEndpointURL creates the url that the front end can use to bring up the globus UI webapp and have the destination
+// panel (right side) pointing to the materials commons endpoint and correct directory. This is used for uploads.
+func (g *GlobusController) createDownloadEndpointURL(path string) string {
+	return fmt.Sprintf("%s?destination_id=%s&destination_path=%s", globusBaseURL, g.globusEndpointID, path)
 }
