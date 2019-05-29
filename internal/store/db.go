@@ -15,6 +15,7 @@ type DB interface {
 	GlobusUploadsStore() *GlobusUploadsStore
 	BackgroundProcessStore() *BackgroundProcessStore
 	ExperimentsStore() *ExperimentsStore
+	DatasetsStore() *DatasetsStore
 }
 
 type DBRethinkdb struct {
@@ -57,6 +58,10 @@ func (db *DBRethinkdb) ExperimentsStore() *ExperimentsStore {
 	return NewExperimentsStore(storengine.NewExperimentsRethinkdb(db.Session))
 }
 
+func (db *DBRethinkdb) DatasetsStore() *DatasetsStore {
+	return NewDatasetsStore(storengine.NewDatasetsRethinkdb(db.Session))
+}
+
 type DBMemory struct {
 	DBProj              map[string]model.ProjectSchema
 	DBUsers             map[string]model.UserSchema
@@ -66,6 +71,7 @@ type DBMemory struct {
 	DBGlobusUploads     map[string]model.GlobusUploadSchema
 	DBBackgroundProcess map[string]model.BackgroundProcessSchema
 	DBExperiments       map[string]model.ExperimentSchema
+	DBDatasets          map[string]model.DatasetSchema
 }
 
 func NewDBMemory() *DBMemory {
@@ -78,6 +84,7 @@ func NewDBMemory() *DBMemory {
 		DBGlobusUploads:     make(map[string]model.GlobusUploadSchema),
 		DBBackgroundProcess: make(map[string]model.BackgroundProcessSchema),
 		DBExperiments:       make(map[string]model.ExperimentSchema),
+		DBDatasets:          make(map[string]model.DatasetSchema),
 	}
 }
 
@@ -143,6 +150,14 @@ func (db *DBMemory) ExperimentsStore() *ExperimentsStore {
 	}
 
 	return NewExperimentsStore(storengine.NewExperimentsMemoryWithDB(db.DBExperiments))
+}
+
+func (db *DBMemory) DatasetsStore() *DatasetsStore {
+	if db.DBDatasets == nil {
+		return NewDatasetsStore(storengine.NewDatasetsMemory())
+	}
+
+	return NewDatasetsStore(storengine.NewDatasetsMemoryWithDB(db.DBDatasets))
 }
 
 var InMemory = NewDBMemory() // Global for testing purposes, allows a single db to be shared across test instances

@@ -96,3 +96,8 @@ type BackgroundProcessStoreEngine interface {
 type ExperimentsStoreEngine interface {
 	GetExperimentOverviewsForProject(projectID string) ([]model.ExperimentOverviewModel, error)
 }
+
+type DatasetsStoreEngine interface {
+	GetDatadirsForDataset(datasetID string) ([]model.DatadirEntryModel, error)
+	GetDataset(datasetID string) (model.DatasetSchema, error)
+}

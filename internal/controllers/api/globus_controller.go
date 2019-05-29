@@ -30,6 +30,7 @@ type GlobusController struct {
 	client             *globusapi.Client
 	globusUploadsStore *store.GlobusUploadsStore
 	ddirsStore         *store.DatadirsStore
+	dsStore            *store.DatasetsStore
 	basePath           string
 	globusEndpointID   string
 }
@@ -41,6 +42,7 @@ func NewGlobusController(db store.DB, client *globusapi.Client, basePath, globus
 		basePath:           basePath,
 		globusEndpointID:   globusEndpointID,
 		ddirsStore:         db.DatadirsStore(),
+		dsStore:            db.DatasetsStore(),
 	}
 }
 
@@ -72,7 +74,8 @@ func (g *GlobusController) CreateGlobusProjectDownload(c echo.Context) error {
 
 	baseDir := filepath.Join(g.basePath, "__download_staging", randomPartOfName)
 
-	projectDownload := file.NewProjectDownload(req.ProjectID, user, g.ddirsStore)
+	downloadDir := file.NewDownloadDir(req.ProjectID, user, g.ddirsStore)
+	projectDownload := file.NewProjectDownload(downloadDir)
 	if err := projectDownload.CreateProjectDownloadDirectory(baseDir); err != nil {
 		log.Infof("Failed creating download directory %s", err)
 		return ToHttpError(err)
@@ -90,6 +93,44 @@ func (g *GlobusController) CreateGlobusProjectDownload(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, resp)
+}
+
+func (g *GlobusController) CreateGlobusDatasetDownload(c echo.Context) error {
+	var (
+		req struct {
+			DatasetID string `json:"dataset_id"`
+		}
+
+		datasetGlobusPath string
+	)
+
+	if err := c.Bind(&req); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest)
+	}
+
+	user := c.Get("User").(model.UserSchema)
+
+	dataset, err := g.dsStore.GetDataset(req.DatasetID)
+	if err != nil {
+		log.Infof("Failed getting dataset %s", req.DatasetID)
+		return ToHttpError(err)
+	}
+
+	if dataset.Owner != user.ID {
+		log.Infof("User doesn't have permission to create dataset directory")
+		return echo.NewHTTPError(http.StatusUnauthorized)
+	}
+
+	if dataset.Published {
+		datasetGlobusPath = filepath.Join(g.basePath, "__published_datasets/%s", req.DatasetID)
+	} else {
+		datasetGlobusPath = filepath.Join(g.basePath, "__datasets/%s", req.DatasetID)
+	}
+
+	var _ = user
+	var _ = datasetGlobusPath
+
+	return c.JSON(http.StatusOK, req)
 }
 
 // Code based on https://www.calhoun.io/creating-random-strings-in-go/
