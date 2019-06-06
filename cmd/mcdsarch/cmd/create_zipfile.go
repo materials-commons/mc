@@ -95,7 +95,7 @@ func createDatasetZipfile(projectId, datasetId string, session *r.Session) {
 
 		var f model.DatafileSimpleModel
 		for fileCursor.Next(&f) {
-
+			// use selection here
 		}
 	}
 }
