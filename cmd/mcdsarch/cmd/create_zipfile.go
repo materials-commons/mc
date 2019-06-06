@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/apex/log"
+	"github.com/materials-commons/mc/internal/store"
 
 	r "gopkg.in/gorethink/gorethink.v4"
 
@@ -78,9 +79,10 @@ func connectToDB(dbName, dbConnection string) *r.Session {
 }
 
 func createDatasetZipfile(projectId, datasetId string, session *r.Session) {
-
+	dbStore := store.NewDBRethinkdb(session)
+	GetProjectFilesCursor(session, dbStore)
 }
 
-func GetProjectFilesCursor() {
+func GetProjectFilesCursor(session *r.Session, db store.DB) {
 
 }

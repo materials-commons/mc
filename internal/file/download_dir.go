@@ -17,10 +17,11 @@ type DownloadDir struct {
 	ProjectID  string
 	User       model.UserSchema
 	ddirsStore *store.DatadirsStore
+	filter     FileAndDirFilter
 }
 
-func NewDownloadDir(projectID string, user model.UserSchema, ddirsStore *store.DatadirsStore) *DownloadDir {
-	return &DownloadDir{ProjectID: projectID, User: user, ddirsStore: ddirsStore}
+func NewDownloadDir(projectID string, user model.UserSchema, ddirsStore *store.DatadirsStore, filter FileAndDirFilter) *DownloadDir {
+	return &DownloadDir{ProjectID: projectID, User: user, ddirsStore: ddirsStore, filter: filter}
 }
 
 // CreateDownloadDirectory creates a download directory for the given set of directories. It will
@@ -36,18 +37,50 @@ func (d *DownloadDir) CreateDownloadDirectory(basePath string, ddirs []model.Dat
 
 	for _, dir := range dirs {
 		log.Infof("os.MkdirAll %s", dir)
+		if d.filter != nil {
+			// Remove base path because filter expects the path contained in materials commons.
+			// Because there is no assurance how basePath was setup, and we want to remove the
+			// basePath + "/", but we don't know if basePath already contained a "/" at the end
+			// we use filepath.Join to correct the format.eg:
+			//   when basePath = "/a/b/c/" then filepath.Join(basePath, "/") => "/a/b/c"
+			//   when basePath = "/a/b/c" then filepath.Join(basePath, "/") => "/a/b/c"
+			// So this corrects for the case that basePath has a trailing "/". Then we
+			// append the "/" so that we remove the prefix basePath up to and including
+			// the "/" leaving the directory path as it exists in Materials Commons.
+			dirToCheck := strings.TrimPrefix(filepath.Join(basePath, "/")+"/", dir)
+			if !d.filter.IsIncludedDir(dirToCheck) {
+				// There was a filter and the filter doesn't contain this directory so
+				// ignore this directory entry.
+				continue
+			}
+		}
+
 		if err := os.MkdirAll(dir, 0700); err != nil {
 			log.Infof("Failed to create directory %s", dir)
 		}
 	}
 
 	for _, dir := range ddirs {
+		if d.filter != nil {
+			// A filter exists - Check if this directory is excluded in the filter. That way we can skip
+			// retrieving and processing all entries.
+			if !d.filter.IsIncludedDir(dir.Name) {
+				continue
+			}
+		}
 		files, err := d.ddirsStore.GetFilesForDatadir(d.ProjectID, d.User.ID, dir.ID)
 		if err != nil && errors.Cause(err) != mc.ErrNotFound {
 			log.Infof("GetFilesForDatadir(%s, %s, %s) failed: %s", d.ProjectID, d.User.ID, dir.ID, err)
 		}
 
 		for _, file := range files {
+			if d.filter != nil {
+				// A filter exists, check if file should be included, and if not skip it.
+				filePathToCheck := filepath.Join(dir.Name, file.Name)
+				if !d.filter.IsIncludedFile(filePathToCheck) {
+					continue
+				}
+			}
 			linkToPath := filepath.Join(basePath, dir.Name, file.Name)
 			if err := os.Link(file.FirstMCDirPath(), linkToPath); err != nil {
 				log.Infof("Failed to create hard link for file %s/%s", file.FirstMCDirPath(), linkToPath, err)
