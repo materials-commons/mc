@@ -9,9 +9,9 @@ type DatasetSchema struct {
 }
 
 type FileSelection struct {
-	ID            string   `json:"id"`
-	IncludedFiles []string `json:"included_files"`
-	ExcludedFiles []string `json:"excluded_files"`
-	IncludedDirs  []string `json:"included_dirs"`
-	ExcludedDirs  []string `json:"excluded_dirs"`
+	ID           string   `json:"id"`
+	IncludeFiles []string `json:"include_files"`
+	ExcludeFiles []string `json:"exclude_files"`
+	IncludeDirs  []string `json:"include_dirs"`
+	ExcludeDirs  []string `json:"exclude_dirs"`
 }

@@ -18,8 +18,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/materials-commons/mc/internal/store/model"
+
 	"github.com/apex/log"
-	"github.com/materials-commons/mc/internal/store"
 
 	r "gopkg.in/gorethink/gorethink.v4"
 
@@ -79,10 +80,34 @@ func connectToDB(dbName, dbConnection string) *r.Session {
 }
 
 func createDatasetZipfile(projectId, datasetId string, session *r.Session) {
-	dbStore := store.NewDBRethinkdb(session)
-	GetProjectFilesCursor(session, dbStore)
+	//dbStore := store.NewDBRethinkdb(session)
+	cursor, err := GetProjectDirsCursor(projectId, session)
+	if err != nil {
+		log.Fatalf("Unable to retrieve project directories %s", err)
+	}
+
+	var dir model.DatadirSimpleModel
+	for cursor.Next(&dir) {
+		fileCursor, err := GetDirFilesCursor(dir.ID, session)
+		if err != nil {
+			continue
+		}
+
+		var f model.DatafileSimpleModel
+		for fileCursor.Next(&f) {
+
+		}
+	}
 }
 
-func GetProjectFilesCursor(session *r.Session, db store.DB) {
+func GetProjectDirsCursor(projectID string, session *r.Session) (*r.Cursor, error) {
+	return r.Table("project2datadir").GetAllByIndex("project_id", projectID).
+		EqJoin("datadir_id", r.Table("datadirs")).Zip().
+		Run(session)
+}
 
+func GetDirFilesCursor(dirID string, session *r.Session) (*r.Cursor, error) {
+	return r.Table("datadir2datafile").GetAllByIndex("datadir_id", dirID).
+		EqJoin("datafile_id", r.Table("datafiles")).Zip().
+		Run(session)
 }
