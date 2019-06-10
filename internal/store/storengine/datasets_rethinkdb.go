@@ -40,5 +40,24 @@ func (e *DatasetsRethinkdb) GetDataset(datasetID string) (model.DatasetSchema, e
 	defer res.Close()
 
 	err = res.One(&dataset)
+
+	if err != nil {
+		return dataset, err
+	}
+
+	if dataset.SelectionID != "" {
+		var fileSelection model.FileSelection
+		errMsg := fmt.Sprintf("No such Selection %s", dataset.SelectionID)
+
+		res2, err := r.Table("fileselection").Get(dataset.SelectionID).Run(e.Session)
+		if err := checkRethinkdbQueryError(res2, err, errMsg); err != nil {
+			return dataset, err
+		}
+		defer res2.Close()
+		err = res.One(&fileSelection)
+		dataset.FileSelection = fileSelection
+		return dataset, err
+	}
+
 	return dataset, err
 }

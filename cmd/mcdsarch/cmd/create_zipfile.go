@@ -16,7 +16,15 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"time"
+
+	"github.com/materials-commons/mc/internal/store"
+
+	"github.com/materials-commons/mc/internal/file"
+
+	"github.com/materials-commons/mc/internal/ds"
 
 	"github.com/materials-commons/mc/internal/store/model"
 
@@ -35,8 +43,11 @@ var createZipfileCmd = &cobra.Command{
 	Run:   cliCmdCreateZipfile,
 }
 
+// 65 Gigabytes is the max zip file size, this takes into account legacy zip file builds
+const MaxZipfileSize int64 = 1024 * 1024 * 1024 * 65
+
 var (
-	session *r.Session
+	zipfilePath string
 )
 
 func init() {
@@ -45,6 +56,7 @@ func init() {
 	createZipfileCmd.Flags().StringP("project-id", "p", "", "Project id dataset is in")
 	createZipfileCmd.Flags().StringP("db-connection", "c", "localhost:28015", "Database connection string (MCDB_CONNECTION)")
 	createZipfileCmd.Flags().StringP("db-name", "n", "materialscommons", "Database name to use (MCDB_NAME)")
+	createZipfileCmd.Flags().StringP("zipfile", "z", "", "Full path to zipfile to create")
 }
 
 func cliCmdCreateZipfile(cmd *cobra.Command, args []string) {
@@ -54,10 +66,25 @@ func cliCmdCreateZipfile(cmd *cobra.Command, args []string) {
 	datasetId, _ := cmd.Flags().GetString("dataset-id")
 	dbName, _ := cmd.Flags().GetString("db-name")
 	dbConnect, _ := cmd.Flags().GetString("db-connection")
+	zipfilePath, _ = cmd.Flags().GetString("zipfile")
+
+	if file.Exists(zipfilePath) {
+		fmt.Println("Zipfile already exists")
+		return
+	}
 
 	session := connectToDB(dbName, dbConnect)
 
-	createDatasetZipfile(projectId, datasetId, session)
+	db := store.NewDBRethinkdb(session)
+	dataset, err := db.DatasetsStore().GetDataset(datasetId)
+	if err != nil {
+		fmt.Println("Unable to retrieve dataset:", err)
+		os.Exit(1)
+	}
+
+	selection := ds.FromFileSelection(&dataset.FileSelection)
+
+	createDatasetZipfile(projectId, session, selection)
 }
 
 func connectToDB(dbName, dbConnection string) *r.Session {
@@ -79,30 +106,63 @@ func connectToDB(dbName, dbConnection string) *r.Session {
 	return session
 }
 
-func createDatasetZipfile(projectId, datasetId string, session *r.Session) {
-	//dbStore := store.NewDBRethinkdb(session)
-	cursor, err := GetProjectDirsCursor(projectId, session)
+func createDatasetZipfile(projectId string, session *r.Session, selection *ds.Selection) {
+	cursor, err := GetProjectDirsSortedCursor(projectId, session)
 	if err != nil {
 		log.Fatalf("Unable to retrieve project directories %s", err)
 	}
 
+	zipper, err := file.CreateZipper(zipfilePath)
+	if err != nil {
+		fmt.Printf("Unable to create zipfile %s: %s", zipfilePath, err)
+	}
+	defer zipper.Close()
+
 	var dir model.DatadirSimpleModel
 	for cursor.Next(&dir) {
+
+		// Check if dir exists in selection, if not, then check its parent dir, and if that
+		// exists set this dir to the parent dir setting. This reflects recursive selection as
+		// parent directories that are included automatically include all descendants, and parent
+		// directories that are excluded automatically exclude all descendants. These can be
+		// overriden and selection will take that into account.
+		if exists, _ := selection.DirExists(dir.Name); !exists {
+			if exists, included := selection.DirExists(filepath.Dir(dir.Name)); exists {
+				selection.AddDir(dir.Name, included)
+			}
+		}
+
 		fileCursor, err := GetDirFilesCursor(dir.ID, session)
 		if err != nil {
 			continue
 		}
 
+		var totalSize int64 = 0
+
 		var f model.DatafileSimpleModel
 		for fileCursor.Next(&f) {
-			// use selection here
+			totalSize += f.Size
+
+			if totalSize > MaxZipfileSize {
+				zipper.RemoveZip()
+				fmt.Println("Zipfile too big, not building...")
+				return
+			}
+
+			fullMCFilePath := filepath.Join(dir.Name, f.Name)
+			if selection.IsIncludedFile(fullMCFilePath) {
+				if err := zipper.AddToZipfile(f.FirstMCDirPath(), fullMCFilePath); err != nil {
+					fmt.Println(err)
+				}
+			}
 		}
 	}
 }
 
-func GetProjectDirsCursor(projectID string, session *r.Session) (*r.Cursor, error) {
+func GetProjectDirsSortedCursor(projectID string, session *r.Session) (*r.Cursor, error) {
 	return r.Table("project2datadir").GetAllByIndex("project_id", projectID).
 		EqJoin("datadir_id", r.Table("datadirs")).Zip().
+		OrderBy("name").
 		Run(session)
 }
 
