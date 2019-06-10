@@ -125,7 +125,7 @@ func createDatasetZipfile(projectId string, session *r.Session, selection *ds.Se
 		// exists set this dir to the parent dir setting. This reflects recursive selection as
 		// parent directories that are included automatically include all descendants, and parent
 		// directories that are excluded automatically exclude all descendants. These can be
-		// overriden and selection will take that into account.
+		// overridden and selection will take that into account.
 		if exists, _ := selection.DirExists(dir.Name); !exists {
 			if exists, included := selection.DirExists(filepath.Dir(dir.Name)); exists {
 				selection.AddDir(dir.Name, included)
