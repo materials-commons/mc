@@ -70,6 +70,10 @@ func (s *Selection) IsIncludedDir(dirPath string) bool {
 		return false
 	}
 
+	if val, ok := s.Parents[dirPath]; ok {
+		return val
+	}
+
 	val, ok := s.Parents[filepath.Dir(dirPath)]
 	if !ok {
 		return false
