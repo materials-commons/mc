@@ -54,7 +54,7 @@ func (e *DatasetsRethinkdb) GetDataset(datasetID string) (model.DatasetSchema, e
 			return dataset, err
 		}
 		defer res2.Close()
-		err = res.One(&fileSelection)
+		err = res2.One(&fileSelection)
 		dataset.FileSelection = fileSelection
 		return dataset, err
 	}
