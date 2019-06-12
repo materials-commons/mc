@@ -60,8 +60,6 @@ func init() {
 }
 
 func cliCmdCreateZipfile(cmd *cobra.Command, args []string) {
-	fmt.Println("create called")
-
 	projectId, _ := cmd.Flags().GetString("project-id")
 	datasetId, _ := cmd.Flags().GetString("dataset-id")
 	dbName, _ := cmd.Flags().GetString("db-name")
@@ -96,6 +94,7 @@ func connectToDB(dbName, dbConnection string) *r.Session {
 		Timeout:    1 * time.Second,
 		NumRetries: 3,
 	}
+
 	session, err := r.Connect(opts)
 	if err != nil {
 		log.Fatalf("unable to connect to rethinkdb server, database: %s, address: %s, error: %s", dbName, dbConnection, err)
