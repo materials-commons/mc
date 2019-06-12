@@ -74,8 +74,7 @@ func (g *GlobusController) CreateGlobusProjectDownload(c echo.Context) error {
 
 	baseDir := filepath.Join(g.basePath, "__download_staging", randomPartOfName)
 
-	downloadDir := file.NewDownloadDir(req.ProjectID, user, g.ddirsStore, nil)
-	projectDownload := file.NewProjectDownload(downloadDir)
+	projectDownload := file.NewProjectDownload(req.ProjectID, user, g.ddirsStore)
 	if err := projectDownload.CreateProjectDownloadDirectory(baseDir); err != nil {
 		log.Infof("Failed creating download directory %s", err)
 		return ToHttpError(err)
