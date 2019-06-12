@@ -171,9 +171,6 @@ func setupEcho() *echo.Echo {
 func setupInternalAPIRoutes(e *echo.Echo, db store.DB) {
 	g := e.Group("/intapi")
 
-	//uc := &api.UsersController{}
-	//g.POST("/getUserAPIKey", uc.GetUserByAPIKey).Name = "getUserByAPIKey"
-
 	fileLoaderController := api.NewFileLoaderController(db)
 	g.POST("/loadFilesFromDirectory", fileLoaderController.LoadFilesFromDirectory).Name = "loadFilesFromDirectory"
 	g.POST("/getFilesLoadRequest", fileLoaderController.GetFilesLoadRequest).Name = "getFilesLoadRequest"
