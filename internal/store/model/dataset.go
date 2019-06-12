@@ -15,5 +15,5 @@ type FileSelection struct {
 	IncludeFiles []string `json:"include_files" r:"include_files"`
 	ExcludeFiles []string `json:"exclude_files" r:"exclude_files"`
 	IncludeDirs  []string `json:"include_dirs" r:"include_dirs"`
-	ExcludeDirs  []string `json:"exclude_dirs" r:"exclude_dir"`
+	ExcludeDirs  []string `json:"exclude_dirs" r:"exclude_dirs"`
 }
