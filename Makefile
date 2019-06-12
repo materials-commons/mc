@@ -8,6 +8,7 @@ fmt:
 bin: server cli
 
 cli:
+	(cd ./cmd/mcdsarch; go build)
 
 server:
 	(cd ./cmd/mcserv; go build)
