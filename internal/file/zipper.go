@@ -24,7 +24,7 @@ func CreateZipper(zipfilePath string) (*Zipper, error) {
 func (z *Zipper) AddToZipfile(filePath string, pathInZip string) error {
 	data, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		return fmt.Errorf("unable to read file (%s): %s", filePath, err)
+		return fmt.Errorf("unable to read file (%s/%s): %s", filePath, pathInZip, err)
 	}
 
 	zf, err := z.w.Create(pathInZip)
