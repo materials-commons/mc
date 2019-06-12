@@ -14,9 +14,9 @@ func NewDatasetsStore(e storengine.DatasetsStoreEngine) *DatasetsStore {
 }
 
 func (s *DatasetsStore) GetDatadirsForDataset(datasetID string) ([]model.DatadirEntryModel, error) {
-	return s.GetDatadirsForDataset(datasetID)
+	return s.dsStoreEngine.GetDatadirsForDataset(datasetID)
 }
 
 func (s *DatasetsStore) GetDataset(datasetID string) (model.DatasetSchema, error) {
-	return s.GetDataset(datasetID)
+	return s.dsStoreEngine.GetDataset(datasetID)
 }
