@@ -34,7 +34,6 @@ func APIKeyAuth(config APIKeyConfig) echo.MiddlewareFunc {
 			}
 
 			user, err := config.Retriever(value, c)
-			fmt.Println("err retrieving user", err)
 			switch {
 			case err != nil && errors.Cause(err) == mc.ErrNotFound:
 				return echo.ErrUnauthorized
