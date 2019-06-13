@@ -57,3 +57,7 @@ func (e *ProjectsMemory) DeleteProject(id string) error {
 
 	return nil
 }
+
+func (e *ProjectsMemory) GetProjectUsers(id string) ([]model.UserSchema, error) {
+	return []model.UserSchema{}, nil
+}

@@ -40,3 +40,7 @@ func (s *ProjectsStore) AddProject(pModel model.AddProjectModel) (model.ProjectS
 func (s *ProjectsStore) GetProjectSimple(id string) (model.ProjectSimpleModel, error) {
 	return s.pStoreEngine.GetProjectSimple(id)
 }
+
+func (s *ProjectsStore) GetProjectUsers(id string) ([]model.UserSchema, error) {
+	return s.pStoreEngine.GetProjectUsers(id)
+}

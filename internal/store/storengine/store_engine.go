@@ -20,6 +20,7 @@ type ProjectsStoreEngine interface {
 	GetProjectSimple(id string) (model.ProjectSimpleModel, error)
 	AddProject(project model.ProjectSchema) (model.ProjectSchema, error)
 	DeleteProject(id string) error
+	GetProjectUsers(id string) ([]model.UserSchema, error)
 }
 
 type AccessStoreEngine interface {

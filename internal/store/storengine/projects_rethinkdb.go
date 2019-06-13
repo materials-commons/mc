@@ -74,3 +74,18 @@ func (e *ProjectsRethinkdb) DeleteProject(id string) error {
 	resp, err = r.Table("access").GetAllByIndex("project_id", id).Delete().RunWrite(e.Session)
 	return checkRethinkdbWriteError(resp, err, errMsg)
 }
+
+func (e *ProjectsRethinkdb) GetProjectUsers(id string) ([]model.UserSchema, error) {
+	users := make([]model.UserSchema, 0)
+	errMsg := fmt.Sprintf("No such project %s", id)
+	res, err := r.Table("access").GetAllByIndex("project_id", id).
+		EqJoin("user_id", r.Table("users")).Zip().Run(e.Session)
+	if err := checkRethinkdbQueryError(res, err, errMsg); err != nil {
+		return users, err
+	}
+
+	defer res.Close()
+
+	err = res.All(&users)
+	return users, err
+}
