@@ -133,9 +133,6 @@ func (c *Client) AddEndpointACLRule(rule EndpointACLRule) (AddEndpointACLRuleRes
 		return result, nil
 	}
 
-	fmt.Println(resp.RawResponse.StatusCode)
-	fmt.Println(resp)
-
 	err = c.getAPIError(resp, err)
 	if err == ErrGlobusAuth {
 		err = c.reauthAndRedoPost(request, url, true)
