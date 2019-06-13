@@ -94,44 +94,6 @@ func (g *GlobusController) CreateGlobusProjectDownload(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp)
 }
 
-func (g *GlobusController) CreateGlobusDatasetDownload(c echo.Context) error {
-	var (
-		req struct {
-			DatasetID string `json:"dataset_id"`
-		}
-
-		datasetGlobusPath string
-	)
-
-	if err := c.Bind(&req); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest)
-	}
-
-	user := c.Get("User").(model.UserSchema)
-
-	dataset, err := g.dsStore.GetDataset(req.DatasetID)
-	if err != nil {
-		log.Infof("Failed getting dataset %s", req.DatasetID)
-		return ToHttpError(err)
-	}
-
-	if dataset.Owner != user.ID {
-		log.Infof("User doesn't have permission to create dataset directory")
-		return echo.NewHTTPError(http.StatusUnauthorized)
-	}
-
-	if dataset.Published {
-		datasetGlobusPath = filepath.Join(g.basePath, "__published_datasets/%s", req.DatasetID)
-	} else {
-		datasetGlobusPath = filepath.Join(g.basePath, "__datasets/%s", req.DatasetID)
-	}
-
-	var _ = user
-	var _ = datasetGlobusPath
-
-	return c.JSON(http.StatusOK, req)
-}
-
 // Code based on https://www.calhoun.io/creating-random-strings-in-go/
 const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
