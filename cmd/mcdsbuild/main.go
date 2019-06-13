@@ -14,7 +14,7 @@
 
 package main
 
-import "github.com/materials-commons/mc/cmd/mcdsarch/cmd"
+import "github.com/materials-commons/mc/cmd/mcdsbuild/cmd"
 
 func main() {
 	cmd.Execute()
