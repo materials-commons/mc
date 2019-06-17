@@ -1,10 +1,10 @@
 package ds
 
 import (
+	"github.com/apex/log"
 	"os"
 	"path/filepath"
 
-	"github.com/materials-commons/mc/internal/file"
 	"github.com/materials-commons/mc/internal/store/model"
 	r "gopkg.in/gorethink/gorethink.v4"
 )
@@ -53,8 +53,8 @@ func (d *DirLoader) loadDatasetDir(projectID, datasetID string, selection *Selec
 			fullMCFilePath := filepath.Join(dir.Name, f.Name)
 			if selection.IsIncludedFile(fullMCFilePath) {
 				dstDir := filepath.Join(d.basePath, dir.Name)
-				if err := d.moveFile(f.FirstMCDirPath(), dstDir, f.Name); err != nil {
-					// log err?
+				if err := d.linkFile(f.FirstMCDirPath(), dstDir, f.Name); err != nil {
+					log.Infof("Failed to create hard link from %s to %s/%s: %s", f.FirstMCDirPath(), dstDir, f.Name, err)
 				}
 			}
 		}
@@ -62,14 +62,15 @@ func (d *DirLoader) loadDatasetDir(projectID, datasetID string, selection *Selec
 	return nil
 }
 
-func (d *DirLoader) moveFile(src, dstDir, fileName string) error {
+// linkFile will create a hard link to a file and create any directories in the path.
+func (d *DirLoader) linkFile(src, dstDir, fileName string) error {
 	// Check if we need to create the directory
 	if _, ok := d.createdDirs[dstDir]; !ok {
 		d.createdDirs[dstDir] = true
 		_ = os.MkdirAll(dstDir, 0700)
 	}
 
-	return file.MoveFile(src, filepath.Join(dstDir, fileName), false)
+	return os.Link(src, filepath.Join(dstDir, fileName))
 }
 
 func GetProjectDirsSortedCursor(projectID string, session *r.Session) (*r.Cursor, error) {

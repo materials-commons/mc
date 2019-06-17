@@ -12,11 +12,11 @@ import (
 	"path/filepath"
 )
 
-var globusDirectoryCmd = &cobra.Command{
-	Use:   "globus-directory",
-	Short: "Create the globus directory for the given dataset",
-	Long:  "Create the globus directory for the given dataset",
-	Run:   cliCmdGlobusDirectory,
+var createGlobusDatasetCmd = &cobra.Command{
+	Use:   "create-globus-dataset",
+	Short: "Create dataset file structure in globus",
+	Long:  "Create dataset file structure in globus",
+	Run:   cliCmdCreateGlobusDataset,
 }
 
 var (
@@ -27,25 +27,25 @@ var (
 )
 
 func init() {
-	rootCmd.AddCommand(globusDirectoryCmd)
-	globusDirectoryCmd.Flags().StringP("dataset-id", "d", "", "Dataset id to build zipfile for")
-	globusDirectoryCmd.Flags().StringP("project-id", "p", "", "Project id dataset is in")
-	globusDirectoryCmd.Flags().StringP("db-connection", "c", "localhost:28015", "Database connection string (MCDB_CONNECTION)")
-	globusDirectoryCmd.Flags().StringP("db-name", "n", "materialscommons", "Database name to use (MCDB_NAME)")
-	globusDirectoryCmd.Flags().StringP("mcdir", "d", "/mcfs/data/materialscommons", "Database name to use (MCDB_NAME)")
-	globusDirectoryCmd.Flags().BoolP("public", "t", false, "Is dataset public")
+	rootCmd.AddCommand(createGlobusDatasetCmd)
+	createGlobusDatasetCmd.Flags().StringP("dataset-id", "d", "", "Dataset id to build zipfile for")
+	createGlobusDatasetCmd.Flags().StringP("project-id", "p", "", "Project id dataset is in")
+	createGlobusDatasetCmd.Flags().StringP("db-connection", "c", "localhost:28015", "Database connection string (MCDB_CONNECTION)")
+	createGlobusDatasetCmd.Flags().StringP("db-name", "n", "materialscommons", "Database name to use (MCDB_NAME)")
+	createGlobusDatasetCmd.Flags().StringP("mcdir", "m", "/mcfs/data/materialscommons", "Database name to use (MCDB_NAME)")
+	createGlobusDatasetCmd.Flags().BoolP("private", "t", false, "Is dataset a private dataset")
 }
 
-func cliCmdGlobusDirectory(cmd *cobra.Command, args []string) {
+func cliCmdCreateGlobusDataset(cmd *cobra.Command, args []string) {
 	var (
 		datasetGlobusPath string
 	)
 
 	dbName, _ := cmd.Flags().GetString("db-name")
-	dbConnect, _ := cmd.Flags().GetString("db-connect")
+	dbConnect, _ := cmd.Flags().GetString("db-connection")
 	datasetID, _ := cmd.Flags().GetString("dataset-id")
 	projectID, _ := cmd.Flags().GetString("project-id")
-	isPublicDataset, _ := cmd.Flags().GetBool("public")
+	isPrivateDataset, _ := cmd.Flags().GetBool("private")
 	mcdir, _ := cmd.Flags().GetString("mcdir")
 
 	setGlobusParams()
@@ -64,10 +64,10 @@ func cliCmdGlobusDirectory(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
-	if isPublicDataset {
-		datasetGlobusPath = filepath.Join(mcdir, "__published_datasets/%s", datasetID)
+	if isPrivateDataset {
+		datasetGlobusPath = filepath.Join(mcdir, "__datasets", datasetID)
 	} else {
-		datasetGlobusPath = filepath.Join(mcdir, "__datasets/%s", datasetID)
+		datasetGlobusPath = filepath.Join(mcdir, "__published_datasets", datasetID)
 	}
 
 	dsDirLoader := ds.NewDirLoader(datasetGlobusPath, session)
@@ -75,7 +75,7 @@ func cliCmdGlobusDirectory(cmd *cobra.Command, args []string) {
 		// do something
 	}
 
-	if !isPublicDataset {
+	if isPrivateDataset {
 		projectUsers, err := db.ProjectsStore().GetProjectUsers(projectID)
 		if err != nil {
 			// do something
