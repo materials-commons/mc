@@ -117,7 +117,7 @@ func (c *Client) GetIdentities(users []string) (Identities, error) {
 func (c *Client) AddEndpointACLRule(rule EndpointACLRule) (AddEndpointACLRuleResult, error) {
 	req := endpointACLRequest{
 		DataType:      "access",
-		PrincipalType: "identity",
+		PrincipalType: rule.PrincipalType,
 		Principal:     rule.IdentityID,
 		Path:          rule.Path,
 		Permissions:   rule.Permissions,
@@ -155,6 +155,20 @@ func (c *Client) DeleteEndpointACLRule(endpointID string, accessID string) (Dele
 	err = c.getAPIError(resp, err)
 	if err == ErrGlobusAuth {
 		err = c.reauthAndRedoDelete(request, url, true)
+	}
+
+	return result, err
+}
+
+func (c *Client) GetEndpointAccessRules(endpointID string) (EndpointAccessRuleList, error) {
+	url := fmt.Sprintf("%s/endpoint/%s/access_list", transferManagerURLBase, endpointID)
+	var result EndpointAccessRuleList
+	request := r().SetAuthToken(c.token).SetResult(&result)
+	resp, err := request.Get(url)
+
+	err = c.getAPIError(resp, err)
+	if err == ErrGlobusAuth {
+		err = c.reauthAndRedoGet(request, url)
 	}
 
 	return result, err

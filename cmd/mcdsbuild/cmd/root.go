@@ -18,6 +18,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/materials-commons/mc/pkg/globusapi"
+
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -40,6 +42,8 @@ to quickly create a Cobra application.`,
 	//	Run: func(cmd *cobra.Command, args []string) { },
 }
 
+var apiParams globusapi.APIParams
+
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
@@ -51,6 +55,8 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
+
+	apiParams = globusapi.GetAPIParamsFromEnvFatal()
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,

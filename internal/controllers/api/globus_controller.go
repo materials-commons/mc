@@ -260,10 +260,11 @@ func (g *GlobusController) globusSetup(path, globusUser, permissions string) (gl
 	globusIdentityID = identities.Identities[0].ID
 
 	rule := globusapi.EndpointACLRule{
-		EndpointID:  g.globusEndpointID,
-		Path:        path,
-		IdentityID:  globusIdentityID,
-		Permissions: permissions,
+		PrincipalType: globusapi.ACLPrincipalTypeIdentity,
+		EndpointID:    g.globusEndpointID,
+		Path:          path,
+		IdentityID:    globusIdentityID,
+		Permissions:   permissions,
 	}
 
 	aclRes, err := g.client.AddEndpointACLRule(rule)

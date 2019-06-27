@@ -40,10 +40,11 @@ func TestACLs(t *testing.T) {
 
 	for _, test := range tests {
 		rule := globusapi.EndpointACLRule{
-			EndpointID:  testEndpointID,
-			Path:        test.path,
-			IdentityID:  test.identity,
-			Permissions: "rw",
+			PrincipalType: "identity",
+			EndpointID:    testEndpointID,
+			Path:          test.path,
+			IdentityID:    test.identity,
+			Permissions:   "rw",
 		}
 
 		aclRes, err := client.AddEndpointACLRule(rule)
