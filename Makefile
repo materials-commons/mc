@@ -22,6 +22,10 @@ devrun:
 devtest:
 	-reflex -r '\.go$\' -s make test 
 
+devdeploy: bin
+	(cd ./cmd/mcserv; cp mcserv ../../../materialscommons.org/backend/prodbin)
+	(cd ./cmd/mcdsbuild; cp mcdsbuild ../../../materialscommons.org/backend/prodbin)
+
 dep:
 	dep ensure
 
