@@ -42,12 +42,22 @@ func (d *DirLoader) loadDatasetDir(projectID, datasetID string, selection *Selec
 		// overridden and selection will take that into account.
 		fmt.Printf("Checking if %s in selection\n", dir.Name)
 		if exists, _ := selection.DirExists(dir.Name); !exists {
-			fmt.Printf("  Not in selection, now checking parent\n")
-			if exists, included := selection.DirExists(filepath.Dir(dir.Name)); exists {
-				selection.AddDir(dir.Name, included)
-			} else {
-				fmt.Printf("  Parent not in selection either\n")
+			dirName := filepath.Dir(dir.Name)
+			for {
+				if dirName == "." {
+					break
+				}
+				if exists, included := selection.DirExists(filepath.Dir(dir.Name)); exists {
+					selection.AddDir(dirName, included)
+				}
+				dirName = filepath.Dir(dirName)
 			}
+
+			//if exists, included := selection.DirExists(filepath.Dir(dir.Name)); exists {
+			//	selection.AddDir(dir.Name, included)
+			//} else {
+			//	fmt.Printf("  Parent not in selection either\n")
+			//}
 		}
 
 		fileCursor, err := GetDirFilesCursor(dir.ID, d.session)
