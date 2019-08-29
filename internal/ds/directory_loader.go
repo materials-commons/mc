@@ -1,9 +1,11 @@
 package ds
 
 import (
-	"github.com/apex/log"
+	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/apex/log"
 
 	"github.com/materials-commons/mc/internal/store/model"
 	r "gopkg.in/gorethink/gorethink.v4"
@@ -21,6 +23,7 @@ func NewDirLoader(basePath string, session *r.Session) *DirLoader {
 
 func (d *DirLoader) LoadDirFromDataset(dataset model.DatasetSchema, projectID string) error {
 	selection := FromFileSelection(&dataset.FileSelection)
+	fmt.Printf("selection = %#v\n", selection)
 
 	return d.loadDatasetDir(projectID, dataset.ID, selection)
 }
@@ -37,14 +40,19 @@ func (d *DirLoader) loadDatasetDir(projectID, datasetID string, selection *Selec
 		// parent directories that are included automatically include all descendants, and parent
 		// directories that are excluded automatically exclude all descendants. These can be
 		// overridden and selection will take that into account.
+		fmt.Printf("Checking if %s in selection\n", dir.Name)
 		if exists, _ := selection.DirExists(dir.Name); !exists {
+			fmt.Printf("  Not in selection, now checking parent\n")
 			if exists, included := selection.DirExists(filepath.Dir(dir.Name)); exists {
 				selection.AddDir(dir.Name, included)
+			} else {
+				fmt.Printf("  Parent not in selection either\n")
 			}
 		}
 
 		fileCursor, err := GetDirFilesCursor(dir.ID, d.session)
 		if err != nil {
+			fmt.Printf("GetDirFilesCursor returned error %s\n", err)
 			continue
 		}
 
