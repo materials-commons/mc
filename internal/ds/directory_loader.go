@@ -40,7 +40,6 @@ func (d *DirLoader) loadDatasetDir(projectID, datasetID string, selection *Selec
 		// parent directories that are included automatically include all descendants, and parent
 		// directories that are excluded automatically exclude all descendants. These can be
 		// overridden and selection will take that into account.
-		fmt.Printf("Checking if %s in selection\n", dir.Name)
 		if exists, _ := selection.DirExists(dir.Name); !exists {
 			dirName := filepath.Dir(dir.Name)
 			for {
@@ -52,31 +51,21 @@ func (d *DirLoader) loadDatasetDir(projectID, datasetID string, selection *Selec
 				}
 				dirName = filepath.Dir(dirName)
 			}
-
-			//if exists, included := selection.DirExists(filepath.Dir(dir.Name)); exists {
-			//	selection.AddDir(dir.Name, included)
-			//} else {
-			//	fmt.Printf("  Parent not in selection either\n")
-			//}
 		}
 
 		fileCursor, err := GetDirFilesCursor(dir.ID, d.session)
 		if err != nil {
-			fmt.Printf("GetDirFilesCursor returned error %s\n", err)
 			continue
 		}
 
 		var f model.DatafileSimpleModel
 		for fileCursor.Next(&f) {
 			fullMCFilePath := filepath.Join(dir.Name, f.Name)
-			fmt.Printf("Checking if file is included %s\n", fullMCFilePath)
 			if selection.IsIncludedFile(fullMCFilePath) {
 				dstDir := filepath.Join(d.basePath, dir.Name)
 				if err := d.linkFile(f.FirstMCDirPath(), dstDir, f.Name); err != nil {
 					log.Infof("Failed to create hard link from %s to %s/%s: %s", f.FirstMCDirPath(), dstDir, f.Name, err)
 				}
-			} else {
-				fmt.Println("    Not included...")
 			}
 		}
 	}
