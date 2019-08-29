@@ -59,11 +59,14 @@ func (d *DirLoader) loadDatasetDir(projectID, datasetID string, selection *Selec
 		var f model.DatafileSimpleModel
 		for fileCursor.Next(&f) {
 			fullMCFilePath := filepath.Join(dir.Name, f.Name)
+			fmt.Printf("Checking if file is included %s\n", fullMCFilePath)
 			if selection.IsIncludedFile(fullMCFilePath) {
 				dstDir := filepath.Join(d.basePath, dir.Name)
 				if err := d.linkFile(f.FirstMCDirPath(), dstDir, f.Name); err != nil {
 					log.Infof("Failed to create hard link from %s to %s/%s: %s", f.FirstMCDirPath(), dstDir, f.Name, err)
 				}
+			} else {
+				fmt.Println("    Not included...")
 			}
 		}
 	}
