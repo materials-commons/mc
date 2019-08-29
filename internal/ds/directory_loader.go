@@ -47,8 +47,8 @@ func (d *DirLoader) loadDatasetDir(projectID, datasetID string, selection *Selec
 				if dirName == "." {
 					break
 				}
-				if exists, included := selection.DirExists(filepath.Dir(dir.Name)); exists {
-					selection.AddDir(dirName, included)
+				if exists, included := selection.DirExists(filepath.Dir(dirName)); exists {
+					selection.AddDir(dir.Name, included)
 				}
 				dirName = filepath.Dir(dirName)
 			}
