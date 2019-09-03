@@ -70,6 +70,23 @@ func (s *Selection) IsIncludedDir(dirPath string) bool {
 		return false
 	}
 
+	dirName := filepath.Dir(dirPath)
+	for {
+		if dirName == "." {
+			break
+		}
+
+		if _, ok := s.IncludeDirs[dirName]; ok {
+			return true
+		}
+
+		if _, ok := s.ExcludeDirs[dirName]; ok {
+			return false
+		}
+
+		dirName = filepath.Dir(dirName)
+	}
+
 	if val, ok := s.Parents[dirPath]; ok {
 		return val
 	}
