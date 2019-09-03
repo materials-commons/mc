@@ -1,7 +1,6 @@
 package ds
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -23,8 +22,6 @@ func NewDirLoader(basePath string, session *r.Session) *DirLoader {
 
 func (d *DirLoader) LoadDirFromDataset(dataset model.DatasetSchema, projectID string) error {
 	selection := FromFileSelection(&dataset.FileSelection)
-	fmt.Printf("selection = %#v\n", selection)
-
 	return d.loadDatasetDir(projectID, dataset.ID, selection)
 }
 
@@ -47,7 +44,6 @@ func (d *DirLoader) loadDatasetDir(projectID, datasetID string, selection *Selec
 					break
 				}
 				if exists, included := selection.DirExists(filepath.Dir(dirName)); exists {
-					fmt.Println("adding dir", dir.Name, included)
 					selection.AddDir(dir.Name, included)
 				}
 				dirName = filepath.Dir(dirName)
@@ -62,9 +58,7 @@ func (d *DirLoader) loadDatasetDir(projectID, datasetID string, selection *Selec
 		var f model.DatafileSimpleModel
 		for fileCursor.Next(&f) {
 			fullMCFilePath := filepath.Join(dir.Name, f.Name)
-			fmt.Println("Looking at file", fullMCFilePath)
 			if selection.IsIncludedFile(fullMCFilePath) {
-				fmt.Println("   Is Included")
 				dstDir := filepath.Join(d.basePath, dir.Name)
 				if err := d.linkFile(f.FirstMCDirPath(), dstDir, f.Name); err != nil {
 					log.Infof("Failed to create hard link from %s to %s/%s: %s", f.FirstMCDirPath(), dstDir, f.Name, err)
