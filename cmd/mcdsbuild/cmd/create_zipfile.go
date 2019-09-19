@@ -140,6 +140,10 @@ func createDatasetZipfile(projectId string, session *r.Session, selection *ds.Se
 
 		var f model.DatafileSimpleModel
 		for fileCursor.Next(&f) {
+			if !f.Current {
+				continue
+			}
+
 			totalSize += f.Size
 
 			if totalSize > MaxZipfileSize {

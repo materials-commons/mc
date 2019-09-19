@@ -28,10 +28,11 @@ type DatafileMediaType struct {
 }
 
 type DatafileSimpleModel struct {
-	ID     string `json:"id" r:"id"`
-	Name   string `json:"name" r:"name"`
-	UsesID string `json:"usesid" r:"usesid"`
-	Size   int64  `json:"size" r:"size"`
+	ID      string `json:"id" r:"id"`
+	Name    string `json:"name" r:"name"`
+	UsesID  string `json:"usesid" r:"usesid"`
+	Size    int64  `json:"size" r:"size"`
+	Current bool   `db:"current" json:"current" r:"current"`
 }
 
 func (m DatafileSimpleModel) FirstMCDirPath() string {
