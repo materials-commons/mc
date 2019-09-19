@@ -111,6 +111,10 @@ func createDatasetZipfile(projectId string, session *r.Session, selection *ds.Se
 		log.Fatalf("Unable to retrieve project directories %s", err)
 	}
 
+	if err := createZipfileDir(zipfilePath); err != nil {
+		log.Fatalf("Unable to create directory %s", filepath.Dir(zipfilePath))
+	}
+
 	zipper, err := file.CreateZipper(zipfilePath)
 	if err != nil {
 		fmt.Printf("Unable to create zipfile %s: %s", zipfilePath, err)
@@ -173,4 +177,9 @@ func GetDirFilesCursor(dirID string, session *r.Session) (*r.Cursor, error) {
 	return r.Table("datadir2datafile").GetAllByIndex("datadir_id", dirID).
 		EqJoin("datafile_id", r.Table("datafiles")).Zip().
 		Run(session)
+}
+
+func createZipfileDir(zipfilePath string) error {
+	dir := filepath.Dir(zipfilePath)
+	return os.MkdirAll(dir, 0700)
 }
