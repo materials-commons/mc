@@ -20,3 +20,7 @@ func (s *DatasetsStore) GetDatadirsForDataset(datasetID string) ([]model.Datadir
 func (s *DatasetsStore) GetDataset(datasetID string) (model.DatasetSchema, error) {
 	return s.dsStoreEngine.GetDataset(datasetID)
 }
+
+func (s *DatasetsStore) SetDatasetZipfile(datasetID string, size int64, name string) error {
+	return s.dsStoreEngine.SetDatasetZipfile(datasetID, size, name)
+}

@@ -57,6 +57,9 @@ func (d *DirLoader) loadDatasetDir(projectID, datasetID string, selection *Selec
 
 		var f model.DatafileSimpleModel
 		for fileCursor.Next(&f) {
+			if !f.Current {
+				continue
+			}
 			fullMCFilePath := filepath.Join(dir.Name, f.Name)
 			if selection.IsIncludedFile(fullMCFilePath) {
 				dstDir := filepath.Join(d.basePath, dir.Name)

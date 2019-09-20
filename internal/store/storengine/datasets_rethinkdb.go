@@ -61,3 +61,15 @@ func (e *DatasetsRethinkdb) GetDataset(datasetID string) (model.DatasetSchema, e
 
 	return dataset, err
 }
+
+func (e *DatasetsRethinkdb) SetDatasetZipfile(datasetID string, size int64, name string) error {
+	errMsg := fmt.Sprintf("failed updating dataset %s", datasetID)
+	ds, err := e.GetDataset(datasetID)
+	if err != nil {
+		return err
+	}
+	ds.Zip.Size = size
+	ds.Zip.Filename = name
+	resp, err := r.Table("datasets").Get(datasetID).Update(ds, r.UpdateOpts{ReturnChanges: true}).RunWrite(e.Session)
+	return checkRethinkdbUpdateError(resp, err, errMsg)
+}

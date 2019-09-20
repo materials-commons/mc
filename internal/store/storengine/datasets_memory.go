@@ -23,3 +23,7 @@ func (e *DatasetsMemory) GetDatadirsForDataset(datasetID string) ([]model.Datadi
 func (e *DatasetsMemory) GetDataset(datasetID string) (model.DatasetSchema, error) {
 	return model.DatasetSchema{}, nil
 }
+
+func (e *DatasetsMemory) SetDatasetZipfile(datasetID string, size int64, name string) error {
+	return nil
+}

@@ -66,11 +66,6 @@ func cliCmdCreateZipfile(cmd *cobra.Command, args []string) {
 	dbConnect, _ := cmd.Flags().GetString("db-connection")
 	zipfilePath, _ = cmd.Flags().GetString("zipfile")
 
-	if file.Exists(zipfilePath) {
-		fmt.Println("Zipfile already exists")
-		return
-	}
-
 	session := connectToDB(dbName, dbConnect)
 
 	db := store.NewDBRethinkdb(session)
@@ -83,6 +78,7 @@ func cliCmdCreateZipfile(cmd *cobra.Command, args []string) {
 	selection := ds.FromFileSelection(&dataset.FileSelection)
 
 	createDatasetZipfile(projectId, session, selection)
+	updateDatasetSizeAndName(db, datasetId)
 }
 
 func connectToDB(dbName, dbConnection string) *r.Session {
@@ -182,4 +178,16 @@ func GetDirFilesCursor(dirID string, session *r.Session) (*r.Cursor, error) {
 func createZipfileDir(zipfilePath string) error {
 	dir := filepath.Dir(zipfilePath)
 	return os.MkdirAll(dir, 0700)
+}
+
+func updateDatasetSizeAndName(db *store.DBRethinkdb, datasetID string) {
+	name := filepath.Base(zipfilePath)
+	finfo, err := os.Stat(zipfilePath)
+	if err != nil {
+		return
+	}
+
+	size := finfo.Size()
+
+	var _ = db.DatasetsStore().SetDatasetZipfile(datasetID, size, name)
 }

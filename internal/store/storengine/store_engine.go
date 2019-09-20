@@ -101,4 +101,5 @@ type ExperimentsStoreEngine interface {
 type DatasetsStoreEngine interface {
 	GetDatadirsForDataset(datasetID string) ([]model.DatadirEntryModel, error)
 	GetDataset(datasetID string) (model.DatasetSchema, error)
+	SetDatasetZipfile(datasetID string, size int64, name string) error
 }
