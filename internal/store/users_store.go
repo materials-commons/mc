@@ -5,7 +5,6 @@ import (
 
 	"github.com/materials-commons/mc/internal/store/storengine"
 
-	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/hashicorp/go-uuid"
 	"github.com/materials-commons/mc/internal/store/model"
 	"golang.org/x/crypto/bcrypt"
@@ -47,35 +46,6 @@ func (s *UsersStore) GetAndVerifyUser(id, password string) (model.UserSchema, er
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	return user, err
-}
-
-func (s *UsersStore) ModifyUserFullname(id, fullname string) (model.UserSchema, error) {
-	if err := validation.Validate(fullname, validation.Required, validation.Length(1, 40)); err != nil {
-		return model.UserSchema{}, err
-	}
-	return s.UsersStoreEngine.UpdateUserFullname(id, fullname, time.Now())
-}
-
-func (s *UsersStore) ModifyUserPassword(id, password string) (model.UserSchema, error) {
-	if err := validation.Validate(password, validation.Required, validation.Length(1, 100)); err != nil {
-		return model.UserSchema{}, err
-	}
-
-	passwordHash, err := generatePasswordHash(password)
-	if err != nil {
-		return model.UserSchema{}, err
-	}
-
-	return s.UsersStoreEngine.UpdateUserPassword(id, passwordHash, time.Now())
-}
-
-func (s *UsersStore) ModifyUserAPIKey(id string) (model.UserSchema, error) {
-	apikey, err := uuid.GenerateUUID()
-	if err != nil {
-		return model.UserSchema{}, err
-	}
-
-	return s.UsersStoreEngine.UpdateUserAPIKey(id, apikey, time.Now())
 }
 
 func prepareUser(userModel model.AddUserModel) (model.UserSchema, error) {

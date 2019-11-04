@@ -47,15 +47,6 @@
   version = "v3.4.0"
 
 [[projects]]
-  name = "github.com/gocraft/dbr"
-  packages = [
-    ".",
-    "dialect"
-  ]
-  revision = "a0fd650918f6287ffe111d1c7b66bb755ff3be4a"
-  version = "v2.2"
-
-[[projects]]
   name = "github.com/golang/protobuf"
   packages = ["proto"]
   revision = "aa810b61a9c79d51363740d207bb46cf8e620ed5"
@@ -310,6 +301,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a392a6decde84056b2844bad0feb12824d69478060e74e12309e5406efc30190"
+  inputs-digest = "fbee4f1a17cf74c2817b2af6a1f6b5865d80d789215cef6fd0e64b5b53ca99db"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -13,8 +13,6 @@ type DB interface {
 	DatadirsStore() *DatadirsStore
 	FileLoadsStore() *FileLoadsStore
 	GlobusUploadsStore() *GlobusUploadsStore
-	BackgroundProcessStore() *BackgroundProcessStore
-	ExperimentsStore() *ExperimentsStore
 	DatasetsStore() *DatasetsStore
 }
 
@@ -48,14 +46,6 @@ func (db *DBRethinkdb) FileLoadsStore() *FileLoadsStore {
 
 func (db *DBRethinkdb) GlobusUploadsStore() *GlobusUploadsStore {
 	return NewGlobusUploadsStore(storengine.NewGlobusUploadsRethinkdb(db.Session))
-}
-
-func (db *DBRethinkdb) BackgroundProcessStore() *BackgroundProcessStore {
-	return NewBackgroundProcessStore(storengine.NewBackgroundProcessRethinkdb(db.Session))
-}
-
-func (db *DBRethinkdb) ExperimentsStore() *ExperimentsStore {
-	return NewExperimentsStore(storengine.NewExperimentsRethinkdb(db.Session))
 }
 
 func (db *DBRethinkdb) DatasetsStore() *DatasetsStore {
@@ -134,22 +124,6 @@ func (db *DBMemory) GlobusUploadsStore() *GlobusUploadsStore {
 	}
 
 	return NewGlobusUploadsStore(storengine.NewGlobusUploadsMemoryWithDB(db.DBGlobusUploads))
-}
-
-func (db *DBMemory) BackgroundProcessStore() *BackgroundProcessStore {
-	if db.DBBackgroundProcess == nil {
-		return NewBackgroundProcessStore(storengine.NewBackgroundProcessMemory())
-	}
-
-	return NewBackgroundProcessStore(storengine.NewBackgroundProcessMemoryWithDB(db.DBBackgroundProcess))
-}
-
-func (db *DBMemory) ExperimentsStore() *ExperimentsStore {
-	if db.DBExperiments == nil {
-		return NewExperimentsStore(storengine.NewExperimentsMemory())
-	}
-
-	return NewExperimentsStore(storengine.NewExperimentsMemoryWithDB(db.DBExperiments))
 }
 
 func (db *DBMemory) DatasetsStore() *DatasetsStore {

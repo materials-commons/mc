@@ -26,24 +26,6 @@ func TestUsersStoreEngineRethinkdb_GetUserByAPIKey(t *testing.T) {
 	e.Session.Close()
 }
 
-func TestUsersStoreEngineRethinkdb_ModifyUserFullname(t *testing.T) {
-	e := createRethinkdbUsersStoreEngine()
-	testUsersStoreEngineModifyUserFullname(t, e)
-	e.Session.Close()
-}
-
-func TestUsersStoreEngineRethinkdb_ModifyUserPassword(t *testing.T) {
-	e := createRethinkdbUsersStoreEngine()
-	testUsersStoreEngineModifyUserPassword(t, e)
-	e.Session.Close()
-}
-
-func TestUsersStoreEngineRethinkdb_ModifyUserAPIKey(t *testing.T) {
-	e := createRethinkdbUsersStoreEngine()
-	testUsersStoreEngineModifyUserAPIKey(t, e)
-	e.Session.Close()
-}
-
 func createRethinkdbUsersStoreEngine() *storengine.UsersRethinkdb {
 	session, _ := r.Connect(r.ConnectOpts{Database: "mctest", Address: "localhost:30815"})
 	r.SetTags("r")
